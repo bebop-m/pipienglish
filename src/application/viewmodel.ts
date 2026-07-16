@@ -57,6 +57,7 @@ export interface FarmHomeViewModel {
 export type FarmHomeEvent =
   | { type: 'NAME_HEN'; name: string }
   | { type: 'START_DAILY_LESSON' }
+  | { type: 'OPEN_HANDWRITING_GAME' }
   | { type: 'DAILY_LESSON_COMPLETED'; newWords: number; reviews: number }
   | { type: 'OPEN_EGG_PANEL' }
   | { type: 'CLOSE_EGG_PANEL' }

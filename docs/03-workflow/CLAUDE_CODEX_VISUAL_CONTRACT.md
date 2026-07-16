@@ -61,6 +61,7 @@ interface FarmHomeViewModel {
 
 type FarmHomeEvent =
   | { type: "START_DAILY_LESSON" }
+  | { type: "OPEN_HANDWRITING_GAME" }
   | { type: "ALLOCATE_EGG"; use: "hatch" | "cook" }
   | { type: "MOVE_CHICK"; chickId: string; x: number; y: number }
   | { type: "OPEN_RESCUE" }

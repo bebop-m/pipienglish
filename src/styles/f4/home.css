@@ -146,6 +146,190 @@
   box-shadow: 0 7px 0 rgba(48, 41, 37, 0.2), 0 15px 32px rgba(77, 55, 34, 0.14);
 }
 
+.name-board-f4,
+.complete-board-f4 {
+  position: absolute;
+  z-index: 65;
+  top: 104px;
+  left: 31px;
+  width: 405px;
+  padding: 24px 25px 23px;
+  border: 2.5px solid #705644;
+  border-radius: 18px 22px 20px 16px;
+  background:
+    radial-gradient(rgba(112, 86, 68, 0.09) 1px, transparent 1px) 2px 3px / 17px 17px,
+    rgba(255, 247, 221, 0.98);
+  box-shadow: 0 7px 0 rgba(89, 64, 45, 0.19), 0 18px 36px rgba(66, 47, 35, 0.14);
+  transform: rotate(-0.35deg);
+}
+
+.name-board-pin-f4 {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 24px;
+  height: 17px;
+  border: 2px solid #705644;
+  border-radius: 50%;
+  background: #e8bd68;
+  box-shadow: 0 2px 0 rgba(89, 64, 45, 0.18);
+  transform: translateX(-50%);
+}
+
+.name-board-f4 h1,
+.complete-board-f4 h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 29px;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.name-board-f4 > p:not(.k-eyebrow),
+.complete-board-f4 > p:not(.complete-kicker-f4) {
+  margin: 9px 0 17px;
+  color: var(--ink-soft);
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.55;
+}
+
+.name-board-f4 form {
+  display: grid;
+  gap: 8px;
+}
+
+.name-board-f4 label {
+  color: #7c5944;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.name-input-row-f4 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 142px;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.name-input-row-f4 input {
+  min-width: 0;
+  height: 58px;
+  padding: 0 17px;
+  border: 2px solid #8a6b54;
+  border-radius: 16px;
+  outline: 0;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--ink);
+  font: 850 20px/1 var(--f4-font);
+  box-shadow: inset 0 2px 0 rgba(112, 86, 68, 0.08);
+}
+
+.name-input-row-f4 input::placeholder { color: #aa9684; }
+.name-input-row-f4 input:focus { border-color: #d1774f; outline: 5px solid rgba(255, 255, 255, 0.83); }
+.name-input-row-f4 .k-button { min-height: 58px; padding: 0 12px; font-size: 17px; }
+.name-input-row-f4 .k-button:disabled { opacity: 0.62; cursor: wait; }
+.name-board-f4 form small { min-height: 18px; color: #95634c; font-size: 12px; font-weight: 750; }
+
+.complete-board-f4 {
+  top: 91px;
+  width: 382px;
+  padding-top: 31px;
+  text-align: center;
+  transform: rotate(0.35deg);
+}
+
+.complete-ribbon-f4 {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  padding: 7px 19px;
+  border: 2px solid #705644;
+  border-radius: 999px;
+  background: #f3c966;
+  box-shadow: 0 4px 0 rgba(89, 64, 45, 0.17);
+  color: #8c5339;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  transform: translateX(-50%) rotate(-1deg);
+}
+
+.complete-kicker-f4 {
+  margin: 0 0 4px;
+  color: #c96748;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.complete-board-f4 h1 { font-size: 38px; color: #b55e3d; }
+
+.complete-stats-f4 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.complete-stats-f4 span {
+  display: grid;
+  gap: 1px;
+  padding: 8px 5px;
+  border-radius: 13px;
+  background: rgba(241, 218, 155, 0.42);
+  color: #735e4e;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.complete-stats-f4 strong { color: #b96040; font-size: 19px; }
+
+.handwriting-sign-f4 {
+  position: relative;
+  width: 100%;
+  min-height: 68px;
+  display: grid;
+  grid-template-columns: 45px 1fr;
+  grid-template-rows: auto auto;
+  align-items: center;
+  padding: 9px 17px 9px 12px;
+  border: 2.5px solid #5f4433;
+  border-radius: 12px 17px 13px 15px;
+  cursor: pointer;
+  background: #c98a4d;
+  box-shadow: inset 0 4px 0 rgba(255, 237, 189, 0.24), 0 6px 0 rgba(77, 51, 34, 0.24);
+  text-align: left;
+  transition: transform 130ms ease, box-shadow 130ms ease;
+}
+
+.handwriting-sign-f4::after {
+  content: '';
+  position: absolute;
+  inset: 8px 14px;
+  border-top: 1px solid rgba(106, 66, 40, 0.25);
+  border-bottom: 1px solid rgba(255, 231, 177, 0.23);
+  pointer-events: none;
+}
+
+.handwriting-sign-f4 > span {
+  grid-row: 1 / 3;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff2c8;
+  font-size: 23px;
+}
+
+.handwriting-sign-f4 strong,
+.handwriting-sign-f4 small { position: relative; z-index: 1; }
+.handwriting-sign-f4 strong { font-size: 17px; }
+.handwriting-sign-f4 small { color: #5f493a; font-size: 11px; font-weight: 800; }
+.handwriting-sign-f4:hover { transform: translateY(-2px) rotate(-0.25deg); }
+.handwriting-sign-f4:active { transform: translateY(4px) scale(0.992); box-shadow: inset 0 4px 0 rgba(255, 237, 189, 0.2), 0 2px 0 rgba(77, 51, 34, 0.24); }
+.handwriting-sign-f4:focus-visible { outline: 5px solid rgba(255, 255, 255, 0.92); outline-offset: 3px; }
+
 .k-eyebrow {
   display: flex;
   align-items: center;

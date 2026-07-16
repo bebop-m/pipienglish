@@ -17,7 +17,11 @@ function getSynthesis(): SpeechSynthesis | null {
 const browserSynthesis = getSynthesis()
 if (browserSynthesis) {
   browserSynthesis.addEventListener('voiceschanged', () => {
-    voice = selectEnglishVoice(browserSynthesis.getVoices())
+    try {
+      voice = selectEnglishVoice(browserSynthesis.getVoices())
+    } catch {
+      voice = null
+    }
   })
 }
 
@@ -26,12 +30,16 @@ export function speak(text: string): boolean {
   const synthesis = getSynthesis()
   if (!text.trim() || !synthesis || typeof SpeechSynthesisUtterance === 'undefined') return false
 
-  synthesis.cancel()
-  const utter = new SpeechSynthesisUtterance(text)
-  if (!voice) voice = selectEnglishVoice(synthesis.getVoices())
-  if (voice) utter.voice = voice
-  utter.lang = 'en-US'
-  utter.rate = 0.85
-  synthesis.speak(utter)
-  return true
+  try {
+    synthesis.cancel()
+    const utter = new SpeechSynthesisUtterance(text)
+    if (!voice) voice = selectEnglishVoice(synthesis.getVoices())
+    if (voice) utter.voice = voice
+    utter.lang = 'en-US'
+    utter.rate = 0.85
+    synthesis.speak(utter)
+    return true
+  } catch {
+    return false
+  }
 }

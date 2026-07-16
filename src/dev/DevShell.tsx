@@ -71,6 +71,12 @@ export function DevFarmView({ bridge }: { bridge: FarmHomeBridge }) {
           }
           window.location.reload()
         })}
+        {import.meta.env.DEV && btn('[测试] 关闭自主运动', () => {
+          dispatch({ type: 'SET_MOTION', enabled: false })
+        }, !vm.motionEnabled)}
+        {import.meta.env.DEV && btn('[测试] 把 dev-c 放到 720,620', () => {
+          dispatch({ type: 'CHICK_PLACED', chickId: 'dev-c', home: { x: 720, y: 620 } })
+        }, !vm.chicksVisible.some(chick => chick.chickId === 'dev-c'))}
       </div>
 
       <div className="dev-row">

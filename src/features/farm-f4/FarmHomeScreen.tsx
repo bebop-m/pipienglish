@@ -1,5 +1,5 @@
 // F4 首页容器:只做 VM/事件桥接与阶段状态路由。
-// 阶段 C 仅 daily_incomplete 进入正式 F4 视觉;其余两态在阶段 F 前仍保持内部开发壳。
+// 阶段 F 起，首页三种状态都进入正式 F4 视觉；开发壳仅显式查询参数可见。
 
 import { useFarmHome } from './useFarmHome'
 import { DevFarmView } from '../../dev/DevShell'
@@ -11,9 +11,11 @@ export function FarmHomeScreen() {
   const forceDevShell = import.meta.env.DEV && new URLSearchParams(window.location.search).has('dev-shell')
   return (
     <FarmStageShell>
-      {!forceDevShell && bridge.vm?.state === 'daily_incomplete'
-        ? <FarmHomeDaily vm={bridge.vm} dispatch={bridge.dispatch} />
-        : <DevFarmView bridge={bridge} />}
+      {forceDevShell
+        ? <DevFarmView bridge={bridge} />
+        : bridge.vm
+          ? <FarmHomeDaily vm={bridge.vm} dispatch={bridge.dispatch} />
+          : null}
     </FarmStageShell>
   )
 }

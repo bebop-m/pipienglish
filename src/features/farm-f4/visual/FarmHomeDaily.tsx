@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import type { CookingState } from '../../../domain/types'
 import type { FarmHomeEvent, FarmHomeViewModel } from '../../../application/viewmodel'
+import { f4AssetUrl } from '../assetUrl'
 import { FarmActors } from './FarmActors'
 import '../../../styles/f4/home.css'
 
@@ -60,7 +61,7 @@ function FeedFlight({ targetId, motionEnabled, onArrive }: {
 
   return (
     <>
-      <img ref={foodRef} className="flying-food-f4" src="/assets/f4/fried-egg-f4.png" alt="" />
+      <img ref={foodRef} className="flying-food-f4" src={f4AssetUrl('fried-egg-f4.png')} alt="" />
       <span className="f4-sr-only" role="status">正在把煎蛋送给小鸡</span>
     </>
   )
@@ -132,7 +133,7 @@ function EggPanel({ vm, dispatch, onFeed }: FarmHomeDailyProps & { onFeed: () =>
         <button className="panel-close-f4" type="button" aria-label="关闭鸡蛋篮" onClick={() => dispatch({ type: 'CLOSE_EGG_PANEL' })}>×</button>
         <p className="k-eyebrow">小皮的鸡蛋篮</p>
         <h2 id="egg-panel-title-f4">鸡蛋要怎么用？</h2>
-        <div className="egg-balance-f4"><img src="/assets/f4/egg-f4-v2.png" alt="" />剩余 <strong>{vm.eggStock}</strong> 颗</div>
+        <div className="egg-balance-f4"><img src={f4AssetUrl('egg-f4-v2.png')} alt="" />剩余 <strong>{vm.eggStock}</strong> 颗</div>
 
         {!showCook && state === 'empty' ? (
           <div className="egg-choice-view-f4">
@@ -146,11 +147,11 @@ function EggPanel({ vm, dispatch, onFeed }: FarmHomeDailyProps & { onFeed: () =>
                   setFeedback(emptySlots > 1 ? `放好啦！还剩 ${emptySlots - 1} 个空巢位。` : '放好啦！三个巢位都住满了。')
                 }}
               >
-                <img src="/assets/f4/hatchery-empty-f4.png" alt="" />
+                <img src={f4AssetUrl('hatchery-empty-f4.png')} alt="" />
                 <span><strong>拿去孵化</strong><small>{emptySlots > 0 ? `还有 ${emptySlots} 个空巢位` : '三个巢位都住满了'}</small></span>
               </button>
               <button type="button" disabled={vm.eggStock === 0} onClick={() => setShowCook(true)}>
-                <img src="/assets/f4/fried-egg-f4.png" alt="" />
+                <img src={f4AssetUrl('fried-egg-f4.png')} alt="" />
                 <span><strong>煎鸡蛋</strong><small>做好后喂一只小鸡</small></span>
               </button>
             </div>
@@ -161,9 +162,9 @@ function EggPanel({ vm, dispatch, onFeed }: FarmHomeDailyProps & { onFeed: () =>
             <button className="back-choice-f4" type="button" disabled={state !== 'empty'} onClick={() => setShowCook(false)}>← 重新选择用途</button>
             <h3>煎一颗蛋喂小鸡</h3>
             <div className="kitchen-worktop-f4">
-              <img className="kitchen-panel-image-f4" src="/assets/f4/kitchen-f4.png" alt="空平底锅" />
-              <img className="pan-egg-f4 pan-egg-raw-f4" src="/assets/f4/egg-f4-v2.png" alt="锅里的生鸡蛋" />
-              <img className="pan-egg-f4 pan-egg-fried-f4" src="/assets/f4/fried-egg-f4.png" alt="煎好的鸡蛋" />
+              <img className="kitchen-panel-image-f4" src={f4AssetUrl('kitchen-f4.png')} alt="空平底锅" />
+              <img className="pan-egg-f4 pan-egg-raw-f4" src={f4AssetUrl('egg-f4-v2.png')} alt="锅里的生鸡蛋" />
+              <img className="pan-egg-f4 pan-egg-fried-f4" src={f4AssetUrl('fried-egg-f4.png')} alt="煎好的鸡蛋" />
               <span className="pan-sizzle-f4">滋滋～</span>
             </div>
             <p className="kitchen-copy-f4">{kitchenCopy}</p>
@@ -173,6 +174,80 @@ function EggPanel({ vm, dispatch, onFeed }: FarmHomeDailyProps & { onFeed: () =>
         )}
       </section>
     </>
+  )
+}
+
+function FirstVisitBoard({ dispatch }: Pick<FarmHomeDailyProps, 'dispatch'>) {
+  const [name, setName] = useState('')
+  const [feedback, setFeedback] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  const submitName = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const trimmed = name.trim()
+    if (!trimmed) {
+      setFeedback('先写下一个名字吧。')
+      return
+    }
+    setSubmitting(true)
+    setFeedback('')
+    try {
+      await dispatch({ type: 'NAME_HEN', name: trimmed })
+    } catch {
+      setSubmitting(false)
+      setFeedback('刚才没有保存好，再试一次吧。')
+    }
+  }
+
+  return (
+    <section className="name-board-f4" aria-labelledby="name-title-f4">
+      <span className="name-board-pin-f4" aria-hidden="true" />
+      <p className="k-eyebrow">欢迎来到小鸡农场</p>
+      <h1 id="name-title-f4">给母鸡妈妈起个名字吧</h1>
+      <p>以后她会陪你认识新单词，也会在农场里等你回来。</p>
+      <form onSubmit={submitName}>
+        <label htmlFor="hen-name-f4">她叫什么名字？</label>
+        <div className="name-input-row-f4">
+          <input
+            id="hen-name-f4"
+            value={name}
+            maxLength={8}
+            autoComplete="off"
+            enterKeyHint="done"
+            placeholder="写一个名字"
+            aria-describedby="name-feedback-f4"
+            onChange={event => {
+              setName(event.target.value)
+              if (feedback) setFeedback('')
+            }}
+          />
+          <button className="k-button" type="submit" disabled={submitting}>就叫这个！</button>
+        </div>
+        <small id="name-feedback-f4" role="status">{feedback || '最多 8 个字，想好了就告诉她。'}</small>
+      </form>
+    </section>
+  )
+}
+
+function CompleteBoard({ vm, dispatch }: FarmHomeDailyProps) {
+  const completedNewWords = vm.state === 'daily_complete' ? vm.dailyTarget : vm.newWordsLearnedToday
+  return (
+    <section className="complete-board-f4" aria-labelledby="complete-title-f4">
+      <div className="complete-ribbon-f4">TODAY · DONE</div>
+      <p className="complete-kicker-f4">今天的农场任务完成啦</p>
+      <h1 id="complete-title-f4">连续 {vm.streak} 天！</h1>
+      <p>今天认识了 {completedNewWords} 个新朋友，还复习了 {vm.reviewCountToday} 个老朋友。</p>
+      <div className="complete-stats-f4" aria-label="今日学习战报">
+        <span><strong>{completedNewWords}</strong> 新词</span>
+        <span><strong>{vm.reviewCountToday}</strong> 复习</span>
+        <span><strong>+{vm.eggsEarnedToday}</strong> 鸡蛋</span>
+      </div>
+      <button className="handwriting-sign-f4" type="button" onClick={() => dispatch({ type: 'OPEN_HANDWRITING_GAME' })}>
+        <span>✎</span>
+        <strong>玩一轮写词游戏</strong>
+        <small>10 题 · 完成可得煎蛋</small>
+      </button>
+    </section>
   )
 }
 
@@ -186,6 +261,7 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
   const hatcheryCopy = emptySlots > 0
     ? `蛋会各自在巢里轻轻晃动，还可以放入 ${emptySlots} 颗。`
     : '三个巢位都住进了小鸡宝宝，耐心等它们破壳吧。'
+  const displayedNewWords = vm.state === 'daily_complete' ? vm.dailyTarget : vm.newWordsLearnedToday
 
   const startFeeding = async () => {
     const candidates = vm.chicksVisible.slice(0, 6)
@@ -206,18 +282,20 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
     <div className={`f4-home farm-app-f3 farm-app-f4 ${vm.motionEnabled ? '' : 'motion-paused'}`}>
       <header className="sticker-topbar">
         <div className="sticker-brand"><span className="brand-face">🐤</span>皮皮 English</div>
-        <div className="sticker-chip">今日单词 <strong>{vm.newWordsLearnedToday} / {vm.dailyTarget}</strong></div>
-        <button className="sticker-chip egg-stock-f4" type="button" aria-label={`剩余鸡蛋 ${vm.eggStock} 颗，选择孵化或煎蛋`} onClick={() => dispatch({ type: 'OPEN_EGG_PANEL' })}>
-          <img src="/assets/f4/egg-f4-v2.png" alt="" /><span>鸡蛋</span><strong>{vm.eggStock}</strong>
-        </button>
-        <div className="sticker-chip">小鸡 <strong>{vm.chicksTotal}</strong></div>
-        <div className="sticker-chip">孵化中 <strong>{vm.incubating.length}</strong></div>
+        {vm.state !== 'first_visit' && <>
+          <div className="sticker-chip">今日单词 <strong>{displayedNewWords} / {vm.dailyTarget}</strong></div>
+          <button className="sticker-chip egg-stock-f4" type="button" aria-label={`剩余鸡蛋 ${vm.eggStock} 颗，选择孵化或煎蛋`} onClick={() => dispatch({ type: 'OPEN_EGG_PANEL' })}>
+            <img src={f4AssetUrl('egg-f4-v2.png')} alt="" /><span>鸡蛋</span><strong>{vm.eggStock}</strong>
+          </button>
+          <div className="sticker-chip">小鸡 <strong>{vm.chicksTotal}</strong></div>
+          <div className="sticker-chip">孵化中 <strong>{vm.incubating.length}</strong></div>
+        </>}
         <button className="sticker-chip motion-toggle" type="button" aria-pressed={!vm.motionEnabled} onClick={() => dispatch({ type: 'SET_MOTION', enabled: !vm.motionEnabled })}>动效：{vm.motionEnabled ? '开' : '关'}</button>
         <button className="parent-button" type="button" onClick={() => dispatch({ type: 'OPEN_PARENT' })}>家长</button>
       </header>
 
       <section className="farm-stage-f3 farm-stage-f4" aria-label="会慢慢散步和生活互动的农场">
-        <section className="task-board-f3" aria-labelledby="task-title-f4">
+        {vm.state === 'first_visit' ? <FirstVisitBoard dispatch={dispatch} /> : vm.state === 'daily_complete' ? <CompleteBoard vm={vm} dispatch={dispatch} /> : <section className="task-board-f3" aria-labelledby="task-title-f4">
           <p className="k-eyebrow">DAY {String(vm.dayNumber).padStart(2, '0')} · 今日农场任务</p>
           <h1 id="task-title-f4">开始今天的单词！</h1>
           <p className="k-copy">{taskCopy}</p>
@@ -228,14 +306,14 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
           </div>
           <button className="k-button" type="button" onClick={() => dispatch({ type: 'START_DAILY_LESSON' })}>开始学习！</button>
           <div className="task-footer-f3"><span>约 {vm.estimatedMinutes} 分钟</span><span>🥚 奖励 ×{vm.eggsEarnedToday}</span><span>连续第 {vm.streak} 天</span></div>
-        </section>
+        </section>}
 
-        <section className={`hatchery-wrap-f4 ${vm.overlay === 'hatchery_pop' ? 'is-open' : ''}`} aria-label="鸡蛋孵化区">
+        {vm.state !== 'first_visit' && <section className={`hatchery-wrap-f4 ${vm.overlay === 'hatchery_pop' ? 'is-open' : ''}`} aria-label="鸡蛋孵化区">
           <button className="hatchery-button-f4" type="button" aria-expanded={vm.overlay === 'hatchery_pop'} onClick={() => dispatch({ type: 'TOGGLE_HATCHERY_POP' })}>
-            <img className="hatchery-base-f4" src="/assets/f4/hatchery-empty-f4.png" alt="有三个独立巢位的孵化小屋" />
+            <img className="hatchery-base-f4" src={f4AssetUrl('hatchery-empty-f4.png')} alt="有三个独立巢位的孵化小屋" />
             {[0, 1, 2].map(slot => {
               const active = vm.incubating.some(egg => egg.slot === slot)
-              return <img key={slot} className={`hatchery-egg-f4 ${active ? 'is-incubating' : ''}`} data-egg-slot={slot} src="/assets/f4/egg-f4-v2.png" alt={active ? '正在孵化的鸡蛋' : ''} />
+              return <img key={slot} className={`hatchery-egg-f4 ${active ? 'is-incubating' : ''}`} data-egg-slot={slot} src={f4AssetUrl('egg-f4-v2.png')} alt={active ? '正在孵化的鸡蛋' : ''} />
             })}
             <span className="hatchery-status-f4"><strong>孵化小屋 · {vm.incubating.length} 颗孵化中</strong></span>
           </button>
@@ -246,11 +324,11 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
               {emptySlots === 0 ? '孵化位已满' : vm.eggStock === 0 ? '没有剩余鸡蛋' : '放入一颗鸡蛋孵化'}
             </button>
           </div>
-        </section>
+        </section>}
 
-        <section className={`rescue-wrap-f4 ${vm.overlay === 'rescue_pop' ? 'is-open' : ''}`} aria-label="等待救援的小鸡">
+        {vm.state !== 'first_visit' && <section className={`rescue-wrap-f4 ${vm.overlay === 'rescue_pop' ? 'is-open' : ''}`} aria-label="等待救援的小鸡">
           <button className="rescue-entry-f4" type="button" aria-expanded={vm.overlay === 'rescue_pop'} onClick={() => dispatch({ type: 'TOGGLE_RESCUE_POP' })}>
-            <img src="/assets/f4/rescue-basket-f4.png" alt="在篮子里安全探头、等待救援的小鸡" />
+            <img src={f4AssetUrl('rescue-basket-f4.png')} alt="在篮子里安全探头、等待救援的小鸡" />
             <span>待救 ×{vm.rescueCount}</span>
           </button>
           <div className="rescue-pop-f4">
@@ -258,10 +336,10 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
             <p>完成错词补练，它们就会开开心心回到农场。</p>
             <button type="button" disabled={vm.rescueCount === 0} onClick={() => dispatch({ type: 'OPEN_RESCUE' })}>去救援</button>
           </div>
-        </section>
+        </section>}
 
         <FarmActors vm={vm} dispatch={dispatch} />
-        <EggPanel vm={vm} dispatch={dispatch} onFeed={startFeeding} />
+        {vm.state !== 'first_visit' && <EggPanel vm={vm} dispatch={dispatch} onFeed={startFeeding} />}
         {feedingTargetId && <FeedFlight targetId={feedingTargetId} motionEnabled={vm.motionEnabled} onArrive={finishFeeding} />}
       </section>
     </div>

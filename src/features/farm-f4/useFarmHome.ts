@@ -13,8 +13,8 @@ const CLOCK_GUARD_MS = 60_000
 export interface FarmHomeBridge {
   vm: FarmHomeViewModel | null
   dispatch: (event: FarmHomeEvent) => Promise<void>
-  /** 导航意图(START_DAILY_LESSON / OPEN_RESCUE / OPEN_PARENT),由路由层消费 */
-  navigation: 'lesson' | 'rescue' | 'parent' | null
+  /** 导航意图，由后续逐屏接入的路由层消费。 */
+  navigation: 'lesson' | 'handwriting' | 'rescue' | 'parent' | null
   clearNavigation: () => void
 }
 
@@ -22,7 +22,7 @@ export function useFarmHome(): FarmHomeBridge {
   const [core, setCore] = useState<Omit<FarmHomeViewModel, 'overlay' | 'chat'> | null>(null)
   const [overlay, setOverlay] = useState<FarmOverlay>('none')
   const [chat, setChat] = useState<ChickChatVM | null>(null)
-  const [navigation, setNavigation] = useState<'lesson' | 'rescue' | 'parent' | null>(null)
+  const [navigation, setNavigation] = useState<'lesson' | 'handwriting' | 'rescue' | 'parent' | null>(null)
   const guardTimer = useRef<number | undefined>(undefined)
   const chatRequest = useRef(0)
 
@@ -67,6 +67,9 @@ export function useFarmHome(): FarmHomeBridge {
           break
         case 'START_DAILY_LESSON':
           setNavigation('lesson')
+          return
+        case 'OPEN_HANDWRITING_GAME':
+          setNavigation('handwriting')
           return
         case 'DAILY_LESSON_COMPLETED':
           await usecases.completeDailyLesson()

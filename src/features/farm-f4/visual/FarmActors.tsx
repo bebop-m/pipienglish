@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { FarmChickVM, FarmHomeEvent, FarmHomeViewModel } from '../../../application/viewmodel'
 import type { StagePoint } from '../../../domain/types'
+import { f4AssetUrl } from '../assetUrl'
 import { STAGE_H, STAGE_W, toStagePoint } from '../stage/stagePoint'
 
 type ActorKind = 'mother' | 'farmer' | 'chick'
@@ -318,7 +319,7 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
         id: 'mother',
         kind: 'mother',
         label: vm.henName ? `母鸡妈妈：${vm.henName}` : '母鸡妈妈',
-        image: '/assets/f4/mother-f3.png',
+        image: f4AssetUrl('mother-f3.png'),
         home: { x: 615, y: 530 },
         talk: { line: '咕咕，慢慢散步吧～', translation: "Let's take a walk!" },
       },
@@ -326,7 +327,7 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
         id: 'farmer',
         kind: 'farmer',
         label: '农场主小皮',
-        image: '/assets/f4/xiaopi-f3.png',
+        image: f4AssetUrl('xiaopi-f3.png'),
         home: { x: 835, y: 495 },
         talk: { line: '今天也一起加油！', translation: "Let's do our best!" },
       },
@@ -334,7 +335,7 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
         id: chick.chickId,
         kind: 'chick' as const,
         label: '农场小鸡，点按听单词，拖动可以搬家',
-        image: '/assets/f4/chick-f3.png',
+        image: f4AssetUrl('chick-f3.png'),
         home: chick.home ?? CHICK_HOMES[index],
         talk: null,
         chick,
