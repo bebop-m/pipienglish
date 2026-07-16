@@ -1,0 +1,5 @@
+# F4 母版与参考母图按字节锁定(F4_BASELINE_MANIFEST.md 哈希校验),禁止任何换行符转换
+design-samples/** -text
+docs/reference-images/** -text
+public/assets/f4/** -text
+*.png binary
