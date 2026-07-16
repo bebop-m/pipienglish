@@ -1,0 +1,26 @@
+:root {
+  --f4-ink: #302925;
+  --f4-ink-soft: #75645b;
+  --f4-cream: #fffaf0;
+  --f4-yellow: #ffe47d;
+  --f4-yellow-deep: #ffc94f;
+  --f4-pink: #ffd9df;
+  --f4-pink-deep: #ff9fae;
+  --f4-blue: #cfe9ff;
+  --f4-blue-deep: #87c7ef;
+  --f4-mint: #dff2d0;
+  --f4-mint-deep: #9bd27d;
+  --f4-orange: #ffac63;
+
+  --f4-outline-control: 2px solid var(--f4-ink);
+  --f4-outline-panel: 3px solid var(--f4-ink);
+  --f4-shadow-raised: 0 7px 0 rgba(48, 41, 37, 0.18);
+  --f4-shadow-soft: 0 12px 30px rgba(77, 59, 45, 0.13);
+  --f4-radius-control: 18px;
+  --f4-radius-panel: 27px;
+  --f4-font: "Arial Rounded MT Bold", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+
+  --f4-stage-width: 1194px;
+  --f4-stage-height: 834px;
+  --f4-sky: #bfe5f7;
+}

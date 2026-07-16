@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>样板 C · 轻量任务卡</title>
+    <link rel="stylesheet" href="shared.css" />
+  </head>
+  <body>
+    <main class="app sample-c" aria-label="皮皮的单词农场首次进入首页">
+      <header class="topbar">
+        <div class="brand"><span class="brand-mark">🐥</span>皮皮のEnglish</div>
+        <div class="status-chip">连续学习 <strong>第 1 天</strong></div>
+        <div class="status-chip">今天 <strong>0 / 4</strong></div>
+        <button class="parent-link" type="button">家长</button>
+      </header>
+
+      <div class="today-banner" aria-label="今日学习目标">
+        <div class="egg">🥚</div>
+        <div><strong>今天认识 4 个新朋友</strong><span>完成后母鸡妈妈会下一颗蛋</span></div>
+      </div>
+
+      <div class="speech">我的名字，就交给你啦～</div>
+      <img class="characters" src="assets/characters.png" alt="母鸡妈妈和农场主小皮" />
+
+      <section class="mission-strip paper" aria-labelledby="welcome-c">
+        <p class="eyebrow">开始今天的农场生活</p>
+        <h2 id="welcome-c">给母鸡妈妈起个名字</h2>
+        <p class="description">这个名字以后会一直陪着你，也可以在家长页修改。</p>
+        <form data-name-form>
+          <label class="label" for="hen-name-c">输入一个喜欢的名字</label>
+          <div class="form-row">
+            <input class="name-input" id="hen-name-c" maxlength="8" placeholder="比如：小太阳" autocomplete="off" />
+            <button class="primary-button" type="submit">就叫这个名字！</button>
+          </div>
+          <div class="learning-cue"><span>下一步：学习 4 个新单词</span><span class="mini-progress"><span></span></span></div>
+          <p class="gentle-message" data-message aria-live="polite"></p>
+        </form>
+      </section>
+      <span class="sample-label">样板 C · 轻量任务卡</span>
+    </main>
+    <script src="shared.js"></script>
+  </body>
+</html>

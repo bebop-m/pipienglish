@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>方案 F3 · 自由活动与孵化农场</title>
+    <link rel="stylesheet" href="sticker.css" />
+    <link rel="stylesheet" href="sticker-f-farm-v3.css" />
+  </head>
+  <body>
+    <main class="sticker-app farm-app-f3" aria-label="自由活动与孵化单词农场首页">
+      <header class="sticker-topbar">
+        <div class="sticker-brand"><span class="brand-face">🐥</span>皮皮のEnglish</div>
+        <div class="sticker-chip">今日单词 <strong>0 / 4</strong></div>
+        <div class="sticker-chip">小鸡 <strong>6</strong></div>
+        <div class="sticker-chip">孵化中 <strong>1</strong></div>
+        <button class="sticker-chip motion-toggle" type="button" data-motion-toggle aria-pressed="false">动效：开</button>
+        <button class="parent-button" type="button">家长</button>
+      </header>
+
+      <section class="farm-stage-f3" aria-label="可自由活动的农场">
+        <section class="task-board-f3" aria-labelledby="task-title-f3">
+          <p class="k-eyebrow">DAY 06 · 今日农场任务</p>
+          <h1 id="task-title-f3">开始今天的单词！</h1>
+          <p class="k-copy">认识 4 个新朋友，完成后母鸡妈妈会下一颗蛋。</p>
+          <div class="progress-line"><span>今日进度</span><span class="progress-track"><span></span></span><strong>0 / 4</strong></div>
+          <button class="k-button" type="button">开始学习 4 个单词</button>
+          <div class="task-footer-f3"><span>约 10 分钟</span><span>🥚 奖励 ×1</span><span>连续第 6 天</span></div>
+        </section>
+
+        <div class="farm-help-f3">角色会自由散步，也会偶尔靠近彼此互动～</div>
+
+        <button class="hatchery-f3" type="button" aria-expanded="false" aria-label="查看鸡蛋孵化进度">
+          <img class="hatchery-image-f3" src="assets/hatchery-f3.png" alt="有三颗鸡蛋的孵化小屋" />
+          <img class="egg-wobble-layer-f3" src="assets/hatchery-f3.png" alt="" aria-hidden="true" />
+          <span class="hatchery-status-f3"><strong>孵化小屋 · 1 颗孵化中</strong><time>08:24</time><span class="hatchery-progress-f3"><span></span></span></span>
+        </button>
+        <div class="hatchery-pop-f3">中间的蛋正在轻轻晃动。完成明天的学习后，它就会孵出新小鸡！</div>
+
+        <button class="actor-f3" data-kind="mother" data-x="610" data-y="480" data-line="咕咕，出发啦！" data-translation="Let's go!" type="button" aria-label="母鸡妈妈">
+          <span class="actor-talk-f3"></span>
+          <span class="sprite-shell-f3"><img class="sprite-f3" src="assets/mother-f3.png" alt="母鸡妈妈" /></span>
+        </button>
+
+        <button class="actor-f3" data-kind="farmer" data-x="865" data-y="493" data-line="今天也一起加油！" data-translation="Let's do our best!" type="button" aria-label="农场主小皮">
+          <span class="actor-talk-f3"></span>
+          <span class="sprite-shell-f3"><img class="sprite-f3" src="assets/xiaopi-f3.png" alt="农场主小皮" /></span>
+        </button>
+
+        <button class="actor-f3" data-kind="chick" data-x="415" data-y="540" data-line="Hello!" data-translation="你好！" type="button" aria-label="小鸡：Hello，你好">
+          <span class="actor-talk-f3"></span><span class="sprite-shell-f3"><img class="sprite-f3" src="assets/chick-f3.png" alt="小鸡" /></span><span class="chick-mark-f3">🌼</span>
+        </button>
+        <button class="actor-f3" data-kind="chick" data-x="515" data-y="635" data-line="Apple!" data-translation="苹果" type="button" aria-label="小鸡：Apple，苹果">
+          <span class="actor-talk-f3"></span><span class="sprite-shell-f3"><img class="sprite-f3" src="assets/chick-f3.png" alt="小鸡" /></span>
+        </button>
+        <button class="actor-f3" data-kind="chick" data-x="750" data-y="625" data-line="Friend!" data-translation="朋友" type="button" aria-label="小鸡：Friend，朋友">
+          <span class="actor-talk-f3"></span><span class="sprite-shell-f3"><img class="sprite-f3" src="assets/chick-f3.png" alt="小鸡" /></span><span class="chick-mark-f3">🎀</span>
+        </button>
+        <button class="actor-f3" data-kind="chick" data-x="965" data-y="650" data-line="Sunny!" data-translation="晴朗的" type="button" aria-label="小鸡：Sunny，晴朗">
+          <span class="actor-talk-f3"></span><span class="sprite-shell-f3"><img class="sprite-f3" src="assets/chick-f3.png" alt="小鸡" /></span>
+        </button>
+        <button class="actor-f3" data-kind="chick" data-x="475" data-y="415" data-line="Good job!" data-translation="做得好！" type="button" aria-label="小鸡：Good job，做得好">
+          <span class="actor-talk-f3"></span><span class="sprite-shell-f3"><img class="sprite-f3" src="assets/chick-f3.png" alt="小鸡" /></span><span class="chick-mark-f3">⭐</span>
+        </button>
+        <button class="actor-f3" data-kind="chick" data-x="1030" data-y="500" data-line="Let's play!" data-translation="一起玩！" type="button" aria-label="小鸡：Let's play，一起玩">
+          <span class="actor-talk-f3"></span><span class="sprite-shell-f3"><img class="sprite-f3" src="assets/chick-f3.png" alt="小鸡" /></span>
+        </button>
+      </section>
+      <span class="sample-tag">方案 F3 · 自由活动与孵化农场</span>
+    </main>
+    <script src="sticker-f-farm-v3.js"></script>
+  </body>
+</html>

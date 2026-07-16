@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>贴纸样板 E · 角色舞台与任务栏</title>
+    <link rel="stylesheet" href="sticker.css" />
+  </head>
+  <body>
+    <main class="sticker-app sticker-e" aria-label="贴纸风单词农场首页">
+      <header class="sticker-topbar">
+        <div class="sticker-brand"><span class="brand-face">🐥</span>皮皮のEnglish</div>
+        <div class="sticker-chip">连续学习 <strong>第 1 天</strong></div>
+        <div class="sticker-chip">今天 <strong>0 / 4</strong></div>
+        <button class="parent-button" type="button">家长</button>
+      </header>
+
+      <section class="stage-e k-card" aria-label="角色欢迎区">
+        <div class="bubble">我的名字，就交给你啦～</div>
+        <img class="sticker-mascots" src="assets/sticker-characters.png" alt="贴纸风母鸡妈妈和小皮" />
+        <span class="spark" style="left:48px;top:56px">♡</span>
+        <span class="spark" style="right:45px;bottom:58px">✦</span>
+      </section>
+
+      <aside class="task-rail-e k-card dot-card" aria-labelledby="title-e">
+        <p class="k-eyebrow">建立你的单词农场</p>
+        <h1 id="title-e">欢迎回来，皮皮！</h1>
+        <p class="k-copy">先给母鸡妈妈起名，然后开始今天的学习任务。</p>
+
+        <div class="steps-e" aria-label="今日流程">
+          <div class="step-e"><span>✏️</span>起名字</div>
+          <div class="step-e"><span>🔤</span>学 4 词</div>
+          <div class="step-e"><span>🥚</span>收鸡蛋</div>
+        </div>
+
+        <form class="form-stack" data-name-form>
+          <label class="k-label" for="name-e">母鸡妈妈叫什么？</label>
+          <input class="k-input" id="name-e" maxlength="8" placeholder="输入 2～8 个字" autocomplete="off" />
+          <button class="k-button" type="submit">就叫这个名字！</button>
+          <p class="k-message" data-message aria-live="polite"></p>
+        </form>
+
+        <div class="tip-e">小提示：名字以后也可以在家长页修改，不用担心选错哦。</div>
+      </aside>
+      <span class="sample-tag">贴纸样板 E · 角色舞台＋任务栏</span>
+    </main>
+    <script src="shared.js"></script>
+  </body>
+</html>

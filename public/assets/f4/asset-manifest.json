@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "copiedOn": "2026-07-17",
+  "sourceRoot": "design-samples/assets",
+  "rule": "Byte-for-byte production copies; locked sources remain unchanged.",
+  "assets": [
+    {
+      "file": "farm-background-f3.png",
+      "sha256": "0E0D54F93BEB79972209AE9AAA7EBED6F4EC9FD9F91A122EEEC0028C7DF546A8"
+    },
+    {
+      "file": "mother-f3.png",
+      "sha256": "CFE836C951BBD726486BDE65972F61A0739D667024EF767FFA020DF095CB90BF"
+    },
+    {
+      "file": "xiaopi-f3.png",
+      "sha256": "30C61F790B2E9A829CC9B26661EE77B4942512D60DB502D2880137A2B6E64637"
+    },
+    {
+      "file": "chick-f3.png",
+      "sha256": "B06B82D8BA17A6AAF381E897309E67064C0D09D2E692D34EF1A344C2B97AAAB5"
+    },
+    {
+      "file": "hatchery-empty-f4.png",
+      "sha256": "F2C4666F31A1B63AABF57202CDE8FB867B8472112B801A7E0485488639F2AB74"
+    },
+    {
+      "file": "egg-f4-v2.png",
+      "sha256": "FBAA203DC4888EA7EBDF504448D402DC3707AD16504398240E081F2AA7BA4C38"
+    },
+    {
+      "file": "kitchen-f4.png",
+      "sha256": "567D1D386CA5418BFA20B90F9E8CDC13CA3D3C6767EEA32FF352E3DC7D36482F"
+    },
+    {
+      "file": "fried-egg-f4.png",
+      "sha256": "AE569374FFA4B11488B6734D3ECE126388CF46D7C59D152FEF950812CE378601"
+    },
+    {
+      "file": "rescue-basket-f4.png",
+      "sha256": "B7189C6EA1A4924CE41B088750DE8E607BD9FAEF438F4E265054AACE8D2CC915"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+/* ⚠️ DEV PLACEHOLDER 样式 —— 仅供内部开发壳使用,无任何视觉主张。
+   F4 正式样式(Token/固定舞台/组件)由 Codex 建于 src/styles/f4/,
+   设计来源以 docs/02-visual/F4_VISUAL_SYSTEM.md 与锁定 CSS 为准。 */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+  font-family: system-ui, sans-serif;
+  background: #bfe5f7;
+  color: #222;
+}
+
+.dev-shell {
+  position: absolute;
+  inset: 84px 120px 54px;
+  overflow: auto;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 2px dashed #8a6500;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.dev-banner {
+  background: #fff3cd;
+  border: 1px dashed #b8860b;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.dev-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.dev-btn {
+  padding: 6px 12px;
+  border: 1px solid #999;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.dev-btn:disabled {
+  opacity: 0.4;
+}
+
+.dev-chat {
+  background: #e8f4e8;
+  border: 1px solid #9c9;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.dev-vm {
+  background: #1e1e1e;
+  color: #9cdcfe;
+  padding: 12px;
+  font-size: 12px;
+  overflow: auto;
+  max-height: 50vh;
+}

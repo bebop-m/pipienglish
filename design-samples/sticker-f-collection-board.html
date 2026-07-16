@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>贴纸样板 F · 贴纸收藏板</title>
+    <link rel="stylesheet" href="sticker.css" />
+  </head>
+  <body>
+    <main class="sticker-app sticker-f" aria-label="贴纸风单词农场首页">
+      <header class="sticker-topbar">
+        <div class="sticker-brand"><span class="brand-face">🐥</span>皮皮のEnglish</div>
+        <div class="sticker-chip">今日单词 <strong>0 / 4</strong></div>
+        <div class="sticker-chip">贴纸图鉴 <strong>0 / 12</strong></div>
+        <button class="parent-button" type="button">家长</button>
+      </header>
+
+      <section class="board-f k-card" aria-label="农场贴纸收藏板">
+        <span class="tape one"></span>
+        <span class="tape two"></span>
+
+        <section class="mission-card-f k-card dot-card" aria-labelledby="title-f">
+          <p class="k-eyebrow">START! 第一次农场任务</p>
+          <h1 id="title-f">给母鸡妈妈起名</h1>
+          <p class="k-copy">完成每天的单词任务，解锁更多小鸡贴纸。</p>
+          <form class="form-row-f" data-name-form>
+            <label class="k-label" for="name-f">写下一个喜欢的名字</label>
+            <input class="k-input" id="name-f" maxlength="8" placeholder="比如：小太阳" autocomplete="off" />
+            <button class="k-button" type="submit">保存并开始今天的单词</button>
+            <p class="k-message" data-message aria-live="polite"></p>
+          </form>
+        </section>
+
+        <section class="collection-f k-card" aria-label="小鸡贴纸收藏进度">
+          <div class="collection-copy"><strong>小鸡贴纸图鉴</strong><span>学完单词后获得第一张！</span></div>
+          <span class="mini-chick">🐥</span>
+          <span class="mini-chick locked">?</span>
+          <span class="mini-chick locked">?</span>
+        </section>
+
+        <div class="bubble">一起收集小鸡贴纸吧！</div>
+        <img class="sticker-mascots" src="assets/sticker-characters.png" alt="贴纸风母鸡妈妈和小皮" />
+      </section>
+      <span class="sample-tag">贴纸样板 F · 贴纸收藏板</span>
+    </main>
+    <script src="shared.js"></script>
+  </body>
+</html>

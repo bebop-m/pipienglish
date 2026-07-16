@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>方案 F4 · 鸡蛋分配与可拖拽农场</title>
+    <link rel="stylesheet" href="sticker.css" />
+    <link rel="stylesheet" href="sticker-f-farm-v3.css" />
+    <link rel="stylesheet" href="sticker-f-farm-v4.css" />
+  </head>
+  <body>
+    <main class="sticker-app farm-app-f3 farm-app-f4" aria-label="皮皮 English 农场首页 F4">
+      <header class="sticker-topbar">
+        <div class="sticker-brand"><span class="brand-face">🐤</span>皮皮 English</div>
+        <div class="sticker-chip">今日单词 <strong>0 / 4</strong></div>
+        <button class="sticker-chip egg-stock-f4" type="button" data-open-egg-panel aria-label="剩余鸡蛋三颗，选择孵化或煎蛋">
+          <img src="assets/egg-f4-v2.png" alt="" /><span>鸡蛋</span><strong data-egg-count>3</strong>
+        </button>
+        <div class="sticker-chip">小鸡 <strong>6</strong></div>
+        <div class="sticker-chip">孵化中 <strong data-incubating-count>1</strong></div>
+        <button class="sticker-chip motion-toggle" type="button" data-motion-toggle aria-pressed="false">动效：开</button>
+        <button class="parent-button" type="button">家长</button>
+      </header>
+
+      <section class="farm-stage-f3 farm-stage-f4" aria-label="会慢慢散步和生活互动的农场">
+        <section class="task-board-f3" aria-labelledby="task-title-f4">
+          <p class="k-eyebrow">DAY 06 · 今日农场任务</p>
+          <h1 id="task-title-f4">开始今天的单词！</h1>
+          <p class="k-copy">认识 4 个新朋友，完成后母鸡妈妈会下一颗蛋。</p>
+          <div class="progress-line"><span>今日进度</span><span class="progress-track"><span></span></span><strong>0 / 4</strong></div>
+          <button class="k-button" type="button">开始学习 4 个单词</button>
+          <div class="task-footer-f3"><span>约 10 分钟</span><span>🥚 奖励 ×1</span><span>连续第 6 天</span></div>
+        </section>
+
+        <section class="hatchery-wrap-f4" aria-label="鸡蛋孵化区">
+          <button class="hatchery-button-f4" type="button" aria-expanded="false" data-hatchery-toggle>
+            <img class="hatchery-base-f4" src="assets/hatchery-empty-f4.png" alt="有三个独立巢位的孵化小屋" />
+            <img class="hatchery-egg-f4" data-egg-slot="0" src="assets/egg-f4-v2.png" alt="" />
+            <img class="hatchery-egg-f4 is-incubating" data-egg-slot="1" src="assets/egg-f4-v2.png" alt="正在孵化的鸡蛋" />
+            <img class="hatchery-egg-f4" data-egg-slot="2" src="assets/egg-f4-v2.png" alt="" />
+            <span class="hatchery-status-f4"><strong>孵化小屋 · <span data-hatchery-status>1 颗孵化中</span></strong><time>08:24</time><span><i></i></span></span>
+          </button>
+          <div class="hatchery-pop-f4" data-hatchery-pop>
+            <strong>给新小鸡留一个位置</strong>
+            <p data-hatchery-copy>中间的蛋正在轻轻晃动，还可以放入 2 颗。</p>
+            <button type="button" data-add-incubating>放入一颗鸡蛋孵化</button>
+          </div>
+        </section>
+
+        <section class="rescue-wrap-f4" aria-label="等待救援的小鸡">
+          <button class="rescue-entry-f4" type="button" aria-expanded="false" data-rescue-toggle>
+            <img src="assets/rescue-basket-f4.png" alt="在篮子里安全探头、等待救援的小鸡" />
+            <span>待救 ×2</span>
+          </button>
+          <div class="rescue-pop-f4" data-rescue-pop>
+            <strong>有 2 只小鸡等你接回家</strong>
+            <p>完成错词补练，它们就会开开心心回到农场。</p>
+            <button type="button" data-rescue-action>去救援</button>
+          </div>
+        </section>
+
+        <button class="actor-f3" data-kind="mother" data-home="mother" data-x="615" data-y="530" data-line="咕咕，慢慢散步吧～" data-translation="Let's take a walk!" type="button" aria-label="母鸡妈妈">
+          <span class="actor-talk-f3"></span>
+          <span class="sprite-shell-f3"><img class="sprite-f3" src="assets/mother-f3.png" alt="母鸡妈妈" /></span>
+        </button>
+
+        <button class="actor-f3" data-kind="farmer" data-home="farmer" data-x="835" data-y="495" data-line="今天也一起加油！" data-translation="Let's do our best!" type="button" aria-label="农场主小皮">
+          <span class="actor-talk-f3"></span>
+          <span class="sprite-shell-f3"><img class="sprite-f3" src="assets/xiaopi-f3.png" alt="农场主小皮" /></span>
+        </button>
+
+        <button class="actor-f3" data-kind="chick" data-home="0" data-x="365" data-y="470" data-line="Hello!" data-translation="你好！" type="button" aria-label="小鸡：Hello，你好">
+          <span class="actor-talk-f3"></span><span class="sprite-shell-f3"><img class="sprite-f3" src="assets/chick-f3.png" alt="小鸡" /></span>
+        </button>
+        <button class="actor-f3" data-kind="chick" data-home="1" data-x="475" data-y="650" data-line="Apple!" data-translation="苹果" type="button" aria-label="小鸡：Apple，苹果">
+          <span class="actor-talk-f3"></span><span class="sprite-shell-f3"><img class="sprite-f3" src="assets/chick-f3.png" alt="小鸡" /></span>
+        </button>
+        <button class="actor-f3" data-kind="chick" data-home="2" data-x="680" data-y="640" data-line="Friend!" data-translation="朋友" type="button" aria-label="小鸡：Friend，朋友">
+          <span class="actor-talk-f3"></span><span class="sprite-shell-f3"><img class="sprite-f3" src="assets/chick-f3.png" alt="小鸡" /></span>
+        </button>
+        <button class="actor-f3" data-kind="chick" data-home="3" data-x="925" data-y="650" data-line="Sunny!" data-translation="晴朗的" type="button" aria-label="小鸡：Sunny，晴朗">
+          <span class="actor-talk-f3"></span><span class="sprite-shell-f3"><img class="sprite-f3" src="assets/chick-f3.png" alt="小鸡" /></span>
+        </button>
+        <button class="actor-f3" data-kind="chick" data-home="4" data-x="655" data-y="410" data-line="Good job!" data-translation="做得好！" type="button" aria-label="小鸡：Good job，做得好">
+          <span class="actor-talk-f3"></span><span class="sprite-shell-f3"><img class="sprite-f3" src="assets/chick-f3.png" alt="小鸡" /></span>
+        </button>
+        <button class="actor-f3" data-kind="chick" data-home="5" data-x="990" data-y="455" data-line="Let's play!" data-translation="一起玩！" type="button" aria-label="小鸡：一起玩">
+          <span class="actor-talk-f3"></span><span class="sprite-shell-f3"><img class="sprite-f3" src="assets/chick-f3.png" alt="小鸡" /></span>
+        </button>
+
+        <div class="panel-backdrop-f4" data-kitchen-backdrop hidden></div>
+        <section class="kitchen-panel-f4 egg-panel-f4" data-kitchen-panel hidden aria-labelledby="egg-panel-title-f4">
+          <button class="panel-close-f4" type="button" data-close-kitchen aria-label="关闭鸡蛋篮">×</button>
+          <p class="k-eyebrow">小皮的鸡蛋篮</p>
+          <h2 id="egg-panel-title-f4">鸡蛋要怎么用？</h2>
+          <div class="egg-balance-f4"><img src="assets/egg-f4-v2.png" alt="" />剩余 <strong data-egg-count>3</strong> 颗</div>
+
+          <div class="egg-choice-view-f4" data-egg-choices>
+            <p>每颗鸡蛋只能选择一种用途，由你来安排。</p>
+            <div class="egg-choice-grid-f4">
+              <button type="button" data-choose-hatch>
+                <img src="assets/hatchery-empty-f4.png" alt="" />
+                <span><strong>拿去孵化</strong><small data-hatch-choice-copy>还有 2 个空巢位</small></span>
+              </button>
+              <button type="button" data-choose-cook>
+                <img src="assets/fried-egg-f4.png" alt="" />
+                <span><strong>煎鸡蛋</strong><small>做好后喂一只小鸡</small></span>
+              </button>
+            </div>
+            <p class="egg-feedback-f4" data-egg-feedback aria-live="polite"></p>
+          </div>
+
+          <div class="cook-view-f4" data-cook-view hidden>
+            <button class="back-choice-f4" type="button" data-back-choices>← 重新选择用途</button>
+            <h3>煎一颗蛋喂小鸡</h3>
+            <div class="kitchen-worktop-f4">
+              <img class="kitchen-panel-image-f4" src="assets/kitchen-f4.png" alt="空平底锅" />
+              <img class="pan-egg-f4 pan-egg-raw-f4" src="assets/egg-f4-v2.png" alt="锅里的生鸡蛋" />
+              <img class="pan-egg-f4 pan-egg-fried-f4" src="assets/fried-egg-f4.png" alt="煎好的鸡蛋" />
+              <span class="pan-sizzle-f4">滋滋～</span>
+            </div>
+            <p class="kitchen-copy-f4" data-kitchen-copy>锅还是空的。要拿一颗鸡蛋来煎吗？</p>
+            <button class="k-button kitchen-action-f4" type="button" data-kitchen-action>放一颗鸡蛋进锅里</button>
+            <small>关闭面板后，锅里的进度会保留。</small>
+          </div>
+        </section>
+      </section>
+      <span class="sample-tag">方案 F4 · 鸡蛋分配与可拖拽农场</span>
+    </main>
+    <script src="sticker-f-farm-v4.js"></script>
+  </body>
+</html>

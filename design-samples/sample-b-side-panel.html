@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>样板 B · 右侧学习栏</title>
+    <link rel="stylesheet" href="shared.css" />
+  </head>
+  <body>
+    <main class="app sample-b" aria-label="皮皮的单词农场首次进入首页">
+      <header class="topbar">
+        <div class="brand"><span class="brand-mark">🐥</span>皮皮のEnglish</div>
+        <div class="status-chip">今日任务 <strong>0 / 4</strong></div>
+      </header>
+
+      <div class="speech">咕咕！我们一起学单词吧～</div>
+      <img class="characters" src="assets/characters.png" alt="母鸡妈妈和农场主小皮" />
+
+      <aside class="side-panel paper" aria-labelledby="welcome-b">
+        <div class="panel-top"><button class="parent-link" type="button">家长</button></div>
+        <p class="eyebrow">建立你的第一座农场</p>
+        <h1 id="welcome-b">先认识母鸡妈妈</h1>
+        <p class="description">给她起一个好听的名字，然后开始今天 10 分钟的单词冒险。</p>
+        <form data-name-form>
+          <label class="label" for="hen-name-b">母鸡妈妈叫什么？</label>
+          <div class="form-row">
+            <input class="name-input" id="hen-name-b" maxlength="8" placeholder="输入 2～8 个字" autocomplete="off" />
+            <button class="primary-button" type="submit">保存名字，开始学习</button>
+          </div>
+          <p class="gentle-message" data-message aria-live="polite"></p>
+        </form>
+        <div class="learning-cue"><span>今日学习进度</span><span class="mini-progress"><span></span></span><strong>0 / 4</strong></div>
+      </aside>
+      <span class="sample-label">样板 B · 右侧学习栏</span>
+    </main>
+    <script src="shared.js"></script>
+  </body>
+</html>

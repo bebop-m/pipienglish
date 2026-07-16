@@ -1,0 +1,118 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+.candidate-viewport {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #bfe5f7;
+}
+
+.candidate-bleed {
+  position: absolute;
+  inset: 0;
+  background: #bfe5f7 url('/assets/f4/farm-background-f3.png') center / cover no-repeat;
+}
+
+.candidate-stage.sticker-app {
+  position: absolute;
+  width: 1194px;
+  height: 834px;
+  aspect-ratio: auto;
+  border-radius: 0;
+  transform:
+    translate3d(var(--candidate-left), var(--candidate-top), 0)
+    scale(var(--candidate-scale));
+  transform-origin: 0 0;
+  background: #bfe5f7 url('/assets/f4/farm-background-f3.png') center / cover no-repeat;
+  box-shadow: none;
+}
+
+.candidate-stage .sticker-brand,
+.candidate-stage .sticker-chip,
+.candidate-stage .parent-button {
+  flex: 0 0 auto;
+}
+
+.candidate-stage .sticker-brand {
+  min-width: 184px;
+}
+
+.candidate-stage .sticker-chip {
+  white-space: nowrap;
+}
+
+.candidate-stage .task-board-f3 {
+  min-height: 310px;
+}
+
+.candidate-stage .task-board-f3 .k-copy {
+  min-height: 49px;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.candidate-stage .progress-line {
+  font-size: 13px;
+}
+
+.candidate-stage .progress-line > span:first-child {
+  flex: 0 0 auto;
+}
+
+.candidate-stage .task-footer-f3 {
+  white-space: nowrap;
+}
+
+.candidate-stage .task-footer-f3 span:nth-child(2) {
+  color: #b7663f;
+}
+
+.candidate-stage .sample-tag {
+  z-index: 120;
+  bottom: 9px;
+  font-size: 11px;
+}
+
+.candidate-stage[data-variant='a'] .sample-tag {
+  background: rgba(48, 41, 37, 0.84);
+}
+
+.candidate-stage[data-variant='b'] .sample-tag {
+  background: rgba(174, 92, 75, 0.9);
+}
+
+.candidate-stage[data-variant='c'] .sample-tag {
+  background: rgba(77, 112, 62, 0.9);
+}
+
+.candidate-hatchery-status {
+  grid-template-columns: 1fr;
+}
+
+.candidate-hatchery-status strong {
+  text-align: center;
+}
+
+.candidate-actor {
+  pointer-events: none;
+}
+
+.candidate-actor .sprite-f3 {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .candidate-stage,
+  .candidate-stage * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

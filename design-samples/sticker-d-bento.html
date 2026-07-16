@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>贴纸样板 D · Kawaii 便当仪表盘</title>
+    <link rel="stylesheet" href="sticker.css" />
+  </head>
+  <body>
+    <main class="sticker-app sticker-d" aria-label="贴纸风单词农场首页">
+      <header class="sticker-topbar">
+        <div class="sticker-brand"><span class="brand-face">🐥</span>皮皮のEnglish</div>
+        <div class="sticker-chip">今日任务 <strong>0 / 4</strong></div>
+        <div class="sticker-chip">鸡蛋 <strong>0</strong></div>
+        <button class="parent-button" type="button">家长</button>
+      </header>
+
+      <div class="bento-layout">
+        <section class="bento-hero k-card" aria-label="农场角色区">
+          <span class="bento-note">NEW FARM!</span>
+          <div class="bubble">咕咕！今天也一起加油吧～</div>
+          <img class="sticker-mascots" src="assets/sticker-characters.png" alt="贴纸风母鸡妈妈和小皮" />
+          <span class="spark" style="left:42px;top:115px">✦</span>
+          <span class="spark" style="right:38px;bottom:38px">♡</span>
+        </section>
+
+        <div class="bento-side">
+          <section class="name-card-d k-card dot-card" aria-labelledby="title-d">
+            <p class="k-eyebrow">第一次来到农场</p>
+            <h1 id="title-d">给母鸡起个名字</h1>
+            <p class="k-copy">每天学会 4 个单词，她就会送你一颗鸡蛋。</p>
+            <form data-name-form>
+              <label class="k-label" for="name-d">你想怎么称呼她？</label>
+              <input class="k-input" id="name-d" maxlength="8" placeholder="比如：布丁" autocomplete="off" />
+              <button class="k-button" type="submit">保存名字，开始学习</button>
+              <p class="k-message" data-message aria-live="polite"></p>
+            </form>
+          </section>
+          <section class="daily-card-d k-card" aria-label="今日学习目标">
+            <div class="egg-sticker">🥚</div>
+            <div>
+              <strong>今天认识 4 个新朋友</strong>
+              <div class="progress-line"><span class="progress-track"><span></span></span><span>0 / 4</span></div>
+            </div>
+          </section>
+        </div>
+      </div>
+      <span class="sample-tag">贴纸样板 D · Kawaii 便当仪表盘</span>
+    </main>
+    <script src="shared.js"></script>
+  </body>
+</html>
