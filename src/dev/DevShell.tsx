@@ -8,6 +8,7 @@ import { db } from '../application/db'
 import { exportAll, importAll } from '../application/backup'
 import { dayKey } from '../domain/time'
 import { HATCH_MS, type FarmState } from '../domain/types'
+import { createStudyUsecases } from '../application/usecases/study'
 
 export function DevFarmView({ bridge }: { bridge: FarmHomeBridge }) {
   const { vm, dispatch, navigation, clearNavigation } = bridge
@@ -55,6 +56,21 @@ export function DevFarmView({ bridge }: { bridge: FarmHomeBridge }) {
           })
           window.location.reload()
         }, vm.incubating.length === 0)}
+        {import.meta.env.DEV && btn('[测试] 准备群聊验收数据', async () => {
+          const today = dayKey()
+          await db.chicks.bulkPut(['dev-a', 'dev-b', 'dev-c'].map(chickId => ({
+            chickId,
+            bornOn: today,
+            source: 'hatch' as const,
+            homeX: null,
+            homeY: null,
+          })))
+          const study = createStudyUsecases(db)
+          for (const wordId of ['apple', 'banana', 'orange']) {
+            await study.answer({ type: 'quiz', wordId }, true)
+          }
+          window.location.reload()
+        })}
       </div>
 
       <div className="dev-row">

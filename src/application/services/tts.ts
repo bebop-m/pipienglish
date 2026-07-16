@@ -1,28 +1,37 @@
 let voice: SpeechSynthesisVoice | null = null
 
-function pickVoice(): SpeechSynthesisVoice | null {
-  const voices = window.speechSynthesis?.getVoices() ?? []
+export function selectEnglishVoice(voices: readonly SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
   return (
-    voices.find(v => v.lang === 'en-US' && v.localService) ??
-    voices.find(v => v.lang === 'en-US') ??
-    voices.find(v => v.lang.startsWith('en')) ??
+    voices.find(v => v.lang.toLowerCase() === 'en-us' && v.localService) ??
+    voices.find(v => v.lang.toLowerCase() === 'en-us') ??
+    voices.find(v => v.lang.toLowerCase().startsWith('en')) ??
     null
   )
 }
 
-if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-  window.speechSynthesis.onvoiceschanged = () => {
-    voice = pickVoice()
-  }
+function getSynthesis(): SpeechSynthesis | null {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null
+  return window.speechSynthesis
 }
 
-export function speak(text: string): void {
-  if (!('speechSynthesis' in window)) return
-  window.speechSynthesis.cancel()
+const browserSynthesis = getSynthesis()
+if (browserSynthesis) {
+  browserSynthesis.addEventListener('voiceschanged', () => {
+    voice = selectEnglishVoice(browserSynthesis.getVoices())
+  })
+}
+
+/** 播放成功提交时返回 true；设备无本地 TTS 时无声降级，不阻塞交互。 */
+export function speak(text: string): boolean {
+  const synthesis = getSynthesis()
+  if (!text.trim() || !synthesis || typeof SpeechSynthesisUtterance === 'undefined') return false
+
+  synthesis.cancel()
   const utter = new SpeechSynthesisUtterance(text)
-  if (!voice) voice = pickVoice()
+  if (!voice) voice = selectEnglishVoice(synthesis.getVoices())
   if (voice) utter.voice = voice
   utter.lang = 'en-US'
   utter.rate = 0.85
-  window.speechSynthesis.speak(utter)
+  synthesis.speak(utter)
+  return true
 }

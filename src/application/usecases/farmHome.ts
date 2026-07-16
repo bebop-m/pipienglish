@@ -13,6 +13,9 @@ import { dayKeyOf } from '../../domain/time'
 import { WORDS, WORD_MAP } from '../../domain/words'
 import { assembleViewModel, type ChickChatVM, type FarmSnapshot } from '../viewmodel'
 
+const CHAT_NEIGHBOR_CAP = 3
+const CHAT_TTL_MS = 4_000
+
 export function createFarmUsecases(d: PipiDB) {
   async function getFarm(): Promise<FarmState> {
     return getKV(d, 'farmState', DEFAULT_FARM)
@@ -121,8 +124,9 @@ export function createFarmUsecases(d: PipiDB) {
   }
 
   /** 拖放落点持久化(1194×834 逻辑坐标) */
-  async function placeChick(chickId: string, home: StagePoint): Promise<void> {
-    await d.chicks.update(chickId, { homeX: home.x, homeY: home.y })
+  async function placeChick(chickId: string, home: StagePoint): Promise<boolean> {
+    if (!Number.isFinite(home.x) || !Number.isFinite(home.y)) return false
+    return (await d.chicks.update(chickId, { homeX: home.x, homeY: home.y })) === 1
   }
 
   /**
@@ -130,25 +134,41 @@ export function createFarmUsecases(d: PipiDB) {
    * 邻居由视觉层按几何挑选;只有 primary 播 TTS(调用方负责,SPEC §2.6)
    */
   async function chickChat(chickId: string, neighborIds: string[], now = Date.now()): Promise<ChickChatVM | null> {
-    const [cards, seenRows] = await Promise.all([d.cards.toArray(), d.seen.toArray()])
-    if (cards.length === 0) return null
-    const seenMap = new Map(seenRows.map(r => [r.wordId, r.lastSeenAt]))
-    const pool = cards.map(c => ({
-      wordId: c.wordId,
-      lastSeenAt: seenMap.get(c.wordId) ?? (c.card.last_review ? new Date(c.card.last_review).getTime() : 0),
-    }))
-    const drawn = weightedSample(pool, 1 + neighborIds.length, now)
-    await d.seen.bulkPut(drawn.map(wordId => ({ wordId, lastSeenAt: now })))
+    return d.transaction('rw', d.cards, d.chicks, d.seen, async () => {
+      if (!(await d.chicks.get(chickId))) return null
 
-    const entry = (wordId: string, id: string) => {
-      const w = WORD_MAP.get(wordId)
-      return { chickId: id, word: w?.word ?? wordId, meaning: w?.meaning ?? '' }
-    }
-    return {
-      primary: entry(drawn[0], chickId),
-      others: drawn.slice(1).map((wordId, i) => entry(wordId, neighborIds[i])),
-      expiresAt: now + 4000,
-    }
+      const requestedNeighbors = [...new Set(neighborIds)]
+        .filter(id => id !== chickId)
+        .slice(0, CHAT_NEIGHBOR_CAP)
+      const neighborRows = await d.chicks.bulkGet(requestedNeighbors)
+      const validNeighborIds = requestedNeighbors.filter((_, index) => Boolean(neighborRows[index]))
+
+      const [cards, seenRows] = await Promise.all([d.cards.toArray(), d.seen.toArray()])
+      const seenMap = new Map(seenRows.map(r => [r.wordId, r.lastSeenAt]))
+      const pool = cards
+        .filter(card => WORD_MAP.has(card.wordId))
+        .map(card => {
+          const reviewedAt = card.card.last_review ? new Date(card.card.last_review).getTime() : 0
+          return {
+            wordId: card.wordId,
+            lastSeenAt: seenMap.get(card.wordId) ?? (Number.isFinite(reviewedAt) ? reviewedAt : 0),
+          }
+        })
+      if (pool.length === 0) return null
+
+      const drawn = weightedSample(pool, 1 + validNeighborIds.length, now)
+      await d.seen.bulkPut(drawn.map(wordId => ({ wordId, lastSeenAt: now })))
+
+      const entry = (wordId: string, id: string) => {
+        const word = WORD_MAP.get(wordId)!
+        return { chickId: id, word: word.word, meaning: word.meaning }
+      }
+      return {
+        primary: entry(drawn[0], chickId),
+        others: drawn.slice(1).map((wordId, index) => entry(wordId, validNeighborIds[index])),
+        expiresAt: now + CHAT_TTL_MS,
+      }
+    })
   }
 
   async function setMotion(enabled: boolean): Promise<void> {

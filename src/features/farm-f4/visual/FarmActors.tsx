@@ -75,6 +75,7 @@ function FarmActor({
     pointerId: number
     offset: StagePoint
     start: StagePoint
+    origin: StagePoint
     lastValid: StagePoint
     moved: boolean
   } | null>(null)
@@ -210,6 +211,7 @@ function FarmActor({
       pointerId: event.pointerId,
       offset: { x: point.x - positionRef.current.x, y: point.y - positionRef.current.y },
       start: point,
+      origin: { ...positionRef.current },
       lastValid: { ...positionRef.current },
       moved: false,
     }
@@ -237,12 +239,21 @@ function FarmActor({
     event.preventDefault()
   }
 
-  const finishDrag = (event: ReactPointerEvent<HTMLButtonElement>) => {
+  const finishDrag = (event: ReactPointerEvent<HTMLButtonElement>, cancelled = false) => {
     const drag = dragRef.current
     if (!drag || drag.pointerId !== event.pointerId) return
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
     dragRef.current = null
     setDragging(false)
+    if (cancelled) {
+      positionRef.current = drag.origin
+      const actor = actorRef.current
+      if (actor) {
+        actor.style.left = `${drag.origin.x}px`
+        actor.style.top = `${drag.origin.y}px`
+      }
+      return
+    }
     if (drag.moved) {
       if (positionIsBlocked(positionRef.current)) {
         positionRef.current = drag.lastValid
@@ -283,12 +294,11 @@ function FarmActor({
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={finishDrag}
-      onPointerCancel={finishDrag}
+      onPointerCancel={event => finishDrag(event, true)}
       onClick={onClick}
     >
-      <span className="actor-talk-f3">
-        {visibleTalk?.line}
-        {visibleTalk?.translation && <small>{visibleTalk.translation}</small>}
+      <span className="actor-talk-f3" role="status" aria-live="polite" aria-atomic="true" aria-hidden={!visibleTalk}>
+        {visibleTalk && <>{visibleTalk.line}{visibleTalk.translation && <small>{visibleTalk.translation}</small>}</>}
       </span>
       <span className="sprite-shell-f3">
         <img className="sprite-f3" src={spec.image} alt="" draggable={false} />
@@ -323,7 +333,7 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
       ...visibleChicks.map((chick, index) => ({
         id: chick.chickId,
         kind: 'chick' as const,
-        label: '农场小鸡',
+        label: '农场小鸡，点按听单词，拖动可以搬家',
         image: '/assets/f4/chick-f3.png',
         home: chick.home ?? CHICK_HOMES[index],
         talk: null,

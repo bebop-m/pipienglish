@@ -11,10 +11,11 @@
 3. [`01-product/DESIGN_BRIEF.md`](01-product/DESIGN_BRIEF.md) —— 页面要求与情感基调；
 4. [`02-visual/F4_VISUAL_SYSTEM.md`](02-visual/F4_VISUAL_SYSTEM.md) —— F4 视觉语言与新图片协议；
 5. [`02-visual/F4_IPAD_FIDELITY.md`](02-visual/F4_IPAD_FIDELITY.md) —— iPad Pro 保真落地；
-6. [`02-visual/F4_BASELINE_MANIFEST.md`](02-visual/F4_BASELINE_MANIFEST.md) —— 锁定文件、图片和哈希；
-7. [`03-workflow/CLAUDE_CODEX_VISUAL_CONTRACT.md`](03-workflow/CLAUDE_CODEX_VISUAL_CONTRACT.md) —— Claude/Codex 分工；
-8. [`04-assets/ASSET_BACKLOG_F4.md`](04-assets/ASSET_BACKLOG_F4.md) —— 后续独立素材清单；
-9. [`reference-images/README.md`](reference-images/README.md) —— 小皮确认的重要原始参考图。
+6. [`02-visual/F4_MULTI_SIZE_ADAPTATION_STATUS.md`](02-visual/F4_MULTI_SIZE_ADAPTATION_STATUS.md) —— 当前设备支持边界与后续恢复入口；
+7. [`02-visual/F4_BASELINE_MANIFEST.md`](02-visual/F4_BASELINE_MANIFEST.md) —— 锁定文件、图片和哈希；
+8. [`03-workflow/CLAUDE_CODEX_VISUAL_CONTRACT.md`](03-workflow/CLAUDE_CODEX_VISUAL_CONTRACT.md) —— Claude/Codex 分工；
+9. [`04-assets/ASSET_BACKLOG_F4.md`](04-assets/ASSET_BACKLOG_F4.md) —— 后续独立素材清单；
+10. [`reference-images/README.md`](reference-images/README.md) —— 小皮确认的重要原始参考图。
 
 ## 目录职责
 

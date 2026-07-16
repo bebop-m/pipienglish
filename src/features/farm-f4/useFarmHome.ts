@@ -24,6 +24,7 @@ export function useFarmHome(): FarmHomeBridge {
   const [chat, setChat] = useState<ChickChatVM | null>(null)
   const [navigation, setNavigation] = useState<'lesson' | 'rescue' | 'parent' | null>(null)
   const guardTimer = useRef<number | undefined>(undefined)
+  const chatRequest = useRef(0)
 
   const refresh = useCallback(async () => {
     setCore(await usecases.loadViewModel())
@@ -48,6 +49,15 @@ export function useFarmHome(): FarmHomeBridge {
       window.clearInterval(guardTimer.current)
     }
   }, [runGuard])
+
+  useEffect(() => {
+    if (!chat) return
+    const expiresAt = chat.expiresAt
+    const timer = window.setTimeout(() => {
+      setChat(current => (current?.expiresAt === expiresAt ? null : current))
+    }, Math.max(0, expiresAt - Date.now()))
+    return () => window.clearTimeout(timer)
+  }, [chat])
 
   const dispatch = useCallback(
     async (event: FarmHomeEvent) => {
@@ -91,14 +101,19 @@ export function useFarmHome(): FarmHomeBridge {
           setNavigation('rescue')
           return
         case 'CHICK_CHAT': {
+          const requestId = ++chatRequest.current
           const result = await usecases.chickChat(event.chickId, event.neighborIds)
+          if (requestId !== chatRequest.current) return
           if (result) {
             setChat(result)
             speak(result.primary.word) // 全局音频原则:只有 primary 播音(SPEC §2.6/§2.1)
+          } else {
+            setChat(null)
           }
           return
         }
         case 'CHAT_DISMISSED':
+          chatRequest.current++
           setChat(null)
           return
         case 'CHICK_PLACED':

@@ -158,18 +158,27 @@ describe('首页三状态与蛋经济全链路', () => {
     const db = freshDb()
     const uc = createFarmUsecases(db)
     const t0 = Date.now()
-    // 造 3 张已学卡
+    await db.chicks.bulkAdd([
+      { chickId: 'chick-a', bornOn: '2026-07-17', source: 'hatch', homeX: null, homeY: null },
+      { chickId: 'chick-b', bornOn: '2026-07-17', source: 'hatch', homeX: null, homeY: null },
+      { chickId: 'chick-c', bornOn: '2026-07-17', source: 'hatch', homeX: null, homeY: null },
+    ])
+    // 造 3 张有效已学卡和 1 张已不在当前词库的旧卡
     await db.cards.bulkPut(
-      ['apple', 'banana', 'orange'].map(id => ({
+      ['apple', 'banana', 'orange', 'legacy-missing'].map(id => ({
         wordId: id, due: t0, card: { due: new Date(t0), reps: 1 } as never,
       })),
     )
-    const chat = await uc.chickChat('chick-a', ['chick-b', 'chick-c'], t0)
+    const chat = await uc.chickChat('chick-a', ['chick-b', 'missing-chick', 'chick-b', 'chick-c'], t0)
     expect(chat).not.toBeNull()
     expect(chat!.others).toHaveLength(2)
     const drawn = [chat!.primary.word, ...chat!.others.map(o => o.word)]
     expect(new Set(drawn).size).toBe(3) // 不重复
-    expect(await db.seen.count()).toBe(3) // 见面时间已记
+    expect(await db.seen.count()).toBe(3) // 见面时间已记;无效旧卡没有进入气泡
+    expect((await db.seen.toArray()).every(row => row.lastSeenAt === t0)).toBe(true)
+
+    expect(await uc.chickChat('missing-chick', [], t0 + 1)).toBeNull()
+    expect(await db.seen.count()).toBe(3)
     db.close()
   })
 
@@ -177,9 +186,28 @@ describe('首页三状态与蛋经济全链路', () => {
     const db = freshDb()
     const uc = createFarmUsecases(db)
     await db.chicks.add({ chickId: 'c1', bornOn: '2026-07-17', source: 'hatch', homeX: null, homeY: null })
-    await uc.placeChick('c1', { x: 365, y: 470 })
-    const vm = await uc.loadViewModel()
+    expect(await uc.placeChick('c1', { x: 365, y: 470 })).toBe(true)
+    expect(await uc.placeChick('missing', { x: 1, y: 2 })).toBe(false)
+    expect(await uc.placeChick('c1', { x: Number.NaN, y: 2 })).toBe(false)
+    const vm = await createFarmUsecases(db).loadViewModel()
     expect(vm.chicksVisible[0].home).toEqual({ x: 365, y: 470 })
+    db.close()
+  })
+
+  it('40 只可见上限的数据侧真实化,其余计入鸡舍', async () => {
+    const db = freshDb()
+    const uc = createFarmUsecases(db)
+    await db.chicks.bulkAdd(Array.from({ length: 43 }, (_, index) => ({
+      chickId: `cap-${index}`,
+      bornOn: `2026-07-${String((index % 28) + 1).padStart(2, '0')}`,
+      source: 'hatch' as const,
+      homeX: null,
+      homeY: null,
+    })))
+    const vm = await uc.loadViewModel()
+    expect(vm.chicksTotal).toBe(43)
+    expect(vm.chicksVisible).toHaveLength(40)
+    expect(vm.chicksInCoop).toBe(3)
     db.close()
   })
 })
