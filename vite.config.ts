@@ -12,19 +12,29 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['apple-touch-icon.png'],
+      workbox: {
+        // F4 首页必须断网可用；背景图约 2.2 MB，显式提高单文件预缓存上限。
+        globPatterns: ['**/*.{js,css,html,png,webmanifest,json}'],
+        // manifest 与其中声明的图标会由插件自动加入；避免扫描阶段重复登记同一 URL。
+        globIgnores: ['manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+      },
       manifest: {
+        id: './',
         name: '皮皮のEnglish',
         short_name: '皮皮のEnglish',
         description: '皮皮的每日单词农场',
+        lang: 'zh-CN',
+        start_url: './',
+        scope: './',
         theme_color: '#ffe382',
         background_color: '#faf3e4',
         display: 'standalone',
-        orientation: 'any',
+        orientation: 'landscape',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+          { src: 'icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
         ]
       }
     })

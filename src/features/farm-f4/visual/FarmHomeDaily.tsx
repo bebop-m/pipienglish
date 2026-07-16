@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import type { CookingState } from '../../../domain/types'
 import type { FarmHomeEvent, FarmHomeViewModel } from '../../../application/viewmodel'
 import { f4AssetUrl } from '../assetUrl'
+import { InstallHint } from '../../pwa/InstallHint'
 import { FarmActors } from './FarmActors'
 import '../../../styles/f4/home.css'
 
@@ -293,6 +294,8 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
         <button className="sticker-chip motion-toggle" type="button" aria-pressed={!vm.motionEnabled} onClick={() => dispatch({ type: 'SET_MOTION', enabled: !vm.motionEnabled })}>动效：{vm.motionEnabled ? '开' : '关'}</button>
         <button className="parent-button" type="button" onClick={() => dispatch({ type: 'OPEN_PARENT' })}>家长</button>
       </header>
+
+      <InstallHint />
 
       <section className="farm-stage-f3 farm-stage-f4" aria-label="会慢慢散步和生活互动的农场">
         {vm.state === 'first_visit' ? <FirstVisitBoard dispatch={dispatch} /> : vm.state === 'daily_complete' ? <CompleteBoard vm={vm} dispatch={dispatch} /> : <section className="task-board-f3" aria-labelledby="task-title-f4">

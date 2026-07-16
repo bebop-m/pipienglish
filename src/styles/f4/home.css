@@ -123,6 +123,64 @@
   background: #e5f5d6;
 }
 
+.install-hint-f4 {
+  position: absolute;
+  z-index: 125;
+  left: 50%;
+  bottom: 18px;
+  width: 520px;
+  min-height: 62px;
+  display: grid;
+  grid-template-columns: 43px 1fr auto;
+  gap: 11px;
+  align-items: center;
+  padding: 9px 10px 9px 12px;
+  border: 2px solid #705644;
+  border-radius: 19px;
+  background: rgba(255, 248, 226, 0.98);
+  box-shadow: 0 6px 0 rgba(72, 52, 39, 0.18), 0 15px 30px rgba(72, 52, 39, 0.14);
+  transform: translateX(-50%);
+}
+
+.install-hint-f4 > span:nth-child(2) { display: grid; gap: 2px; }
+.install-hint-f4 strong { font-size: 15px; }
+.install-hint-f4 small { color: var(--ink-soft); font-size: 11px; font-weight: 750; }
+.install-share-f4 {
+  position: relative;
+  width: 27px;
+  height: 25px;
+  justify-self: center;
+  margin-top: 7px;
+  border: 2px solid #b45f40;
+  border-radius: 5px;
+  color: #b45f40;
+  font-size: 22px;
+  font-weight: 900;
+  text-align: center;
+}
+.install-share-f4 span {
+  position: absolute;
+  left: 50%;
+  top: -17px;
+  padding: 0 2px;
+  background: #fff8e2;
+  line-height: 24px;
+  transform: translateX(-50%);
+}
+.install-hint-f4 button {
+  min-width: 72px;
+  min-height: 40px;
+  border: 2px solid #705644;
+  border-radius: 13px;
+  cursor: pointer;
+  background: var(--yellow);
+  box-shadow: 0 3px 0 rgba(72, 52, 39, 0.18);
+  font-size: 12px;
+  font-weight: 900;
+}
+.install-hint-f4 button:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(72, 52, 39, 0.18); }
+.install-hint-f4 button:focus-visible { outline: 4px solid rgba(255, 255, 255, 0.94); outline-offset: 2px; }
+
 .farm-stage-f3 {
   position: absolute;
   z-index: 2;
