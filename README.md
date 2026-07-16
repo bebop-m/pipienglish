@@ -30,10 +30,10 @@ Vite + React + TypeScript · Dexie (IndexedDB) · ts-fsrs (间隔重复) · vite
 
 | 参数 | 值 | 位置 |
 |---|---|---|
-| 每日新词(硬上限) | 4 | `src/session.ts` `NEW_PER_DAY` |
-| 每日复习上限 | 25 | `src/session.ts` `REVIEW_CAP` |
-| FSRS 目标保留率 | 0.9 | `src/srs.ts` |
-| 词库 | 「好吃的!」88 词 | `src/data/words.ts` |
+| 每日新词(硬上限) | 4 | `src/domain/dailyPlan.ts` `NEW_PER_DAY` |
+| 每日复习上限 | 6(2026-07-17 由 25 调整) | `src/domain/dailyPlan.ts` `REVIEW_CAP` |
+| FSRS 目标保留率 | 0.9 | `src/domain/srs.ts` |
+| 词库 | 「好吃的!」88 词 | `src/domain/words.ts` |
 
 ## 已实现(v0.1)
 

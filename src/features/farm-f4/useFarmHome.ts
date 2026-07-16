@@ -85,7 +85,7 @@ export function useFarmHome(): FarmHomeBridge {
           await usecases.fryingDone()
           break
         case 'FEED_CHICK':
-          await usecases.feedDone()
+          await usecases.feedDone(event.chickId)
           break
         case 'OPEN_RESCUE':
           setNavigation('rescue')

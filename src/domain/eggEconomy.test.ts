@@ -7,10 +7,10 @@ const farm = (over: Partial<FarmState> = {}): FarmState => ({
 })
 
 describe('eggsEarnedFor', () => {
-  it('任务项 <15 得 1 颗,≥15 得 2 颗', () => {
+  it('任务项 <14 得 1 颗,≥14(满任务日:复习6+新词4×2)得 2 颗', () => {
     expect(eggsEarnedFor(8)).toBe(1)
-    expect(eggsEarnedFor(14)).toBe(1)
-    expect(eggsEarnedFor(15)).toBe(2)
+    expect(eggsEarnedFor(13)).toBe(1)
+    expect(eggsEarnedFor(14)).toBe(2)
     expect(eggsEarnedFor(33)).toBe(2)
   })
 })

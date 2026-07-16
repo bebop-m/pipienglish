@@ -35,7 +35,8 @@ export interface FarmHomeViewModel {
   dayNumber: number
   streak: number
   henName: string | null
-  learnedToday: number
+  learnedToday: number // 已完成的复习词 + 已完成见面/自测的新词,用于任务板“朋友”进度
+  newWordsLearnedToday: number // 仅新词,用于顶栏“今日单词”
   dailyTarget: number
   reviewCountToday: number
   totalItemsToday: number
@@ -90,6 +91,9 @@ export function assembleViewModel(s: FarmSnapshot): Omit<FarmHomeViewModel, 'ove
   const state: FarmHomeState =
     farm.henName == null ? 'first_visit' : session.completed ? 'daily_complete' : 'daily_incomplete'
   const items = totalItems(session)
+  const reviewDone = Math.min(session.doneCount, session.reviewIds.length)
+  const newStepsDone = Math.max(0, session.doneCount - session.reviewIds.length)
+  const newWordsLearnedToday = Math.min(session.newIds.length, Math.floor(newStepsDone / 2))
   const today = dayKeyOf(s.now)
   return {
     hydrated: true,
@@ -97,10 +101,11 @@ export function assembleViewModel(s: FarmSnapshot): Omit<FarmHomeViewModel, 'ove
     dayNumber: meta.totalDays + (session.completed ? 0 : 1),
     streak: meta.streak,
     henName: farm.henName,
-    learnedToday: session.doneCount,
+    learnedToday: reviewDone + newWordsLearnedToday,
+    newWordsLearnedToday,
     dailyTarget: session.newIds.length,
     reviewCountToday: session.reviewIds.length,
-    totalItemsToday: items,
+    totalItemsToday: session.reviewIds.length + session.newIds.length,
     estimatedMinutes: estimatedMinutes(session),
     eggStock: farm.eggStock,
     eggsEarnedToday: eggsEarnedFor(items),

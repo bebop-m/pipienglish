@@ -71,6 +71,63 @@ describe('首页三状态与蛋经济全链路', () => {
     db.close()
   })
 
+  it('并发时钟守卫对同一颗到期蛋只结算一次', async () => {
+    const db = freshDb()
+    const uc = createFarmUsecases(db)
+    const t0 = Date.now()
+    await uc.clockGuard(t0)
+    await uc.nameHen('咕咕')
+    await uc.completeDailyLesson(t0)
+    await uc.allocateEggToHatch(t0)
+
+    const results = await Promise.all([
+      uc.clockGuard(t0 + HATCH_MS + 1),
+      uc.clockGuard(t0 + HATCH_MS + 1),
+    ])
+    expect(results.reduce((sum, result) => sum + result.hatched, 0)).toBe(1)
+    expect(await db.chicks.count()).toBe(1)
+    expect((await uc.loadViewModel(t0 + HATCH_MS + 1)).incubating).toHaveLength(0)
+    db.close()
+  })
+
+  it('两日闭环:第一天孵化 → 第二天破壳 → 再赚蛋 → 煎蛋喂真实小鸡', async () => {
+    const db = freshDb()
+    const uc = createFarmUsecases(db)
+    const dayOne = new Date('2026-07-17T09:00:00+08:00').getTime()
+
+    await uc.clockGuard(dayOne)
+    await uc.nameHen('咕咕')
+    await uc.completeDailyLesson(dayOne)
+    expect((await uc.loadViewModel(dayOne)).eggStock).toBe(1)
+    expect(await uc.allocateEggToHatch(dayOne)).toBe(true)
+
+    await uc.clockGuard(dayOne + HATCH_MS - 1)
+    expect((await uc.loadViewModel(dayOne + HATCH_MS - 1)).chicksTotal).toBe(0)
+
+    const dayTwo = dayOne + HATCH_MS + 1
+    expect((await uc.clockGuard(dayTwo)).hatched).toBe(1)
+    let vm = await uc.loadViewModel(dayTwo)
+    expect(vm.state).toBe('daily_incomplete')
+    expect(vm.dayNumber).toBe(2)
+    expect(vm.chicksTotal).toBe(1)
+    expect(vm.incubating).toHaveLength(0)
+
+    await uc.completeDailyLesson(dayTwo)
+    vm = await uc.loadViewModel(dayTwo)
+    expect(vm.state).toBe('daily_complete')
+    expect(vm.streak).toBe(2)
+    expect(vm.eggStock).toBe(1)
+
+    expect(await uc.putEggInPan()).toBe(true)
+    expect(await uc.fryingDone()).toBe(true)
+    expect(await uc.feedDone(vm.chicksVisible[0].chickId)).toBe(true)
+    vm = await uc.loadViewModel(dayTwo)
+    expect(vm.cooking).toBe('empty')
+    expect(vm.eggStock).toBe(0)
+    expect(vm.chicksTotal).toBe(1)
+    db.close()
+  })
+
   it('煎蛋崩溃恢复:落库值只有 raw/ready,cooking 动画态重启后回 raw', async () => {
     const db = freshDb()
     const uc = createFarmUsecases(db)
@@ -86,7 +143,9 @@ describe('首页三状态与蛋经济全链路', () => {
     expect(vm.eggStock).toBe(0) // 蛋已下锅,没有消失
 
     expect(await uc.fryingDone()).toBe(true)
-    expect(await uc.feedDone()).toBe(true)
+    expect(await uc.feedDone()).toBe(false) // 还没有真实小鸡,煎蛋会安全保留
+    await db.chicks.add({ chickId: 'feed-target', bornOn: '2026-07-17', source: 'hatch', homeX: null, homeY: null })
+    expect(await uc.feedDone('feed-target')).toBe(true)
     vm = await uc.loadViewModel(t0)
     expect(vm.cooking).toBe('empty')
 

@@ -1,16 +1,19 @@
-// F4 首页容器:只做 VM/事件桥接,不含任何视觉主张。
-// 阶段 B:固定舞台外壳已接入;阶段 C 再以真实 F4 首页视觉替换内部 DevFarmView。
+// F4 首页容器:只做 VM/事件桥接与阶段状态路由。
+// 阶段 C 仅 daily_incomplete 进入正式 F4 视觉;其余两态在阶段 F 前仍保持内部开发壳。
 
 import { useFarmHome } from './useFarmHome'
 import { DevFarmView } from '../../dev/DevShell'
 import { FarmStageShell } from './visual/FarmStageShell'
+import { FarmHomeDaily } from './visual/FarmHomeDaily'
 
 export function FarmHomeScreen() {
   const bridge = useFarmHome()
-  // DEV PLACEHOLDER:内部开发壳,永不面向小皮(契约 §5;V-8 裁决)
+  const forceDevShell = import.meta.env.DEV && new URLSearchParams(window.location.search).has('dev-shell')
   return (
     <FarmStageShell>
-      <DevFarmView bridge={bridge} />
+      {!forceDevShell && bridge.vm?.state === 'daily_incomplete'
+        ? <FarmHomeDaily vm={bridge.vm} dispatch={bridge.dispatch} />
+        : <DevFarmView bridge={bridge} />}
     </FarmStageShell>
   )
 }

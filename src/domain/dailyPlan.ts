@@ -2,7 +2,7 @@
 // 热身排序与题型分配在学习流页面阶段引入,规则将只在此文件演进
 
 export const NEW_PER_DAY = 4 // 硬上限,不是下限(SPEC §0)
-export const REVIEW_CAP = 25 // 复习债上限,积压顺延且永不展示总数
+export const REVIEW_CAP = 6 // 复习债上限,积压顺延且永不展示总数(2026-07-17 爸爸定:6+4,与写词游戏每轮 10 一致)
 
 export interface PlanInput {
   dueByOverdue: string[] // 到期卡 wordId,最过期优先

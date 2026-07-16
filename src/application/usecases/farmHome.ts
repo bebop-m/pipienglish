@@ -24,22 +24,24 @@ export function createFarmUsecases(d: PipiDB) {
 
   /** 时钟守卫:孵化结算 + 今日会话保障。启动/回前台/60s 间隔调用,幂等 */
   async function clockGuard(now = Date.now()): Promise<{ hatched: number; sessionRebuilt: boolean }> {
-    const farm = await getFarm()
-    const settled = egg.settleHatches(farm, now)
-    if (settled.hatched > 0) {
-      const bornOn = dayKeyOf(now)
-      const rows: Chick[] = Array.from({ length: settled.hatched }, () => ({
-        chickId: crypto.randomUUID(),
-        bornOn,
-        source: 'hatch',
-        homeX: null,
-        homeY: null,
-      }))
-      await d.transaction('rw', d.chicks, d.kv, async () => {
+    let hatched = 0
+    await d.transaction('rw', d.chicks, d.kv, async () => {
+      const farm = await getFarm()
+      const settled = egg.settleHatches(farm, now)
+      if (settled.hatched > 0) {
+        const bornOn = dayKeyOf(now)
+        const rows: Chick[] = Array.from({ length: settled.hatched }, () => ({
+          chickId: crypto.randomUUID(),
+          bornOn,
+          source: 'hatch',
+          homeX: null,
+          homeY: null,
+        }))
         await d.chicks.bulkAdd(rows)
         await setKV(d, 'farmState', settled.farm)
-      })
-    }
+        hatched = settled.hatched
+      }
+    })
 
     const today = dayKeyOf(now)
     let sessionRebuilt = false
@@ -47,7 +49,7 @@ export function createFarmUsecases(d: PipiDB) {
       await d.sessions.put(await buildTodaySession(today, now))
       sessionRebuilt = true
     }
-    return { hatched: settled.hatched, sessionRebuilt }
+    return { hatched, sessionRebuilt }
   }
 
   async function buildTodaySession(today: string, now: number): Promise<DailySession> {
@@ -92,8 +94,18 @@ export function createFarmUsecases(d: PipiDB) {
   async function fryingDone(): Promise<boolean> {
     return applyFarmRule(egg.fryingDone)
   }
-  async function feedDone(): Promise<boolean> {
-    return applyFarmRule(egg.feedDone)
+  async function feedDone(chickId?: string): Promise<boolean> {
+    let applied = false
+    await d.transaction('rw', d.chicks, d.kv, async () => {
+      const targetExists = chickId ? Boolean(await d.chicks.get(chickId)) : (await d.chicks.count()) > 0
+      if (!targetExists) return
+      const next = egg.feedDone(await getFarm())
+      if (next) {
+        await setKV(d, 'farmState', next)
+        applied = true
+      }
+    })
+    return applied
   }
 
   async function applyFarmRule(rule: (farm: FarmState) => FarmState | null): Promise<boolean> {

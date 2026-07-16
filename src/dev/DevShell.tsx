@@ -6,6 +6,8 @@ import { useState } from 'react'
 import type { FarmHomeBridge } from '../features/farm-f4/useFarmHome'
 import { db } from '../application/db'
 import { exportAll, importAll } from '../application/backup'
+import { dayKey } from '../domain/time'
+import { HATCH_MS, type FarmState } from '../domain/types'
 
 export function DevFarmView({ bridge }: { bridge: FarmHomeBridge }) {
   const { vm, dispatch, navigation, clearNavigation } = bridge
@@ -33,6 +35,26 @@ export function DevFarmView({ bridge }: { bridge: FarmHomeBridge }) {
         {btn('开始今日学习(导航)', () => dispatch({ type: 'START_DAILY_LESSON' }), vm.state !== 'daily_incomplete')}
         {btn('[模拟] 完成今日学习', () => dispatch({ type: 'DAILY_LESSON_COMPLETED', newWords: vm.dailyTarget, reviews: vm.reviewCountToday }), vm.state !== 'daily_incomplete')}
         {navigation && btn('清除导航意图', clearNavigation)}
+        {import.meta.env.DEV && btn('[测试] 回到未完成首页（保留资产）', async () => {
+          const session = await db.sessions.get(dayKey())
+          if (session) {
+            await db.sessions.put({ ...session, completed: false, doneCount: 0, answered: 0, correct: 0 })
+          }
+          window.location.assign(window.location.pathname)
+        })}
+        {import.meta.env.DEV && btn('[测试] 推进孵化 24 小时', async () => {
+          const row = await db.kv.get('farmState')
+          if (!row) return
+          const farm = row.value as FarmState
+          await db.kv.put({
+            key: 'farmState',
+            value: {
+              ...farm,
+              incubating: farm.incubating.map(egg => ({ ...egg, placedAt: Date.now() - HATCH_MS - 1 })),
+            },
+          })
+          window.location.reload()
+        }, vm.incubating.length === 0)}
       </div>
 
       <div className="dev-row">

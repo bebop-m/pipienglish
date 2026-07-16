@@ -4,9 +4,10 @@
 import type { FarmState } from './types'
 import { HATCH_MS, HATCHERY_SLOTS } from './types'
 
-/** 完成当日必修的奖励:任务项 ≥15 记 2 颗,否则 1 颗(SPEC §2.3) */
+/** 完成当日必修的奖励:满任务日(复习 6 + 新词 4×2 = 14 项)记 2 颗,否则 1 颗(SPEC §2.3;
+ *  阈值随 2026-07-17 复习上限 25→6 的裁决同步调整,否则 2 颗永远拿不到) */
 export function eggsEarnedFor(totalItems: number): 1 | 2 {
-  return totalItems >= 15 ? 2 : 1
+  return totalItems >= 14 ? 2 : 1
 }
 
 /** 分配一颗蛋去孵化:占用编号最小的空巢位 */
