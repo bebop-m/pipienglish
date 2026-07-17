@@ -36,13 +36,15 @@
           <span class="answer-state-icon" aria-hidden="true"></span>
         </div>
 
-        <div class="peek-answer" role="status"><span>看一眼答案</span><strong>egg</strong><small>/eɡ/</small><p>记住以后，把它写进输入框。</p></div>
+        <div class="rescue-captured" role="status">
+          <div class="rescue-visual" aria-hidden="true"><img src="/assets/f4/chick-f3.png" alt="" /><span>等待救援</span></div>
+          <div class="rescue-copy"><p>RESCUE MISSION</p><h2>一只小鸡被抓走了</h2><span>“鸡蛋”已经进入错题库。去救援时，这个词会单独重新走一遍学习路线。</span><button type="button">先做下一题</button></div>
+        </div>
 
         <div class="dictation-feedback" role="status">
-          <div class="feedback-ready"><span class="feedback-mark">✎</span><p><strong>想好以后再提交</strong><small>大小写都可以，系统会按正常英文判断。</small></p><button class="peek-button" type="button">想不起来？看一眼</button></div>
+          <div class="feedback-ready"><span class="feedback-mark">✎</span><p><strong>想好以后再提交</strong><small>大小写都可以，系统会按正常英文判断。</small></p><button class="skip-button" type="button">想不起来</button></div>
           <div class="feedback-correct"><span class="feedback-mark">✓</span><p><strong>写对啦！egg 就是鸡蛋</strong><small>这个新朋友已经会写了。</small></p><button type="button">继续</button></div>
-          <div class="feedback-retry"><span class="feedback-mark">↶</span><p><strong>差一点，再写一次</strong><small>先改一改答案，也可以重听或看一眼。</small></p><button class="peek-button" type="button">看一眼</button></div>
-          <div class="feedback-peek"><span class="feedback-mark">◌</span><p><strong>看清楚了吗？</strong><small>答案不会自动填进去，要自己再写一遍。</small></p><button class="hide-peek" type="button">我记住了</button></div>
+          <div class="feedback-retry"><span class="feedback-mark">↶</span><p><strong>差一点，再写一次</strong><small>先修改答案；实在想不起来，也可以跳过。</small></p><button class="skip-button" type="button">想不起来</button></div>
         </div>
 
         <div class="dictation-actions"><button class="replay-word" type="button"><span class="sound-mark" aria-hidden="true"><i></i><i></i><i></i></span>重听</button><button class="submit-answer" type="button">提交答案</button></div>

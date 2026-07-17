@@ -17,7 +17,9 @@ visual_after:
   - visual-regression/stage-h-candidates/H5B-dictation-correct-v1-1194x834.png
   - visual-regression/stage-h-candidates/H5C-dictation-retry-v1-1194x834.png
   - visual-regression/stage-h-candidates/H5D-dictation-peek-v1-1194x834.png
-approval: pending-xiaopi
+approval: superseded-by-v2
+superseded_on: 2026-07-17
+superseded_reason: 小皮要求取消看答案，改为想不起来后直接跳过并进入小鸡救援流程
 ---
 
 # H-5 英文默写题四状态视觉候选

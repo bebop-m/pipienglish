@@ -2,8 +2,7 @@
   const root = document.querySelector('.dictation-candidate')
   const input = document.querySelector('#dictation-answer')
   const submitButton = document.querySelector('.submit-answer')
-  const peekButtons = Array.from(document.querySelectorAll('.peek-button'))
-  const hidePeekButton = document.querySelector('.hide-peek')
+  const skipButtons = Array.from(document.querySelectorAll('.skip-button'))
   const queryState = new URLSearchParams(window.location.search).get('state')
 
   function normalize(value) {
@@ -16,31 +15,33 @@
       coordinateSystem: '1194x834 logical stage; origin top-left; x right; y down',
       screen: `dictation_${state}`,
       meaning: '鸡蛋',
-      answerVisible: state === 'correct' || state === 'peek',
+      answerVisible: state === 'correct',
       inputValue: input.value,
       inputMode: 'standard text; keyboard or system handwriting input',
-      controls: ['back', 'replay_word', 'input_answer', 'submit_answer', 'peek_answer'],
+      wrongBookQueued: state === 'captured',
+      chickCaptured: state === 'captured',
+      rescueRoute: state === 'captured' ? ['listen', 'write', 'choose', 'dictate'] : null,
+      controls: ['back', 'replay_word', 'input_answer', 'submit_answer', 'skip_unknown'],
     }
   }
 
   function setState(state) {
     root.dataset.state = state
-    if (state === 'ready' || state === 'peek') input.value = ''
+    if (state === 'ready' || state === 'captured') input.value = ''
     if (state === 'correct') input.value = 'egg'
     if (state === 'retry') input.value = 'hen'
-    input.readOnly = state === 'correct' || state === 'peek'
+    input.readOnly = state === 'correct' || state === 'captured'
     document.body.dataset.gameState = JSON.stringify(statePayload())
   }
 
   submitButton.addEventListener('click', () => setState(normalize(input.value) === 'egg' ? 'correct' : 'retry'))
-  peekButtons.forEach((button) => button.addEventListener('click', () => setState('peek')))
-  hidePeekButton.addEventListener('click', () => setState('ready'))
+  skipButtons.forEach((button) => button.addEventListener('click', () => setState('captured')))
   input.addEventListener('input', () => {
     if (root.dataset.state === 'retry') root.dataset.state = 'ready'
     document.body.dataset.gameState = JSON.stringify(statePayload())
   })
 
-  setState(['correct', 'retry', 'peek'].includes(queryState) ? queryState : 'ready')
+  setState(['correct', 'retry', 'captured'].includes(queryState) ? queryState : 'ready')
   window.render_game_to_text = () => JSON.stringify(statePayload())
   window.advanceTime = () => undefined
 })()

@@ -21,7 +21,11 @@
 | `H4A-listening-ready-v1-1194x834.png` | `xiaopi-approved` | H-4A V1：只显示播放入口与纯中文选项，不显示英文词形或音标 |
 | `H4B-listening-correct-v1-1194x834.png` | `xiaopi-approved` | H-4B V1：答对后绿色确认，并首次揭示 `egg /eɡ/` |
 | `H4C-listening-retry-v1-1194x834.png` | `xiaopi-approved` | H-4C V1：错选项粉色提示，继续隐藏英文并允许重听重选 |
-| `H5A-dictation-ready-v1-1194x834.png` | `pending-xiaopi` | H-5A V1：中文释义、重听和标准英文文本输入框 |
-| `H5B-dictation-correct-v1-1194x834.png` | `pending-xiaopi` | H-5B V1：正确答案框绿色确认，只保留继续操作 |
-| `H5C-dictation-retry-v1-1194x834.png` | `pending-xiaopi` | H-5C V1：保留错误输入并允许修改、重听、看答案与再次提交 |
-| `H5D-dictation-peek-v1-1194x834.png` | `pending-xiaopi` | H-5D V1：显示 `egg /eɡ/`，明确不会自动填入输入框 |
+| `H5A-dictation-ready-v1-1194x834.png` | `superseded` | H-5 V1：整组被新的“不显示答案、直接进入救援”规则替代 |
+| `H5B-dictation-correct-v1-1194x834.png` | `superseded` | H-5 V1：随同组候选作废，保留作审计记录 |
+| `H5C-dictation-retry-v1-1194x834.png` | `superseded` | H-5 V1：包含已废弃的“看答案”入口 |
+| `H5D-dictation-peek-v1-1194x834.png` | `superseded` | H-5 V1：看答案状态已被明确废弃 |
+| `H5A-dictation-ready-v2-1194x834.png` | `pending-xiaopi` | H-5A V2：中文释义、重听、英文文本输入、提交与“想不起来” |
+| `H5B-dictation-correct-v2-1194x834.png` | `pending-xiaopi` | H-5B V2：正确答案框绿色确认，只保留继续操作 |
+| `H5C-dictation-retry-v2-1194x834.png` | `pending-xiaopi` | H-5C V2：保留错误输入，可修改重试或选择“想不起来” |
+| `H5D-dictation-captured-v2-1194x834.png` | `pending-xiaopi` | H-5D V2：单词进入错题库，一只小鸡被抓并等待单词救援 |
