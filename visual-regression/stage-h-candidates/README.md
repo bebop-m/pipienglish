@@ -29,4 +29,5 @@
 | `H5B-dictation-correct-v2-1194x834.png` | `xiaopi-approved` | H-5B V2：正确答案框绿色确认，只保留继续操作 |
 | `H5C-dictation-retry-v2-1194x834.png` | `xiaopi-approved` | H-5C V2：保留错误输入，可修改重试或选择“想不起来” |
 | `H5D-dictation-captured-v2-1194x834.png` | `xiaopi-approved` | H-5D V2：单词进入错题库，一只小鸡被抓并等待单词救援 |
-| `H6-finish-mother-thumbsup-v1-1194x834.png` | `pending-xiaopi` | H-6 V1：母鸡妈妈竖拇指说“真棒！”，显示新词、复习、连胜、鸡蛋 +1 与回农场 |
+| `H6-finish-mother-thumbsup-v1-1194x834.png` | `superseded` | H-6 V1：顶部贴纸与对话气泡黑线断层需要修正 |
+| `H6-finish-mother-thumbsup-v2-1194x834.png` | `xiaopi-approved` | H-6 V2：移除顶部贴纸，气泡改为闭合 SVG 黑线；母鸡妈妈竖拇指说“真棒！” |

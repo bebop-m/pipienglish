@@ -16,7 +16,7 @@ approved_asset:
   - public/assets/f4/mother-thumbsup-f4-v1.png
 visual_after:
   - visual-regression/stage-h-candidates/H6-finish-mother-thumbsup-v1-1194x834.png
-approval: pending-xiaopi
+approval: superseded-by-v2
 ---
 
 # H-6 母鸡妈妈课程结束页候选
@@ -37,6 +37,6 @@ approval: pending-xiaopi
 - 透明批准版和 public 副本字节一致，SHA-256 为 `EBCFBB1898BEF2D31D5E0B2C8F2A2CFE1F35803DCD6DE0AE633B56CC6DF004C3`。
 - 透明角、主体覆盖与去绿边检查通过；对话气泡、星光和阴影均由页面绘制。
 
-Playwright 已验证初始态、回农场点击态、`render_game_to_text` 和控制台；候选仍需小皮确认整页排版后才能接入 `src/`。
+Playwright 已验证初始态、回农场点击态、`render_game_to_text` 和控制台。小皮保留母鸡妈妈资产与整体排版，但要求移除框架顶部贴纸，并修复聊天气泡黑线断层；因此整页 V1 由 V2 替代。
 
 > 协作提醒：Claude 尚未提交的 `docs/05-architecture/F4_STUDY_FLOW_PLAN.md` 仍含两处旧角色注释；Codex 未覆盖该共享工作，Claude 提交前需将其替换为母鸡妈妈结束页。

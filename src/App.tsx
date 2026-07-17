@@ -4,6 +4,7 @@
 import { FarmHomeScreen } from './features/farm-f4/FarmHomeScreen'
 import { LessonChoiceScreen } from './features/lesson-f4/LessonChoiceScreen'
 import { LessonDictationScreen } from './features/lesson-f4/LessonDictationScreen'
+import { LessonFinishScreen } from './features/lesson-f4/LessonFinishScreen'
 import { LessonIntroScreen } from './features/lesson-f4/LessonIntroScreen'
 import { LessonListeningScreen } from './features/lesson-f4/LessonListeningScreen'
 import { LessonTraceScreen } from './features/lesson-f4/LessonTraceScreen'
@@ -75,6 +76,9 @@ export default function App() {
         onCapturedContinue={() => undefined}
       />
     )
+  }
+  if (previewParams?.get('lesson-finish') === '1') {
+    return <LessonFinishScreen dayNumber={7} summary={{ newWords: 4, reviews: 6, streakDays: 3, eggsEarned: 1 }} onReturnFarm={() => undefined} />
   }
   return <FarmHomeScreen />
 }
