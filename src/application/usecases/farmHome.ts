@@ -12,6 +12,7 @@ import { weightedSample } from '../../domain/staleness'
 import { addDays, dayKeyOf } from '../../domain/time'
 import { WORDS, WORD_MAP } from '../../domain/words'
 import { assembleViewModel, type ChickChatVM, type FarmSnapshot } from '../viewmodel'
+import { ensureStarterWords } from '../starterWords'
 
 const CHAT_NEIGHBOR_CAP = 3
 const CHAT_TTL_MS = 4_000
@@ -25,8 +26,9 @@ export function createFarmUsecases(d: PipiDB) {
     return getKV(d, 'meta', defaultMeta(dayKeyOf(now)))
   }
 
-  /** 时钟守卫:孵化结算 + 今日会话保障。启动/回前台/60s 间隔调用,幂等 */
+  /** 时钟守卫:起步词播种 + 孵化结算 + 今日会话保障。启动/回前台/60s 间隔调用,幂等 */
   async function clockGuard(now = Date.now()): Promise<{ hatched: number; sessionRebuilt: boolean }> {
+    await ensureStarterWords(d, now) // 一次性;必须在构建今日会话之前(起步词不进新词队列)
     let hatched = 0
     await d.transaction('rw', d.chicks, d.kv, async () => {
       const farm = await getFarm()

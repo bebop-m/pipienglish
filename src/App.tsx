@@ -1,5 +1,5 @@
 // 生产路由:农场首页 ↔ 学习流(阶段 H 整流:H-1~H-6 均已获小皮批准,导航正式开放)。
-// 救援按爸爸裁决直接复用生产学习卡并开放；手写游戏/家长页继续门控。
+// 救援与写词游戏按爸爸裁决直接复用生产学习卡并开放；家长页继续门控。
 
 import { useState } from 'react'
 import { FarmHomeScreen } from './features/farm-f4/FarmHomeScreen'
@@ -11,6 +11,7 @@ import { LessonIntroScreen } from './features/lesson-f4/LessonIntroScreen'
 import { LessonListeningScreen } from './features/lesson-f4/LessonListeningScreen'
 import { LessonTraceScreen } from './features/lesson-f4/LessonTraceScreen'
 import { RescueFlowScreen } from './features/rescue-f4/RescueFlowScreen'
+import { HandwritingFlowScreen } from './features/handwriting-f4/HandwritingFlowScreen'
 
 const INTRO_PREVIEWS = {
   egg: { id: 'egg', word: 'egg', ipa: '/eɡ/', meaning: '鸡蛋', sentence: 'The hen laid an egg!', sentenceCn: '母鸡下了一颗蛋！', imageAssetId: 'egg-f4-v2' },
@@ -25,7 +26,7 @@ const EGG_MEANING_OPTIONS = [
 ]
 
 export default function App() {
-  const [route, setRoute] = useState<'farm' | 'lesson' | 'rescue'>('farm')
+  const [route, setRoute] = useState<'farm' | 'lesson' | 'rescue' | 'handwriting'>('farm')
 
   const previewParams = import.meta.env.DEV ? new URLSearchParams(window.location.search) : null
   const preview = previewParams?.get('lesson-intro')
@@ -92,12 +93,16 @@ export default function App() {
   if (route === 'rescue') {
     return <RescueFlowScreen onExit={() => setRoute('farm')} />
   }
+  if (route === 'handwriting') {
+    return <HandwritingFlowScreen onExit={() => setRoute('farm')} />
+  }
   return (
     <FarmHomeScreen
       onNavigate={target => {
         if (target === 'lesson') setRoute('lesson')
         if (target === 'rescue') setRoute('rescue')
-        // handwriting/parent:继续门控
+        if (target === 'handwriting') setRoute('handwriting')
+        // parent:继续门控
       }}
     />
   )

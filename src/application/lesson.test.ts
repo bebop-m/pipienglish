@@ -55,7 +55,7 @@ describe('学习流用例(应用层)', () => {
 
     // 音频:描红×4 + 选择答对×4 + 收尾写对×4 = 12 次(听看卡进场 ×2 归视觉层)
     expect(speak).toHaveBeenCalledTimes(12)
-    expect(await db.seen.count()).toBe(4)
+    expect(await db.seen.count()).toBe(12 + 4) // 12 起步词播种 + 今日 4 新词
 
     const lessonVm = await lesson.loadViewModel(t0)
     expect(lessonVm.finished).toBe(true)

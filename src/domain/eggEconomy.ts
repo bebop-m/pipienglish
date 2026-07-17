@@ -4,11 +4,14 @@
 import type { FarmState } from './types'
 import { HATCH_MS, HATCHERY_SLOTS } from './types'
 
-/** 完成当日必修的奖励:满任务日(复习 6 + 新词 4×2 = 14 项)记 2 颗,否则 1 颗(SPEC §2.3;
- *  阈值随 2026-07-17 复习上限 25→6 的裁决同步调整,否则 2 颗永远拿不到) */
-export function eggsEarnedFor(totalItems: number): 1 | 2 {
-  return totalItems >= 14 ? 2 : 1
+/** 完成当日必修的奖励:固定 1 颗(2026-07-17 爸爸定稿蛋经济 v2:
+ *  必修 1 颗/天 + 写词游戏每轮 1 颗(日上限 GAME_EGGS_DAILY_CAP),多劳多得走游戏侧) */
+export function eggsEarnedFor(_totalItems: number): 1 {
+  return 1
 }
+
+/** 写词游戏奖励蛋的每日上限(蛋经济 v2):防无限刷蛋,加练本身不设限 */
+export const GAME_EGGS_DAILY_CAP = 5
 
 /** 分配一颗蛋去孵化:占用编号最小的空巢位 */
 export function allocateEggToHatch(farm: FarmState, now: number): FarmState | null {
