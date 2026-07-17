@@ -7,7 +7,7 @@ production_behavior_change: none
 candidate_source:
   - design-samples/stage-h/intro-candidate.html
   - design-samples/stage-h/intro-candidate.css
-visual_after: visual-regression/stage-h-candidates/H1-intro-egg-v3-1194x834.png
+visual_after: visual-regression/stage-h-candidates/H1-intro-egg-v4-1194x834.png
 assets:
   - public/assets/f4/egg-f4-v2.png
   - public/assets/f4/mother-f3.png
@@ -20,6 +20,8 @@ approval: pending-xiaopi
 2026-07-17 V2：按爸爸反馈将顶部进度母鸡向左移动 21px，拉开母鸡与进度轨道的距离；移除终点鸡窝，让母鸡直接走到路线尽头。V1 截图保留用于对照。
 
 2026-07-17 V3：例句改为整卡可点击，并加入“读句子”发音提示；生产接入时调用现有 `speak(sentence)`，重复点击沿用先取消上一段语音的规则。
+
+2026-07-17 V4：删除卡片顶端无信息作用的黄色图钉；移除“读句子”文字胶囊，改为例句卡右侧垂直居中的圆形音频图标。整卡仍为触控目标，按下时图标轻微缩小并改变底色。
 
 本候选只回答“第一个新词见面时画面长什么样”，不接真实课程状态。
 

@@ -33,7 +33,7 @@ Original prompt: 继续（承接阶段 F 已上线，进入阶段 G）
 - 爸爸反馈首页品牌仍使用 emoji、缺少“の”，字体在 A2759 上过细过锐；品牌改用真实 `chick-f3.png`，正式名称统一为“皮皮のEnglish”，字体改为系统圆体优先并提高正文基础字重。
 - A2759 截图中的左右背景拼接缝来自 `.f4-bleed` 与 `.f4-stage` 分别 cover 同一背景；改为整屏背景只绘制一次，舞台透明叠加。
 - 阶段 H 起每个学习状态都先产 1194×834 视觉候选截图，交小皮确认；批准前不接生产导航、真实数据或锁定基准。
-- H-1A 有图听看卡已迭代到 V3：顶部母鸡左移 21px并移除终点鸡窝，例句整卡可点击发音；截图为 `visual-regression/stage-h-candidates/H1-intro-egg-v3-1194x834.png`；当前 `pending-xiaopi`，未接生产代码。
+- H-1A 有图听看卡已迭代到 V4：删除卡片顶部黄色图钉，例句移除“读句子”文字并改为右侧居中圆形音频图标；截图为 `visual-regression/stage-h-candidates/H1-intro-egg-v4-1194x834.png`；当前 `pending-xiaopi`，未接生产代码。
 - 单词图片改为可选：按一年最多约 800 词规划，其中约 400–500 个高频具象词制作专属图，目标覆盖率约 60%；抽象词使用 H-1B 文字优先候选，缺图时不使用 emoji、破图或空图片框。详见 `docs/03-workflow/F4_WORD_ILLUSTRATION_POLICY.md`。
-- H-1B 无图听看卡已迭代到 V2：使用 `because` 验证文字优先版式，例句整卡可点击发音；截图为 `visual-regression/stage-h-candidates/H1B-intro-because-v2-1194x834.png`；当前 `pending-xiaopi`，未接生产代码。
+- H-1B 无图听看卡已迭代到 V3：删除卡片顶部黄色图钉，例句移除“读句子”文字并改为右侧居中圆形音频图标；截图为 `visual-regression/stage-h-candidates/H1B-intro-because-v3-1194x834.png`；当前 `pending-xiaopi`，未接生产代码。
 - H-1 正式实现约束：点击例句调用现有 `speak(sentence)`；重复点击先取消上一段，不新增音频文件或服务端请求。候选仅展示交互入口，小皮批准 H-1A/H-1B 后再接生产行为。
