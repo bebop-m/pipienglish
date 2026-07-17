@@ -2,6 +2,7 @@
 // 待学习流各屏批准后，再一次性接入孩子可见导航，避免暴露半成品流程。
 
 import { FarmHomeScreen } from './features/farm-f4/FarmHomeScreen'
+import { LessonChoiceScreen } from './features/lesson-f4/LessonChoiceScreen'
 import { LessonIntroScreen } from './features/lesson-f4/LessonIntroScreen'
 import { LessonTraceScreen } from './features/lesson-f4/LessonTraceScreen'
 
@@ -18,6 +19,25 @@ export default function App() {
   }
   if (previewParams?.get('lesson-trace') === 'egg') {
     return <LessonTraceScreen word={INTRO_PREVIEWS.egg} todayDone={4} todayTotal={18} onBack={() => undefined} onComplete={() => undefined} />
+  }
+  if (previewParams?.get('lesson-choice') === 'egg') {
+    return (
+      <LessonChoiceScreen
+        word={INTRO_PREVIEWS.egg}
+        options={[
+          { id: 'egg', label: '鸡蛋' },
+          { id: 'hen', label: '母鸡' },
+          { id: 'apple', label: '苹果' },
+          { id: 'bread', label: '面包' },
+        ]}
+        correctOptionId="egg"
+        todayDone={5}
+        todayTotal={18}
+        onBack={() => undefined}
+        onAnswer={() => undefined}
+        onContinue={() => undefined}
+      />
+    )
   }
   return <FarmHomeScreen />
 }

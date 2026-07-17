@@ -15,7 +15,8 @@ visual_after:
   - visual-regression/stage-h-candidates/H3A-choice-ready-v1-1194x834.png
   - visual-regression/stage-h-candidates/H3B-choice-correct-v1-1194x834.png
   - visual-regression/stage-h-candidates/H3C-choice-retry-v1-1194x834.png
-approval: pending-xiaopi
+approval: xiaopi-approved
+approved_on: 2026-07-17
 ---
 
 # H-3 中文释义选择题三状态视觉候选
@@ -37,3 +38,7 @@ approval: pending-xiaopi
 ## 本轮修正
 
 首轮截图曾在每个中文选项下显示对应英文。爸爸指出这会泄题后，三张首轮图立即作废；V1 正式候选已全部删除选项英文，仅顶部保留题目单词。
+
+## 审批结果
+
+2026-07-17，小皮验收 H-3A/H-3B/H-3C V1 均没有问题，可按该三状态视觉接入生产。
