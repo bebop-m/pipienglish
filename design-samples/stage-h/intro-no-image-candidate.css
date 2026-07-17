@@ -97,7 +97,7 @@
   font-size: 11px;
   font-weight: 850;
 }
-.no-art-sentence p { font-size: 22px; }
+.no-art-sentence .sentence-en { font-size: 22px; }
 .no-art-sentence mark {
   padding: 0 4px 2px;
   border-radius: 6px;
