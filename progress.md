@@ -34,4 +34,5 @@ Original prompt: 继续（承接阶段 F 已上线，进入阶段 G）
 - A2759 截图中的左右背景拼接缝来自 `.f4-bleed` 与 `.f4-stage` 分别 cover 同一背景；改为整屏背景只绘制一次，舞台透明叠加。
 - 阶段 H 起每个学习状态都先产 1194×834 视觉候选截图，交小皮确认；批准前不接生产导航、真实数据或锁定基准。
 - H-1A 有图听看卡已迭代到 V2：顶部母鸡左移 21px并移除终点鸡窝，路线直接延伸到尽头；截图为 `visual-regression/stage-h-candidates/H1-intro-egg-v2-1194x834.png`；当前 `pending-xiaopi`，未接生产代码。
-- 单词图片改为可选：首批只为约 100–150 个高频具象词制作专属图；抽象词使用 H-1B 文字优先候选，缺图时不使用 emoji、破图或空图片框。详见 `docs/03-workflow/F4_WORD_ILLUSTRATION_POLICY.md`。
+- 单词图片改为可选：按一年最多约 800 词规划，其中约 400–500 个高频具象词制作专属图，目标覆盖率约 60%；抽象词使用 H-1B 文字优先候选，缺图时不使用 emoji、破图或空图片框。详见 `docs/03-workflow/F4_WORD_ILLUSTRATION_POLICY.md`。
+- H-1B 无图听看卡使用 `because` 验证文字优先版式，候选源位于 `design-samples/stage-h/intro-no-image-candidate.*`，1194×834 截图为 `visual-regression/stage-h-candidates/H1B-intro-because-1194x834.png`；当前 `pending-xiaopi`，未接生产代码。

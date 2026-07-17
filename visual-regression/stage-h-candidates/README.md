@@ -6,3 +6,4 @@
 |---|---|---|
 | `H1-intro-egg-1194x834.png` | `superseded` | H-1 V1：顶部母鸡与进度轨道距离偏近 |
 | `H1-intro-egg-v2-1194x834.png` | `pending-xiaopi` | H-1 V2：母鸡左移 21px、移除终点鸡窝；egg / 鸡蛋 |
+| `H1B-intro-because-1194x834.png` | `pending-xiaopi` | H-1B 无图听看卡：because / 因为 |
