@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>阶段 H-2 · 描红卡候选</title>
+    <link rel="stylesheet" href="./trace-candidate.css" />
+  </head>
+  <body>
+    <main class="trace-candidate" aria-label="H-2 描红卡视觉候选">
+      <div class="farm-wash" aria-hidden="true"></div>
+
+      <header class="lesson-header">
+        <button class="back-farm" type="button"><span class="back-chevron" aria-hidden="true"></span>回农场</button>
+        <section class="story-progress" aria-label="今日学习进度 4 / 18">
+          <div class="progress-copy"><strong>新朋友 · 第 2 步 / 3</strong><span>今日进度 4 / 18</span></div>
+          <div class="progress-path"><span class="progress-fill"></span><span class="path-dot done"></span><span class="path-dot current"></span><span class="path-dot"></span><span class="path-dot"></span></div>
+          <img class="progress-hen" src="/assets/f4/mother-f3.png" alt="母鸡妈妈正在向终点走" />
+        </section>
+        <span class="approval-chip">H-2 视觉候选</span>
+      </header>
+
+      <section class="trace-paper">
+        <div class="trace-title-row">
+          <div>
+            <p class="step-kicker">WRITE IT ONCE</p>
+            <h1>沿着淡淡的字，写一遍</h1>
+            <p class="trace-subtitle">不用写得一模一样，慢慢来就好。</p>
+          </div>
+          <div class="word-reminder">
+            <span><strong>egg</strong><small>/eɡ/ · 鸡蛋</small></span>
+            <button class="listen-again" type="button" aria-label="再次播放单词 egg"><span class="sound-mark" aria-hidden="true"><i></i><i></i><i></i></span>重听</button>
+          </div>
+        </div>
+
+        <div class="writing-wrap" data-state="ready">
+          <span class="pencil-tab" aria-hidden="true">像蜡笔一样写</span>
+          <div class="writing-lines" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <span class="trace-model" aria-hidden="true">egg</span>
+          <canvas class="ink-canvas" width="1640" height="590" aria-label="在淡灰字母上描写 egg"></canvas>
+          <span class="start-hint">从这里开始</span>
+          <span class="complete-badge" role="status">写好啦！这是你的字</span>
+        </div>
+
+        <div class="trace-actions">
+          <button class="clear-ink" type="button"><span aria-hidden="true">↶</span>清除重写</button>
+          <p><strong>只写一遍就好</strong><span>这里不打分，也不会说你写错。</span></p>
+          <button class="finish-trace" type="button">写好了！</button>
+        </div>
+      </section>
+    </main>
+    <script src="./trace-candidate.js"></script>
+  </body>
+</html>
