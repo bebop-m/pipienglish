@@ -18,3 +18,6 @@
 | `H3A-choice-ready-v1-1194x834.png` | `xiaopi-approved` | H-3A V1：顶部显示 `egg` 与发音入口，四个选项只显示中文，不泄露英文答案 |
 | `H3B-choice-correct-v1-1194x834.png` | `xiaopi-approved` | H-3B V1：正确选项绿色确认，底部显示鼓励与继续按钮 |
 | `H3C-choice-retry-v1-1194x834.png` | `xiaopi-approved` | H-3C V1：错选项粉色提示，保留其他选项并允许重听后重选 |
+| `H4A-listening-ready-v1-1194x834.png` | `pending-xiaopi` | H-4A V1：只显示播放入口与纯中文选项，不显示英文词形或音标 |
+| `H4B-listening-correct-v1-1194x834.png` | `pending-xiaopi` | H-4B V1：答对后绿色确认，并首次揭示 `egg /eɡ/` |
+| `H4C-listening-retry-v1-1194x834.png` | `pending-xiaopi` | H-4C V1：错选项粉色提示，继续隐藏英文并允许重听重选 |

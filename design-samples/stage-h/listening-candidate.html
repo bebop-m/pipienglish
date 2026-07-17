@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>阶段 H-4 · 听音题候选</title>
+    <link rel="stylesheet" href="./listening-candidate.css" />
+  </head>
+  <body>
+    <main class="choice-candidate listening-candidate" data-state="ready" aria-label="H-4 听音题视觉候选">
+      <div class="farm-wash" aria-hidden="true"></div>
+
+      <header class="lesson-header">
+        <button class="back-farm" type="button"><span class="back-chevron" aria-hidden="true"></span>回农场</button>
+        <section class="story-progress" aria-label="今日学习进度 6 / 18">
+          <div class="progress-copy"><strong>听一听 · 第 1 题 / 3</strong><span>今日进度 6 / 18</span></div>
+          <div class="progress-path"><span class="progress-fill listening-fill"></span><span class="path-dot done"></span><span class="path-dot current"></span><span class="path-dot"></span><span class="path-dot"></span></div>
+          <img class="progress-hen" src="/assets/f4/mother-f3.png" alt="母鸡妈妈正在向终点走" />
+        </section>
+        <span class="approval-chip">H-4 视觉候选</span>
+      </header>
+
+      <section class="choice-paper listening-paper">
+        <div class="question-heading listening-heading">
+          <div>
+            <p class="step-kicker">LISTEN AND PICK</p>
+            <h1>听一听，它是什么意思？</h1>
+            <p class="question-subtitle">听清楚以后，再选一个答案。</p>
+          </div>
+          <button class="word-prompt listening-prompt" type="button" aria-label="播放题目单词">
+            <span class="listen-ready"><span class="sound-mark" aria-hidden="true"><i></i><i></i><i></i></span><strong>播放单词</strong><small>可以多听几遍</small></span>
+            <span class="answer-reveal"><strong>egg</strong><small>/eɡ/</small><span class="sound-mark" aria-hidden="true"><i></i><i></i><i></i></span></span>
+          </button>
+        </div>
+
+        <div class="choice-grid" role="group" aria-label="请选择听到的单词对应的中文意思">
+          <button class="choice-option" data-answer="correct" type="button"><span class="option-letter">A</span><strong>鸡蛋</strong></button>
+          <button class="choice-option" data-answer="wrong" type="button"><span class="option-letter">B</span><strong>母鸡</strong></button>
+          <button class="choice-option" data-answer="other" type="button"><span class="option-letter">C</span><strong>苹果</strong></button>
+          <button class="choice-option" data-answer="other" type="button"><span class="option-letter">D</span><strong>面包</strong></button>
+        </div>
+
+        <div class="choice-feedback" role="status">
+          <div class="feedback-ready"><span class="feedback-mark sound-feedback" aria-hidden="true"><i></i><i></i><i></i></span><p><strong>先听，再选择</strong><small>没听清也没关系，可以多播放几遍。</small></p></div>
+          <div class="feedback-correct"><span class="feedback-mark" aria-hidden="true">✓</span><p><strong>听对啦！egg 就是鸡蛋</strong><small>耳朵已经记住这个新朋友了。</small></p><button type="button">继续</button></div>
+          <div class="feedback-retry"><span class="feedback-mark" aria-hidden="true">↶</span><p><strong>差一点，再听一次</strong><small>先不看答案，听听声音再重新选。</small></p><button type="button">重听</button></div>
+        </div>
+      </section>
+    </main>
+    <script src="./listening-candidate.js"></script>
+  </body>
+</html>
