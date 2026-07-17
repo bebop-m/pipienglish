@@ -7,7 +7,7 @@ production_behavior_change: none
 candidate_source:
   - design-samples/stage-h/intro-no-image-candidate.html
   - design-samples/stage-h/intro-no-image-candidate.css
-visual_after: visual-regression/stage-h-candidates/H1B-intro-because-v3-1194x834.png
+visual_after: visual-regression/stage-h-candidates/H1B-intro-because-v4-1194x834.png
 assets:
   - public/assets/f4/mother-f3.png
   - public/assets/f4/farm-background-f3.png
@@ -21,5 +21,7 @@ approval: pending-xiaopi
 2026-07-17 V2：例句改为整卡可点击并显示“读句子”；正式实现调用现有 `speak(sentence)`，不增加录音文件、服务端请求或词库必填字段。
 
 2026-07-17 V3：删除卡片顶端黄色图钉；例句卡移除“读句子”文字，只保留右侧垂直居中的圆形音频图标，整卡继续可点击。
+
+2026-07-17 V4：移除音频图标外围圆框、底色与阴影，仅保留右侧垂直居中的音频波形。
 
 小皮批准前，本候选不接入 `src/`、真实课程导航或生产数据。
