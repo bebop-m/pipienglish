@@ -7,16 +7,17 @@ production_behavior_change: none
 candidate_source:
   - design-samples/stage-h/intro-candidate.html
   - design-samples/stage-h/intro-candidate.css
-visual_after: visual-regression/stage-h-candidates/H1-intro-egg-1194x834.png
+visual_after: visual-regression/stage-h-candidates/H1-intro-egg-v2-1194x834.png
 assets:
   - public/assets/f4/egg-f4-v2.png
   - public/assets/f4/mother-f3.png
-  - public/assets/f4/hatchery-empty-f4.png
   - public/assets/f4/farm-background-f3.png
 approval: pending-xiaopi
 ---
 
 # H-1 听看卡视觉候选
+
+2026-07-17 V2：按爸爸反馈将顶部进度母鸡向左移动 21px，拉开母鸡与进度轨道的距离；移除终点鸡窝，让母鸡直接走到路线尽头。V1 截图保留用于对照。
 
 本候选只回答“第一个新词见面时画面长什么样”，不接真实课程状态。
 

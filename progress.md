@@ -33,4 +33,5 @@ Original prompt: 继续（承接阶段 F 已上线，进入阶段 G）
 - 爸爸反馈首页品牌仍使用 emoji、缺少“の”，字体在 A2759 上过细过锐；品牌改用真实 `chick-f3.png`，正式名称统一为“皮皮のEnglish”，字体改为系统圆体优先并提高正文基础字重。
 - A2759 截图中的左右背景拼接缝来自 `.f4-bleed` 与 `.f4-stage` 分别 cover 同一背景；改为整屏背景只绘制一次，舞台透明叠加。
 - 阶段 H 起每个学习状态都先产 1194×834 视觉候选截图，交小皮确认；批准前不接生产导航、真实数据或锁定基准。
-- H-1 听看卡候选已完成：使用 `egg-f4-v2.png`、`mother-f3.png`、`hatchery-empty-f4.png`，截图为 `visual-regression/stage-h-candidates/H1-intro-egg-1194x834.png`；当前 `pending-xiaopi`，未接生产代码。
+- H-1A 有图听看卡已迭代到 V2：顶部母鸡左移 21px并移除终点鸡窝，路线直接延伸到尽头；截图为 `visual-regression/stage-h-candidates/H1-intro-egg-v2-1194x834.png`；当前 `pending-xiaopi`，未接生产代码。
+- 单词图片改为可选：首批只为约 100–150 个高频具象词制作专属图；抽象词使用 H-1B 文字优先候选，缺图时不使用 emoji、破图或空图片框。详见 `docs/03-workflow/F4_WORD_ILLUSTRATION_POLICY.md`。

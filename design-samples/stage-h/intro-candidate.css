@@ -67,7 +67,7 @@ button { color: inherit; font: inherit; -webkit-tap-highlight-color: transparent
 }
 .progress-copy { display: flex; justify-content: space-between; align-items: baseline; color: #7a5b49; font-size: 12px; font-weight: 750; }
 .progress-copy strong { color: #b75f42; font-size: 14px; letter-spacing: .015em; }
-.progress-path { position: absolute; left: 88px; right: 108px; bottom: 18px; height: 12px; border: 2px solid #6e5747; border-radius: 999px; background: #f3e7c5; }
+.progress-path { position: absolute; left: 88px; right: 24px; bottom: 18px; height: 12px; border: 2px solid #6e5747; border-radius: 999px; background: #f3e7c5; }
 .progress-fill { position: absolute; inset: 0 auto 0 0; width: 18%; border-radius: inherit; background: #f4c95f; }
 .path-dot { position: absolute; top: 50%; width: 15px; height: 15px; border: 2px solid #6e5747; border-radius: 50%; background: #fffaf0; transform: translate(-50%, -50%); }
 .path-dot:nth-of-type(2) { left: 0; }
@@ -76,8 +76,7 @@ button { color: inherit; font: inherit; -webkit-tap-highlight-color: transparent
 .path-dot:nth-of-type(5) { left: 100%; }
 .path-dot.done { background: #f4c95f; }
 .path-dot.current { width: 19px; height: 19px; background: #ff9fae; box-shadow: 0 0 0 4px rgba(255, 159, 174, .2); }
-.progress-hen { position: absolute; z-index: 2; left: 35px; bottom: 4px; width: 66px; height: 66px; object-fit: contain; filter: drop-shadow(0 3px 1px rgba(72, 52, 39, .15)); transform: scaleX(-1); }
-.progress-home { position: absolute; right: 18px; bottom: 4px; width: 82px; height: 70px; object-fit: contain; filter: drop-shadow(0 3px 1px rgba(72, 52, 39, .13)); }
+.progress-hen { position: absolute; z-index: 2; left: 14px; bottom: 4px; width: 66px; height: 66px; object-fit: contain; filter: drop-shadow(0 3px 1px rgba(72, 52, 39, .15)); transform: scaleX(-1); }
 
 .lesson-paper {
   position: absolute;
