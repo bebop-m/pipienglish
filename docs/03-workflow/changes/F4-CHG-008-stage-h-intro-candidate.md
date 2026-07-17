@@ -12,7 +12,8 @@ assets:
   - public/assets/f4/egg-f4-v2.png
   - public/assets/f4/mother-f3.png
   - public/assets/f4/farm-background-f3.png
-approval: pending-xiaopi
+approval: xiaopi-approved
+approved_on: 2026-07-17
 ---
 
 # H-1 听看卡视觉候选
@@ -41,4 +42,4 @@ approval: pending-xiaopi
 - 卡片使用奶油纸张、粗深棕轮廓和不完全机械对称的圆角；按钮保持至少 52px 触控高度。
 - 单词插图暂用已批准的独立鸡蛋资产，不使用词库 emoji。
 
-小皮批准前，本候选不得接入 `src/` 生产页面。
+2026-07-17：小皮确认 V5 没问题，状态改为 `xiaopi-approved`；生产接入见 F4-CHG-010。

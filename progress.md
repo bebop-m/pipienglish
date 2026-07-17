@@ -33,7 +33,15 @@ Original prompt: 继续（承接阶段 F 已上线，进入阶段 G）
 - 爸爸反馈首页品牌仍使用 emoji、缺少“の”，字体在 A2759 上过细过锐；品牌改用真实 `chick-f3.png`，正式名称统一为“皮皮のEnglish”，字体改为系统圆体优先并提高正文基础字重。
 - A2759 截图中的左右背景拼接缝来自 `.f4-bleed` 与 `.f4-stage` 分别 cover 同一背景；改为整屏背景只绘制一次，舞台透明叠加。
 - 阶段 H 起每个学习状态都先产 1194×834 视觉候选截图，交小皮确认；批准前不接生产导航、真实数据或锁定基准。
-- H-1A 有图听看卡已迭代到 V5：删除卡片顶部黄色图钉，例句右侧只保留无圆框、无底色的音频波形图标；截图为 `visual-regression/stage-h-candidates/H1-intro-egg-v5-1194x834.png`；当前 `pending-xiaopi`，未接生产代码。
+- H-1A 有图听看卡已迭代到 V5：删除卡片顶部黄色图钉，例句右侧只保留无圆框、无底色的音频波形图标；截图为 `visual-regression/stage-h-candidates/H1-intro-egg-v5-1194x834.png`；随后已获小皮批准并接入生产组件。
 - 单词图片改为可选：按一年最多约 800 词规划，其中约 400–500 个高频具象词制作专属图，目标覆盖率约 60%；抽象词使用 H-1B 文字优先候选，缺图时不使用 emoji、破图或空图片框。详见 `docs/03-workflow/F4_WORD_ILLUSTRATION_POLICY.md`。
-- H-1B 无图听看卡已迭代到 V4：删除卡片顶部黄色图钉，例句右侧只保留无圆框、无底色的音频波形图标；截图为 `visual-regression/stage-h-candidates/H1B-intro-because-v4-1194x834.png`；当前 `pending-xiaopi`，未接生产代码。
+- H-1B 无图听看卡已迭代到 V4：删除卡片顶部黄色图钉，例句右侧只保留无圆框、无底色的音频波形图标；截图为 `visual-regression/stage-h-candidates/H1B-intro-because-v4-1194x834.png`；随后已获小皮批准并接入生产组件。
 - H-1 正式实现约束：点击例句调用现有 `speak(sentence)`；重复点击先取消上一段，不新增音频文件或服务端请求。候选仅展示交互入口，小皮批准 H-1A/H-1B 后再接生产行为。
+
+## 2026-07-17 · H-1 小皮批准与生产接入
+
+- 小皮确认 H-1A 有图听看卡 V5 与 H-1B 无图听看卡 V4 均没有问题；两项状态已改为 `xiaopi-approved`。
+- 已实现统一生产 `LessonIntroScreen`：有批准插图时使用有图版，缺失或未知 `imageAssetId` 时使用无图版，不回退 emoji、破图或空图片框。
+- 初次进入自动朗读单词两遍，500ms 后显示词形；“再听一次”和整张例句卡分别播放单词与英文例句。
+- H-1A/H-1B 已在 1194×834 下完成视觉与点击回归，生产截图位于 `visual-regression/stage-h-production/`，控制台无错误。
+- 正式首页入口继续门控：等 H-2 及后续学习状态逐屏获得小皮批准后再接完整导航，避免孩子进入半成品学习流。下一项为 H-2 描红卡视觉候选。

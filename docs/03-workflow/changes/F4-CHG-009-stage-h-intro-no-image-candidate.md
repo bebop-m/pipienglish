@@ -11,7 +11,8 @@ visual_after: visual-regression/stage-h-candidates/H1B-intro-because-v4-1194x834
 assets:
   - public/assets/f4/mother-f3.png
   - public/assets/f4/farm-background-f3.png
-approval: pending-xiaopi
+approval: xiaopi-approved
+approved_on: 2026-07-17
 ---
 
 # H-1B 无图听看卡视觉候选
@@ -24,4 +25,4 @@ approval: pending-xiaopi
 
 2026-07-17 V4：移除音频图标外围圆框、底色与阴影，仅保留右侧垂直居中的音频波形。
 
-小皮批准前，本候选不接入 `src/`、真实课程导航或生产数据。
+2026-07-17：小皮确认 V4 没问题，状态改为 `xiaopi-approved`；生产接入见 F4-CHG-010。

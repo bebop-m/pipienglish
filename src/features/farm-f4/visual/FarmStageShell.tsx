@@ -4,6 +4,7 @@ import '../../../styles/f4/stage.css'
 
 interface FarmStageShellProps {
   children?: ReactNode
+  ariaLabel?: string
 }
 
 type StageCustomProperties = CSSProperties & {
@@ -12,7 +13,7 @@ type StageCustomProperties = CSSProperties & {
   '--f4-stage-scale': number
 }
 
-export function FarmStageShell({ children }: FarmStageShellProps) {
+export function FarmStageShell({ children, ariaLabel = '皮皮のEnglish 小鸡农场' }: FarmStageShellProps) {
   const safeAreaRef = useRef<HTMLDivElement>(null)
   const stage = useStageScale(safeAreaRef)
   const stageStyle: StageCustomProperties = {
@@ -31,7 +32,7 @@ export function FarmStageShell({ children }: FarmStageShellProps) {
           style={stageStyle}
           data-ready={stage.ready}
           data-below-comfort={stage.belowComfort}
-          aria-label="皮皮のEnglish 小鸡农场"
+          aria-label={ariaLabel}
           aria-hidden={!stage.ready || stage.belowComfort}
         >
           <div className="f4-stage__content">{children}</div>
