@@ -27,7 +27,7 @@ status: core complete; true-device and cloud-storage decision pending
 
 ### A2759 图标真机回归
 
-首版图标把母图外围约 30px 的白色展示画布一起缩小，iPadOS 再施加主屏幕圆角后出现明显双重白边。修正版只机械裁掉四边各 30px 展示留白，再从同一锁定母图派生全部尺寸；没有重画或改变构图。iPadOS 会缓存已安装图标，验收时需先删除旧主屏幕图标，再从 Safari 重新添加。
+首版图标把母图外围约 30px 的白色展示画布一起缩小，iPadOS 再施加主屏幕圆角后出现明显双重白边。修正版只机械裁掉四边各 30px 展示留白，再从同一锁定母图派生全部尺寸；没有重画或改变构图。Apple 图标 URL 同步升级为 `apple-touch-icon-v2.png`，绕过 iPadOS 对旧 URL 的图标缓存；验收时需先删除旧主屏幕图标，再从 Safari 重新添加。
 
 ## 云备份最终裁决
 
