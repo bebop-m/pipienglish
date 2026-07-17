@@ -282,7 +282,10 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
   return (
     <div className={`f4-home farm-app-f3 farm-app-f4 ${vm.motionEnabled ? '' : 'motion-paused'}`}>
       <header className="sticker-topbar">
-        <div className="sticker-brand"><span className="brand-face">🐤</span>皮皮 English</div>
+        <div className="sticker-brand">
+          <span className="brand-face" aria-hidden="true"><img src={f4AssetUrl('chick-f3.png')} alt="" /></span>
+          <span>皮皮のEnglish</span>
+        </div>
         {vm.state !== 'first_visit' && <>
           <div className="sticker-chip">今日单词 <strong>{displayedNewWords} / {vm.dailyTarget}</strong></div>
           <button className="sticker-chip egg-stock-f4" type="button" aria-label={`剩余鸡蛋 ${vm.eggStock} 颗，选择孵化或煎蛋`} onClick={() => dispatch({ type: 'OPEN_EGG_PANEL' })}>

@@ -37,7 +37,8 @@
     translate3d(var(--f4-stage-left), var(--f4-stage-top), 0)
     scale(var(--f4-stage-scale));
   transform-origin: 0 0;
-  background: var(--f4-sky) url('/assets/f4/farm-background-f3.png') center / cover no-repeat;
+  /* 背景只由 .f4-bleed 绘制一次，避免 iPad 安全区造成两层 cover 比例不同的拼接缝。 */
+  background: transparent;
   opacity: 1;
   visibility: visible;
 }

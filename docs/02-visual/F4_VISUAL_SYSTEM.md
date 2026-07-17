@@ -1,4 +1,4 @@
-# 皮皮 English · F4 视觉系统（锁定版）
+# 皮皮のEnglish · F4 视觉系统（锁定版）
 
 > 状态：**小皮已确认，作为后续全部视觉工作的母版。**  
 > 本文描述的是 `design-samples/sticker-f-farm-v4.html` 已经呈现出来的风格，不是重新提出一种相近风格。
@@ -91,7 +91,7 @@
   --f4-shadow-soft: 0 12px 30px rgba(77, 59, 45, 0.13);
   --f4-radius-control: 18px;
   --f4-radius-panel: 27px;
-  --f4-font: "Arial Rounded MT Bold", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --f4-font: ui-rounded, "Arial Rounded MT Bold", "Yuanti SC", "STYuanti-SC-Regular", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
 }
 ```
 

@@ -18,7 +18,7 @@
   --f4-shadow-soft: 0 12px 30px rgba(77, 59, 45, 0.13);
   --f4-radius-control: 18px;
   --f4-radius-panel: 27px;
-  --f4-font: "Arial Rounded MT Bold", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --f4-font: ui-rounded, "Arial Rounded MT Bold", "Yuanti SC", "STYuanti-SC-Regular", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
 
   --f4-stage-width: 1194px;
   --f4-stage-height: 834px;

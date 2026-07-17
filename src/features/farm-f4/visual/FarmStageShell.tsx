@@ -31,7 +31,7 @@ export function FarmStageShell({ children }: FarmStageShellProps) {
           style={stageStyle}
           data-ready={stage.ready}
           data-below-comfort={stage.belowComfort}
-          aria-label="皮皮 English 小鸡农场"
+          aria-label="皮皮のEnglish 小鸡农场"
           aria-hidden={!stage.ready || stage.belowComfort}
         >
           <div className="f4-stage__content">{children}</div>
