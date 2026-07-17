@@ -1,0 +1,13 @@
+.lesson-listening-prompt-f4 { width: 330px; justify-content: center; padding: 12px 24px; }
+.lesson-listening-ready-f4 { display: grid !important; grid-template-columns: 46px 1fr; grid-template-rows: 1fr 1fr; align-items: center; column-gap: 13px; }
+.lesson-listening-ready-f4 .lesson-choice-sound-f4 { grid-row: 1 / 3; }
+.lesson-listening-ready-f4 strong { align-self: end; font-size: 22px; line-height: 1.1; }
+.lesson-listening-ready-f4 small { align-self: start; margin-top: 5px; color: #80685b; font-size: 11px; font-weight: 750; }
+.lesson-listening-reveal-f4 { width: 100%; display: flex !important; flex-direction: row !important; align-items: center !important; }
+.lesson-listening-reveal-f4 strong { font-size: 41px; }
+.lesson-listening-reveal-f4 small { margin: 7px auto 0 8px; color: #80685b; font-size: 13px; font-weight: 750; }
+.lesson-listening-feedback-sound-f4 { gap: 2px; background: #ffe17b !important; }
+.lesson-listening-feedback-sound-f4 i { display: block; width: 3px; border-radius: 999px; background: #765e3b; }
+.lesson-listening-feedback-sound-f4 i:nth-child(1) { height: 10px; }
+.lesson-listening-feedback-sound-f4 i:nth-child(2) { height: 20px; }
+.lesson-listening-feedback-sound-f4 i:nth-child(3) { height: 14px; }

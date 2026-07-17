@@ -15,7 +15,8 @@ visual_after:
   - visual-regression/stage-h-candidates/H4A-listening-ready-v1-1194x834.png
   - visual-regression/stage-h-candidates/H4B-listening-correct-v1-1194x834.png
   - visual-regression/stage-h-candidates/H4C-listening-retry-v1-1194x834.png
-approval: pending-xiaopi
+approval: xiaopi-approved
+approved_on: 2026-07-17
 ---
 
 # H-4 听音题三状态视觉候选
@@ -35,3 +36,7 @@ approval: pending-xiaopi
 - H-4C 重试态：只标出本次错选，继续隐藏目标词形，避免重试时泄题。
 
 候选只用于视觉审批，不接生产 TTS、课程状态、判分或导航。
+
+## 审批结果
+
+2026-07-17，小皮确认 H-4A/H-4B/H-4C V1 均没有问题，可按该三状态视觉接入生产。
