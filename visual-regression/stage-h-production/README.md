@@ -14,3 +14,7 @@
 | H-4A 听音题准备态 | V1 | `H4A-listening-ready-1194x834.png` | 1194×834；页面文本无目标英文和音标 |
 | H-4B 听音题答对态 | V1 | `H4B-listening-correct-1194x834.png` | 1194×834；答对后才揭示目标词形与音标 |
 | H-4C 听音题重试态 | V1 | `H4C-listening-retry-1194x834.png` | 1194×834；继续隐藏目标词形，可重听重选 |
+| H-5A 默写准备态 | V2 | `H5A-dictation-ready-v2-1194x834.png` | 1194×834；标准英文输入、重听、提交与“想不起来” |
+| H-5B 默写答对态 | V2 | `H5B-dictation-correct-v2-1194x834.png` | 1194×834；绿色确认，只保留继续操作 |
+| H-5C 默写重试态 | V2 | `H5C-dictation-retry-v2-1194x834.png` | 1194×834；保留错误输入，可继续修改或选择“想不起来” |
+| H-5D 小鸡被抓态 | V2 | `H5D-dictation-captured-v2-1194x834.png` | 1194×834；不揭示英文答案，显示错题入库与小鸡等待救援 |

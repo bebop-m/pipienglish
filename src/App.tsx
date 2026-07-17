@@ -3,6 +3,7 @@
 
 import { FarmHomeScreen } from './features/farm-f4/FarmHomeScreen'
 import { LessonChoiceScreen } from './features/lesson-f4/LessonChoiceScreen'
+import { LessonDictationScreen } from './features/lesson-f4/LessonDictationScreen'
 import { LessonIntroScreen } from './features/lesson-f4/LessonIntroScreen'
 import { LessonListeningScreen } from './features/lesson-f4/LessonListeningScreen'
 import { LessonTraceScreen } from './features/lesson-f4/LessonTraceScreen'
@@ -53,6 +54,25 @@ export default function App() {
         onBack={() => undefined}
         onAnswer={() => undefined}
         onContinue={() => undefined}
+      />
+    )
+  }
+  if (previewParams?.get('lesson-dictation') === 'egg') {
+    const previewState = previewParams.get('state')
+    const initialState = previewState === 'correct' || previewState === 'retry' || previewState === 'captured'
+      ? previewState
+      : 'ready'
+    return (
+      <LessonDictationScreen
+        word={INTRO_PREVIEWS.egg}
+        todayDone={7}
+        todayTotal={18}
+        initialState={initialState}
+        onBack={() => undefined}
+        onAnswer={() => undefined}
+        onForgot={() => undefined}
+        onContinue={() => undefined}
+        onCapturedContinue={() => undefined}
       />
     )
   }

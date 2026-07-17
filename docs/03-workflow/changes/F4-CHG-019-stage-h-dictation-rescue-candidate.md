@@ -17,7 +17,8 @@ visual_after:
   - visual-regression/stage-h-candidates/H5B-dictation-correct-v2-1194x834.png
   - visual-regression/stage-h-candidates/H5C-dictation-retry-v2-1194x834.png
   - visual-regression/stage-h-candidates/H5D-dictation-captured-v2-1194x834.png
-approval: pending-xiaopi
+approval: xiaopi-approved
+approved_on: 2026-07-17
 ---
 
 # H-5 默写与小鸡救援 V2 视觉候选
