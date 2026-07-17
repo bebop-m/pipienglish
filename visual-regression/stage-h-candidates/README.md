@@ -15,3 +15,6 @@
 | `H1B-intro-because-v4-1194x834.png` | `xiaopi-approved` | H-1B V4：移除图钉，例句只保留裸音频图标；because / 因为 |
 | `H2A-trace-ready-v1-1194x834.png` | `xiaopi-approved` | H-2A V1：四线三格淡灰 `egg` 字模、重听、清除与完成操作 |
 | `H2B-trace-complete-v1-1194x834.png` | `xiaopi-approved` | H-2B V1：字模淡出，只留下粉色蜡笔字迹与温和完成提示 |
+| `H3A-choice-ready-v1-1194x834.png` | `pending-xiaopi` | H-3A V1：顶部显示 `egg` 与发音入口，四个选项只显示中文，不泄露英文答案 |
+| `H3B-choice-correct-v1-1194x834.png` | `pending-xiaopi` | H-3B V1：正确选项绿色确认，底部显示鼓励与继续按钮 |
+| `H3C-choice-retry-v1-1194x834.png` | `pending-xiaopi` | H-3C V1：错选项粉色提示，保留其他选项并允许重听后重选 |
