@@ -1,37 +1,44 @@
 {
-  "version": 1,
+  "version": 2,
   "generatedAt": "2026-07-17",
-  "method": "Mechanical resize from the locked master with FFmpeg Lanczos; no generative redraw. The maskable variant scales the master to 410x410 and centers it on a 512x512 white canvas.",
+  "method": "Mechanical 30px crop on every edge removes the master artwork's presentation mat, followed by FFmpeg Lanczos resize; no generative redraw. The maskable variant scales the cropped artwork to 410x410 and centers it on a 512x512 white canvas.",
   "source": {
     "path": "docs/reference-images/pwa-icon-farm-master.png",
     "width": 1254,
     "height": 1254,
     "sha256": "652f76e9aec029e8cc87c063d99cfd8d577fbb461ac9dd854aa9ef7d0e37f721"
   },
+  "sourceCrop": {
+    "x": 30,
+    "y": 30,
+    "width": 1194,
+    "height": 1194,
+    "reason": "Remove the source presentation mat before iPadOS applies its own home-screen icon mask."
+  },
   "outputs": [
     {
       "path": "public/apple-touch-icon.png",
       "width": 180,
       "height": 180,
-      "sha256": "ba22801592cf274638f89235c25e50e785f408ad033d375b29a49dee528575d1"
+      "sha256": "8544aa1e54cb081243948ca8451193229c91cd351e11076e2ee67ca0724d2715"
     },
     {
       "path": "public/icon-192.png",
       "width": 192,
       "height": 192,
-      "sha256": "1d21930546c00c33052d260459f85d5e54ca225038d98bbf46b78157d9b6b85f"
+      "sha256": "8eb265b76296e750c00391e1a53ef7379c56b450774c6454fb78da2b8f4ff86e"
     },
     {
       "path": "public/icon-512.png",
       "width": 512,
       "height": 512,
-      "sha256": "a89eb2729c0351da7d1c44d66164cfec597b0f0f9e0d5dcd7dbc6719202c6363"
+      "sha256": "56e21017c91beac8ef34ad15f94276800ae4c43338fbb9b0dddbaa0bf61bdbd8"
     },
     {
       "path": "public/icon-maskable-512.png",
       "width": 512,
       "height": 512,
-      "sha256": "703ee0cd2ce36513e98d4b2715a1b62dffe4bda5cd224f428003dda1de3a26d6"
+      "sha256": "d4754296ad2b6b16550c36408587f4c68248bda17bb50be24be1427742a7158d"
     }
   ]
 }
