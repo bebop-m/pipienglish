@@ -54,3 +54,11 @@ Original prompt: 继续（承接阶段 F 已上线，进入阶段 G）
 - 交互候选已验证 Pointer Events 跟手、清除、重听和完成；测试发现并修复“没有下笔也能完成”，现至少需要一笔才进入完成态。
 - 技能自带 Playwright 客户端再次因项目未安装 `playwright` 无法运行；应用内浏览器完成落笔、清除、空提交保护、完成态及控制台回归，未新增大型依赖。
 - 候选截图：`visual-regression/stage-h-candidates/H2A-trace-ready-v1-1194x834.png` 与 `H2B-trace-complete-v1-1194x834.png`；当前 `pending-xiaopi`，不接 `src/`。
+
+## 2026-07-17 · 英文文本答案裁决
+
+- 爸爸确认描红只练笔划、不判分；H-2 Canvas 与双状态候选保持不变。
+- 默写、手写复习、手写单词游戏和救援补写统一使用标准英文文本输入框；小皮可按键输入，也可用 Apple Scribble 或第三方手写输入法，应用不区分输入来源。
+- 判定对象是输入法转换后的英文文本，不是小皮笔划；因此取消这些场景的自建 OCR、笔迹识别、对照自评和笔迹保存要求，改为标准答案客观判断。
+- 输入框关闭自动纠错/完成/拼写检查/自动大写；答案比较只归一首尾空白、Unicode 和英文大小写，内部空格、撇号与连字符仍按词库答案判断。
+- 详细裁决见 `docs/03-workflow/changes/F4-CHG-012-text-answer-input-decision.md`；H-5 视觉候选按新规则设计。
