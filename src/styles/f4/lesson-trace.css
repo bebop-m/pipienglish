@@ -1,0 +1,94 @@
+@import './design-tokens.css';
+
+.lesson-trace-f4 {
+  position: relative;
+  width: 1194px;
+  height: 834px;
+  overflow: hidden;
+  color: #342a24;
+  font-family: var(--f4-font);
+  font-weight: 700;
+}
+
+.lesson-trace-f4 button { color: inherit; font: inherit; -webkit-tap-highlight-color: transparent; }
+.lesson-trace-wash-f4 { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(236,249,255,.46), rgba(255,249,228,.25) 42%, rgba(246,229,175,.42)); backdrop-filter: blur(2.5px) saturate(.92); }
+.lesson-trace-header-f4 { position: absolute; z-index: 3; top: 18px; left: 24px; right: 24px; height: 84px; display: grid; grid-template-columns: 132px 1fr 132px; gap: 18px; align-items: center; }
+
+.lesson-trace-back-f4,
+.lesson-trace-step-chip-f4 { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 2px solid #493a31; border-radius: 999px; background: rgba(255,250,237,.96); box-shadow: 0 4px 0 rgba(64,48,37,.16); font-size: 15px; font-weight: 850; }
+.lesson-trace-back-f4 { cursor: pointer; }
+.lesson-trace-back-f4 > span { width: 11px; height: 11px; border-left: 3px solid #493a31; border-bottom: 3px solid #493a31; transform: rotate(45deg); }
+.lesson-trace-back-f4:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(64,48,37,.16); }
+.lesson-trace-step-chip-f4 { border-color: #a36b50; color: #96543b; background: #fff0d5; font-size: 12px; }
+
+.lesson-trace-progress-f4 { position: relative; height: 84px; padding: 12px 24px 10px 84px; border: 2.5px solid #5d4638; border-radius: 25px 29px 24px 27px; background: rgba(255,250,232,.96); box-shadow: 0 6px 0 rgba(75,55,42,.16), 0 12px 26px rgba(75,55,42,.1); }
+.lesson-trace-progress-copy-f4 { display: flex; justify-content: space-between; align-items: baseline; color: #7a5b49; font-size: 12px; font-weight: 800; }
+.lesson-trace-progress-copy-f4 strong { color: #b75f42; font-size: 14px; }
+.lesson-trace-progress-path-f4 { position: absolute; left: 88px; right: 24px; bottom: 18px; height: 12px; border: 2px solid #6e5747; border-radius: 999px; background: #f3e7c5; }
+.lesson-trace-progress-fill-f4 { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: #f4c95f; }
+.lesson-trace-progress-dot-f4 { position: absolute; top: 50%; width: 15px; height: 15px; border: 2px solid #6e5747; border-radius: 50%; background: #fffaf0; transform: translate(-50%,-50%); }
+.lesson-trace-progress-dot-f4:nth-of-type(2) { left: 0; }
+.lesson-trace-progress-dot-f4:nth-of-type(3) { left: 32%; }
+.lesson-trace-progress-dot-f4:nth-of-type(4) { left: 65%; }
+.lesson-trace-progress-dot-f4:nth-of-type(5) { left: 100%; }
+.lesson-trace-progress-dot-f4.is-done { background: #f4c95f; }
+.lesson-trace-progress-dot-f4.is-current { width: 19px; height: 19px; background: #ff9fae; box-shadow: 0 0 0 4px rgba(255,159,174,.2); }
+.lesson-trace-progress-hen-f4 { position: absolute; z-index: 2; left: 14px; bottom: 4px; width: 66px; height: 66px; object-fit: contain; filter: drop-shadow(0 3px 1px rgba(72,52,39,.15)); transform: scaleX(-1); }
+
+.lesson-trace-paper-f4 { position: absolute; z-index: 2; left: 137px; top: 126px; width: 920px; height: 638px; padding: 38px 48px 34px; overflow: hidden; border: 3px solid #544137; border-radius: 33px 29px 36px 31px; background: #fff9e9; box-shadow: 0 10px 0 rgba(73,52,39,.18), 0 26px 52px rgba(73,52,39,.2); transform: rotate(-.08deg); }
+.lesson-trace-paper-f4::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .31; background-image: radial-gradient(#d7ba78 1px, transparent 1px); background-size: 13px 13px; }
+.lesson-trace-title-row-f4,
+.lesson-trace-writing-f4,
+.lesson-trace-actions-f4 { position: relative; z-index: 1; }
+.lesson-trace-title-row-f4 { display: flex; align-items: center; justify-content: space-between; min-height: 102px; }
+.lesson-trace-title-row-f4 p { margin: 0 0 4px; color: #c86648; font-size: 12px; font-weight: 900; letter-spacing: .09em; }
+.lesson-trace-title-row-f4 h1 { margin: 0; font-size: 30px; line-height: 1.12; font-weight: 900; letter-spacing: -.025em; }
+.lesson-trace-title-row-f4 > div:first-child > span { display: block; margin-top: 8px; color: #887064; font-size: 13px; font-weight: 750; }
+.lesson-trace-reminder-f4 { min-width: 304px; min-height: 74px; display: flex; align-items: center; justify-content: flex-end; gap: 17px; padding: 10px 12px 10px 20px; border: 2px solid rgba(106,79,59,.34); border-radius: 22px 19px 23px 20px; background: #edf6db; }
+.lesson-trace-reminder-f4 > span { display: flex; flex-direction: column; }
+.lesson-trace-reminder-f4 strong { font-size: 31px; line-height: 1; font-weight: 900; letter-spacing: -.025em; }
+.lesson-trace-reminder-f4 small { margin-top: 5px; color: #80685b; font-size: 12px; font-weight: 750; }
+.lesson-trace-reminder-f4 button { min-width: 102px; min-height: 50px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 2px solid #59463a; border-radius: 16px; cursor: pointer; background: #dff2d0; box-shadow: 0 4px 0 rgba(68,50,39,.16); font-size: 14px; font-weight: 850; }
+.lesson-trace-reminder-f4 button:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(68,50,39,.16); }
+.lesson-trace-sound-f4 { width: 19px; height: 22px; display: inline-flex; align-items: center; justify-content: center; gap: 2px; }
+.lesson-trace-sound-f4 i { display: block; width: 3px; border-radius: 999px; background: #5d8147; }
+.lesson-trace-sound-f4 i:nth-child(1) { height: 8px; }
+.lesson-trace-sound-f4 i:nth-child(2) { height: 15px; }
+.lesson-trace-sound-f4 i:nth-child(3) { height: 21px; }
+
+.lesson-trace-writing-f4 { height: 295px; margin-top: 19px; overflow: hidden; border: 2.5px solid #6b5141; border-radius: 25px 29px 24px 27px; background: linear-gradient(180deg,#fffdfa,#fff8e8); box-shadow: inset 0 0 0 7px rgba(244,215,153,.16), 0 6px 0 rgba(73,52,39,.1); touch-action: none; }
+.lesson-trace-lines-f4 { position: absolute; inset: 39px 35px 37px; }
+.lesson-trace-lines-f4 i { position: absolute; left: 0; right: 0; height: 2px; background: #a7c6c8; opacity: .88; }
+.lesson-trace-lines-f4 i:nth-child(1) { top: 0; }
+.lesson-trace-lines-f4 i:nth-child(2) { top: 33.333%; background: repeating-linear-gradient(90deg,#d59aaa 0 13px,transparent 13px 23px); }
+.lesson-trace-lines-f4 i:nth-child(3) { top: 66.666%; background: repeating-linear-gradient(90deg,#d59aaa 0 13px,transparent 13px 23px); }
+.lesson-trace-lines-f4 i:nth-child(4) { bottom: 0; }
+.lesson-trace-model-f4 { position: absolute; z-index: 1; left: 50%; top: 47%; color: rgba(101,91,85,.2); font-family: "Arial Rounded MT Bold", ui-rounded, system-ui, sans-serif; font-size: 172px; font-weight: 900; line-height: .82; letter-spacing: .02em; transform: translate(-50%,-50%); transition: opacity 180ms ease-out; }
+.lesson-trace-canvas-f4 { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
+.lesson-trace-pencil-tab-f4 { position: absolute; z-index: 3; top: 12px; left: 18px; padding: 5px 11px; border-radius: 999px; background: #fff0cf; color: #9a674e; font-size: 11px; font-weight: 850; transition: opacity 120ms linear; }
+.lesson-trace-start-f4 { position: absolute; z-index: 3; left: 68px; bottom: 16px; color: #a38473; font-size: 11px; font-weight: 800; transition: opacity 120ms linear; }
+.lesson-trace-start-f4::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: #ed9aa8; box-shadow: 0 0 0 4px rgba(237,154,168,.18); }
+.lesson-trace-complete-f4 { position: absolute; z-index: 4; top: 12px; right: 18px; padding: 6px 13px; border: 1.5px solid #83a56d; border-radius: 999px; background: #e5f3d7; color: #577744; font-size: 12px; font-weight: 850; opacity: 0; transform: translateY(-3px); transition: opacity 150ms ease-out, transform 150ms ease-out; }
+.lesson-trace-writing-f4.has-ink .lesson-trace-start-f4 { opacity: 0; }
+.lesson-trace-writing-f4.is-complete .lesson-trace-model-f4 { opacity: .06; }
+.lesson-trace-writing-f4.is-complete .lesson-trace-complete-f4 { opacity: 1; transform: none; }
+.lesson-trace-writing-f4.is-complete .lesson-trace-pencil-tab-f4 { opacity: 0; }
+.lesson-trace-writing-f4.needs-ink { box-shadow: inset 0 0 0 7px rgba(244,215,153,.16), inset 0 0 0 11px rgba(232,126,145,.2), 0 6px 0 rgba(73,52,39,.1); }
+
+.lesson-trace-actions-f4 { display: grid; grid-template-columns: 168px 1fr 205px; gap: 24px; align-items: center; margin-top: 28px; }
+.lesson-trace-clear-f4,
+.lesson-trace-finish-f4 { min-height: 60px; border: 2.5px solid #4d3c32; border-radius: 18px; cursor: pointer; font-size: 17px; font-weight: 900; }
+.lesson-trace-clear-f4 { display: inline-flex; align-items: center; justify-content: center; gap: 9px; background: #fffaf0; box-shadow: 0 5px 0 rgba(73,52,39,.16); }
+.lesson-trace-clear-f4 span { color: #b65f62; font-size: 25px; line-height: 1; }
+.lesson-trace-finish-f4 { background: #ffe27c; box-shadow: 0 6px 0 #4b3a31; font-size: 20px; }
+.lesson-trace-clear-f4:active,
+.lesson-trace-finish-f4:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(73,52,39,.22); }
+.lesson-trace-actions-f4 p { margin: 0; text-align: center; }
+.lesson-trace-actions-f4 p strong,
+.lesson-trace-actions-f4 p span { display: block; }
+.lesson-trace-actions-f4 p strong { color: #8f5f48; font-size: 14px; font-weight: 900; }
+.lesson-trace-actions-f4 p span { margin-top: 4px; color: #8d7a6e; font-size: 11px; font-weight: 750; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson-trace-f4 * { transition: none !important; }
+}

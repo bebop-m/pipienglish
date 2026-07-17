@@ -3,6 +3,7 @@
 
 import { FarmHomeScreen } from './features/farm-f4/FarmHomeScreen'
 import { LessonIntroScreen } from './features/lesson-f4/LessonIntroScreen'
+import { LessonTraceScreen } from './features/lesson-f4/LessonTraceScreen'
 
 const INTRO_PREVIEWS = {
   egg: { id: 'egg', word: 'egg', ipa: '/eɡ/', meaning: '鸡蛋', sentence: 'The hen laid an egg!', sentenceCn: '母鸡下了一颗蛋！', imageAssetId: 'egg-f4-v2' },
@@ -10,9 +11,13 @@ const INTRO_PREVIEWS = {
 } as const
 
 export default function App() {
-  const preview = import.meta.env.DEV ? new URLSearchParams(window.location.search).get('lesson-intro') : null
+  const previewParams = import.meta.env.DEV ? new URLSearchParams(window.location.search) : null
+  const preview = previewParams?.get('lesson-intro')
   if (preview === 'egg' || preview === 'because') {
     return <LessonIntroScreen word={INTRO_PREVIEWS[preview]} todayDone={3} todayTotal={18} onBack={() => undefined} onComplete={() => undefined} />
+  }
+  if (previewParams?.get('lesson-trace') === 'egg') {
+    return <LessonTraceScreen word={INTRO_PREVIEWS.egg} todayDone={4} todayTotal={18} onBack={() => undefined} onComplete={() => undefined} />
   }
   return <FarmHomeScreen />
 }

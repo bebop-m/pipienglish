@@ -16,7 +16,8 @@ visual_after:
 assets:
   - public/assets/f4/mother-f3.png
   - public/assets/f4/farm-background-f3.png
-approval: pending-xiaopi
+approval: xiaopi-approved
+approved_on: 2026-07-17
 ---
 
 # H-2 描红卡双状态视觉候选
@@ -41,3 +42,8 @@ approval: pending-xiaopi
 - 候选画布使用 Pointer Events、`setPointerCapture` 与 `touch-action: none`，笔和手指均可直接描写。
 - 落笔即时显示，清除立即复原；没有任何笔迹时不能进入完成态，只给手写区一个短暂温和高亮。
 - 提供 `render_game_to_text` 和 `advanceTime` 测试接口；候选不接真实课程、字迹数据库或生产导航。
+
+## 审批结果
+
+- 2026-07-17，小皮确认 H-2A 与 H-2B V1 均没有问题，可按该视觉接入生产。
+- 爸爸补充裁决：输入设备按普通电容触控处理，不为 Apple Pencil 单独适配或优化。
