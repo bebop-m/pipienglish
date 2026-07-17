@@ -39,6 +39,7 @@ export interface FarmHomeViewModel {
   newWordsLearnedToday: number // 仅新词,用于顶栏“今日单词”
   dailyTarget: number
   reviewCountToday: number
+  newWordsPaused: boolean
   totalItemsToday: number
   estimatedMinutes: number
   eggStock: number
@@ -106,6 +107,7 @@ export function assembleViewModel(s: FarmSnapshot): Omit<FarmHomeViewModel, 'ove
     newWordsLearnedToday,
     dailyTarget: session.newIds.length,
     reviewCountToday: session.reviewIds.length,
+    newWordsPaused: session.newWordsPaused ?? false,
     totalItemsToday: session.reviewIds.length + session.newIds.length,
     estimatedMinutes: estimatedMinutes(session),
     eggStock: farm.eggStock,

@@ -16,6 +16,9 @@ export interface LessonIntroScreenProps {
   todayTotal: number
   stepIndex?: number
   stepTotal?: number
+  headerTitle?: string
+  progressText?: string
+  stepChip?: string
   onBack: () => void
   onComplete: () => void
   speakText?: (text: string) => boolean
@@ -31,6 +34,9 @@ export function LessonIntroScreen({
   todayTotal,
   stepIndex = 1,
   stepTotal = 3,
+  headerTitle,
+  progressText,
+  stepChip,
   onBack,
   onComplete,
   speakText = speak,
@@ -67,6 +73,11 @@ export function LessonIntroScreen({
       meaning: word.meaning,
       sentence: word.sentence,
       wordVisible,
+      header: {
+        title: headerTitle ?? `新朋友 · 第 ${stepIndex} 步 / ${stepTotal}`,
+        progressText: progressText ?? `今日进度 ${todayDone} / ${todayTotal}`,
+        stepChip: stepChip ?? '听一听 · 看一看',
+      },
       progress: { done: todayDone, total: todayTotal, step: stepIndex, stepTotal },
       controls: ['back', 'replay_word', 'replay_sentence', 'complete_intro'],
     })
@@ -78,7 +89,7 @@ export function LessonIntroScreen({
       delete testWindow.render_game_to_text
       delete testWindow.advanceTime
     }
-  }, [illustration, stepIndex, stepTotal, todayDone, todayTotal, word.meaning, word.sentence, word.word, wordVisible])
+  }, [headerTitle, illustration, progressText, stepChip, stepIndex, stepTotal, todayDone, todayTotal, word.meaning, word.sentence, word.word, wordVisible])
 
   const replayWord = () => speakText(word.word)
   const replaySentence = () => speakText(word.sentence)
@@ -94,8 +105,8 @@ export function LessonIntroScreen({
           </button>
           <section className="lesson-progress-f4" aria-label={`今日学习进度 ${todayDone} / ${todayTotal}`}>
             <div className="lesson-progress-copy-f4">
-              <strong>新朋友 · 第 {stepIndex} 步 / {stepTotal}</strong>
-              <span>今日进度 {todayDone} / {todayTotal}</span>
+              <strong>{headerTitle ?? `新朋友 · 第 ${stepIndex} 步 / ${stepTotal}`}</strong>
+              <span>{progressText ?? `今日进度 ${todayDone} / ${todayTotal}`}</span>
             </div>
             <div className="lesson-progress-path-f4">
               <span className="lesson-progress-fill-f4" style={{ width: `${progress}%` }} />
@@ -106,7 +117,7 @@ export function LessonIntroScreen({
             </div>
             <img className="lesson-progress-hen-f4" src={f4AssetUrl('mother-f3.png')} alt="母鸡妈妈正在向终点走" />
           </section>
-          <span className="lesson-step-chip-f4">听一听 · 看一看</span>
+          <span className="lesson-step-chip-f4">{stepChip ?? '听一听 · 看一看'}</span>
         </header>
 
         <section className={`lesson-paper-f4 ${illustration ? 'has-art' : 'no-art'}`}>

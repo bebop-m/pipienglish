@@ -22,6 +22,9 @@ export interface LessonTraceScreenProps {
   todayTotal: number
   stepIndex?: number
   stepTotal?: number
+  headerTitle?: string
+  progressText?: string
+  stepChip?: string
   onBack: () => void
   onComplete: (strokes: TraceStroke[]) => void
   speakText?: (text: string) => boolean
@@ -62,6 +65,9 @@ export function LessonTraceScreen({
   todayTotal,
   stepIndex = 2,
   stepTotal = 3,
+  headerTitle,
+  progressText,
+  stepChip,
   onBack,
   onComplete,
   speakText = speak,
@@ -176,6 +182,11 @@ export function LessonTraceScreen({
       word: word.word,
       templateVisible: !complete,
       graded: false,
+      header: {
+        title: headerTitle ?? `新朋友 · 第 ${stepIndex} 步 / ${stepTotal}`,
+        progressText: progressText ?? `今日进度 ${todayDone} / ${todayTotal}`,
+        stepChip: stepChip ?? '写一写 · 不评分',
+      },
       handwriting: { strokeCount: strokes.length, pointCount: strokes.reduce((sum, stroke) => sum + stroke.length, 0), meaningful: hasInk },
       progress: { done: todayDone, total: todayTotal, step: stepIndex, stepTotal },
       controls: ['back', 'replay_word', 'clear_ink', 'complete_trace'],
@@ -193,7 +204,7 @@ export function LessonTraceScreen({
       delete testWindow.render_game_to_text
       delete testWindow.advanceTime
     }
-  }, [complete, hasInk, sendCompletion, stepIndex, stepTotal, strokes, todayDone, todayTotal, word.word])
+  }, [complete, hasInk, headerTitle, progressText, sendCompletion, stepChip, stepIndex, stepTotal, strokes, todayDone, todayTotal, word.word])
 
   return (
     <FarmStageShell ariaLabel="皮皮のEnglish 描红练习">
@@ -202,7 +213,7 @@ export function LessonTraceScreen({
         <header className="lesson-trace-header-f4">
           <button className="lesson-trace-back-f4" type="button" onClick={onBack}><span aria-hidden="true" />回农场</button>
           <section className="lesson-trace-progress-f4" aria-label={`今日学习进度 ${todayDone} / ${todayTotal}`}>
-            <div className="lesson-trace-progress-copy-f4"><strong>新朋友 · 第 {stepIndex} 步 / {stepTotal}</strong><span>今日进度 {todayDone} / {todayTotal}</span></div>
+            <div className="lesson-trace-progress-copy-f4"><strong>{headerTitle ?? `新朋友 · 第 ${stepIndex} 步 / ${stepTotal}`}</strong><span>{progressText ?? `今日进度 ${todayDone} / ${todayTotal}`}</span></div>
             <div className="lesson-trace-progress-path-f4">
               <span className="lesson-trace-progress-fill-f4" style={{ width: `${progress}%` }} />
               <span className="lesson-trace-progress-dot-f4 is-done" /><span className="lesson-trace-progress-dot-f4 is-current" />
@@ -210,7 +221,7 @@ export function LessonTraceScreen({
             </div>
             <img className="lesson-trace-progress-hen-f4" src={f4AssetUrl('mother-f3.png')} alt="母鸡妈妈正在向终点走" />
           </section>
-          <span className="lesson-trace-step-chip-f4">写一写 · 不评分</span>
+          <span className="lesson-trace-step-chip-f4">{stepChip ?? '写一写 · 不评分'}</span>
         </header>
 
         <section className="lesson-trace-paper-f4">

@@ -3,6 +3,8 @@
 
 import Dexie, { type Table } from 'dexie'
 import type { Card } from 'ts-fsrs'
+import type { QuizKind } from '../domain/lesson'
+import type { RescueStage } from '../domain/rescue'
 import type { Chick, DailySession, FarmState, MetaState, Settings } from '../domain/types'
 import { HATCHERY_SLOTS } from '../domain/types'
 import { addDays, dayKey } from '../domain/time'
@@ -11,6 +13,7 @@ export interface CardRow {
   wordId: string
   due: number // 冗余索引,与 card.due 同步
   card: Card
+  lastQuizType?: QuizKind // 上次低熟练复习的题型,供选择/听音交替(SPEC §5.3;非索引字段,无需迁移)
 }
 
 export interface KV {
@@ -26,6 +29,7 @@ export interface SeenRow {
 export interface RescueRow {
   wordId: string
   capturedAt: number
+  stage?: RescueStage // 非索引字段；旧记录缺失时按 intro 兼容，无需升级 Dexie 版本
 }
 
 // 预留(v0.3):收尾默写字迹缩略图,现在建表免二次迁移

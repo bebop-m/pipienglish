@@ -8,7 +8,7 @@ import { db } from '../application/db'
 import { exportAll, importAll } from '../application/backup'
 import { dayKey } from '../domain/time'
 import { HATCH_MS, type FarmState } from '../domain/types'
-import { createStudyUsecases } from '../application/usecases/study'
+import { newCard, rate } from '../domain/srs'
 
 export function DevFarmView({ bridge }: { bridge: FarmHomeBridge }) {
   const { vm, dispatch, navigation, clearNavigation } = bridge
@@ -65,9 +65,10 @@ export function DevFarmView({ bridge }: { bridge: FarmHomeBridge }) {
             homeX: null,
             homeY: null,
           })))
-          const study = createStudyUsecases(db)
           for (const wordId of ['apple', 'banana', 'orange']) {
-            await study.answer({ type: 'quiz', wordId }, true)
+            const card = rate(newCard(), true)
+            await db.cards.put({ wordId, due: card.due.getTime(), card })
+            await db.seen.put({ wordId, lastSeenAt: Date.now() })
           }
           window.location.reload()
         })}

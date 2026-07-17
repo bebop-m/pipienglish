@@ -259,6 +259,10 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
   const taskCopy = vm.reviewCountToday > 0
     ? `${vm.reviewCountToday} 个老朋友想你了！打完招呼再认识 ${vm.dailyTarget} 个新朋友。`
     : `认识 ${vm.dailyTarget} 个新朋友，完成后母鸡妈妈会下蛋哦。`
+  const taskTitle = vm.newWordsPaused ? `连续 ${vm.streak} 天！` : '开始今天的单词！'
+  const displayedTaskCopy = vm.newWordsPaused
+    ? `今天复习 ${vm.reviewCountToday} 个老朋友。`
+    : taskCopy
   const hatcheryCopy = emptySlots > 0
     ? `蛋会各自在巢里轻轻晃动，还可以放入 ${emptySlots} 颗。`
     : '三个巢位都住进了小鸡宝宝，耐心等它们破壳吧。'
@@ -303,8 +307,8 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
       <section className="farm-stage-f3 farm-stage-f4" aria-label="会慢慢散步和生活互动的农场">
         {vm.state === 'first_visit' ? <FirstVisitBoard dispatch={dispatch} /> : vm.state === 'daily_complete' ? <CompleteBoard vm={vm} dispatch={dispatch} /> : <section className="task-board-f3" aria-labelledby="task-title-f4">
           <p className="k-eyebrow">DAY {String(vm.dayNumber).padStart(2, '0')} · 今日农场任务</p>
-          <h1 id="task-title-f4">开始今天的单词！</h1>
-          <p className="k-copy">{taskCopy}</p>
+          <h1 id="task-title-f4">{taskTitle}</h1>
+          <p className="k-copy">{displayedTaskCopy}</p>
           <div className="progress-line">
             <span>今日进度</span>
             <span className="progress-track"><span style={{ width: `${progress}%` }} /></span>

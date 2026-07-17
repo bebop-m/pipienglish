@@ -1,13 +1,16 @@
-// 生产入口仍只挂 F4 首页；阶段 H 的已批准页面先通过 DEV 查询参数回归。
-// 待学习流各屏批准后，再一次性接入孩子可见导航，避免暴露半成品流程。
+// 生产路由:农场首页 ↔ 学习流(阶段 H 整流:H-1~H-6 均已获小皮批准,导航正式开放)。
+// 救援按爸爸裁决直接复用生产学习卡并开放；手写游戏/家长页继续门控。
 
+import { useState } from 'react'
 import { FarmHomeScreen } from './features/farm-f4/FarmHomeScreen'
+import { LessonFlowScreen } from './features/lesson-f4/LessonFlowScreen'
 import { LessonChoiceScreen } from './features/lesson-f4/LessonChoiceScreen'
 import { LessonDictationScreen } from './features/lesson-f4/LessonDictationScreen'
 import { LessonFinishScreen } from './features/lesson-f4/LessonFinishScreen'
 import { LessonIntroScreen } from './features/lesson-f4/LessonIntroScreen'
 import { LessonListeningScreen } from './features/lesson-f4/LessonListeningScreen'
 import { LessonTraceScreen } from './features/lesson-f4/LessonTraceScreen'
+import { RescueFlowScreen } from './features/rescue-f4/RescueFlowScreen'
 
 const INTRO_PREVIEWS = {
   egg: { id: 'egg', word: 'egg', ipa: '/eɡ/', meaning: '鸡蛋', sentence: 'The hen laid an egg!', sentenceCn: '母鸡下了一颗蛋！', imageAssetId: 'egg-f4-v2' },
@@ -22,6 +25,8 @@ const EGG_MEANING_OPTIONS = [
 ]
 
 export default function App() {
+  const [route, setRoute] = useState<'farm' | 'lesson' | 'rescue'>('farm')
+
   const previewParams = import.meta.env.DEV ? new URLSearchParams(window.location.search) : null
   const preview = previewParams?.get('lesson-intro')
   if (preview === 'egg' || preview === 'because') {
@@ -80,5 +85,20 @@ export default function App() {
   if (previewParams?.get('lesson-finish') === '1') {
     return <LessonFinishScreen dayNumber={7} summary={{ newWords: 4, reviews: 6, streakDays: 3, eggsEarned: 1 }} onReturnFarm={() => undefined} />
   }
-  return <FarmHomeScreen />
+
+  if (route === 'lesson') {
+    return <LessonFlowScreen onExit={() => setRoute('farm')} />
+  }
+  if (route === 'rescue') {
+    return <RescueFlowScreen onExit={() => setRoute('farm')} />
+  }
+  return (
+    <FarmHomeScreen
+      onNavigate={target => {
+        if (target === 'lesson') setRoute('lesson')
+        if (target === 'rescue') setRoute('rescue')
+        // handwriting/parent:继续门控
+      }}
+    />
+  )
 }

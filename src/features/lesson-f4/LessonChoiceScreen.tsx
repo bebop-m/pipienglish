@@ -24,6 +24,9 @@ export interface LessonChoiceScreenProps {
   todayTotal: number
   stepIndex?: number
   stepTotal?: number
+  headerTitle?: string
+  progressText?: string
+  stepChip?: string
   onBack: () => void
   onAnswer: (answer: LessonChoiceAnswer) => void
   onContinue: () => void
@@ -42,6 +45,9 @@ export function LessonChoiceScreen({
   todayTotal,
   stepIndex = 3,
   stepTotal = 3,
+  headerTitle,
+  progressText,
+  stepChip,
   onBack,
   onAnswer,
   onContinue,
@@ -78,6 +84,11 @@ export function LessonChoiceScreen({
       options: options.map((option) => ({ id: option.id, label: option.label })),
       selectedId,
       selectedLabel,
+      header: {
+        title: headerTitle ?? `新朋友 · 第 ${stepIndex} 步 / ${stepTotal}`,
+        progressText: progressText ?? `今日进度 ${todayDone} / ${todayTotal}`,
+        stepChip: stepChip ?? '选一选 · 会重试',
+      },
       progress: { done: todayDone, total: todayTotal, step: stepIndex, stepTotal },
       controls: state === 'correct'
         ? ['back', 'replay_word', 'continue']
@@ -88,7 +99,7 @@ export function LessonChoiceScreen({
       delete testWindow.render_game_to_text
       delete testWindow.advanceTime
     }
-  }, [options, selectedId, selectedLabel, state, stepIndex, stepTotal, todayDone, todayTotal, word.word])
+  }, [headerTitle, options, progressText, selectedId, selectedLabel, state, stepChip, stepIndex, stepTotal, todayDone, todayTotal, word.word])
 
   return (
     <FarmStageShell ariaLabel="皮皮のEnglish 中文释义选择题">
@@ -98,7 +109,7 @@ export function LessonChoiceScreen({
         <header className="lesson-choice-header-f4">
           <button className="lesson-choice-back-f4" type="button" onClick={onBack}><span aria-hidden="true" />回农场</button>
           <section className="lesson-choice-progress-f4" aria-label={`今日学习进度 ${todayDone} / ${todayTotal}`}>
-            <div className="lesson-choice-progress-copy-f4"><strong>新朋友 · 第 {stepIndex} 步 / {stepTotal}</strong><span>今日进度 {todayDone} / {todayTotal}</span></div>
+            <div className="lesson-choice-progress-copy-f4"><strong>{headerTitle ?? `新朋友 · 第 ${stepIndex} 步 / ${stepTotal}`}</strong><span>{progressText ?? `今日进度 ${todayDone} / ${todayTotal}`}</span></div>
             <div className="lesson-choice-progress-path-f4">
               <span className="lesson-choice-progress-fill-f4" style={{ width: `${progress}%` }} />
               <span className="lesson-choice-progress-dot-f4 is-done" /><span className="lesson-choice-progress-dot-f4 is-done" />
@@ -106,7 +117,7 @@ export function LessonChoiceScreen({
             </div>
             <img className="lesson-choice-progress-hen-f4" src={f4AssetUrl('mother-f3.png')} alt="母鸡妈妈正在向终点走" />
           </section>
-          <span className="lesson-choice-step-chip-f4">选一选 · 会重试</span>
+          <span className="lesson-choice-step-chip-f4">{stepChip ?? '选一选 · 会重试'}</span>
         </header>
 
         <section className="lesson-choice-paper-f4">

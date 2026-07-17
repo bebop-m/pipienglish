@@ -7,9 +7,22 @@ import { DevFarmView } from '../../dev/DevShell'
 import { FarmStageShell } from './visual/FarmStageShell'
 import { FarmHomeDaily } from './visual/FarmHomeDaily'
 
-export function FarmHomeScreen() {
+export interface FarmHomeScreenProps {
+  /** 路由层(App)消费导航意图;未接入的目标(手写游戏/救援/家长页)由 App 决定忽略或提示 */
+  onNavigate?: (target: 'lesson' | 'handwriting' | 'rescue' | 'parent') => void
+}
+
+export function FarmHomeScreen({ onNavigate }: FarmHomeScreenProps = {}) {
   const bridge = useFarmHome()
   const forceDevShell = import.meta.env.DEV && new URLSearchParams(window.location.search).has('dev-shell')
+
+  const { navigation, clearNavigation } = bridge
+  useEffect(() => {
+    if (navigation && onNavigate) {
+      clearNavigation()
+      onNavigate(navigation)
+    }
+  }, [navigation, clearNavigation, onNavigate])
 
   useEffect(() => {
     const testWindow = window as Window & { render_game_to_text?: () => string }

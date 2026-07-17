@@ -9,7 +9,7 @@ import * as egg from '../../domain/eggEconomy'
 import { completeDay } from '../../domain/streak'
 import { buildPlan, totalItems } from '../../domain/dailyPlan'
 import { weightedSample } from '../../domain/staleness'
-import { dayKeyOf } from '../../domain/time'
+import { addDays, dayKeyOf } from '../../domain/time'
 import { WORDS, WORD_MAP } from '../../domain/words'
 import { assembleViewModel, type ChickChatVM, type FarmSnapshot } from '../viewmodel'
 
@@ -58,11 +58,27 @@ export function createFarmUsecases(d: PipiDB) {
   async function buildTodaySession(today: string, now: number): Promise<DailySession> {
     const due = await d.cards.where('due').belowOrEqual(now).sortBy('due')
     const known = new Set(await d.cards.toCollection().primaryKeys())
+    // 近两日积压记录,供 SPEC §5.1 连续积压判定(缺记录按 0/false)
+    const recentBacklogs = (await Promise.all([addDays(today, -1), addDays(today, -2)].map(k => d.sessions.get(k)))).map(
+      s => ({ backlog: s?.dueBacklog ?? 0, paused: s?.newWordsPaused ?? false }),
+    )
     const plan = buildPlan({
       dueByOverdue: due.map(c => c.wordId),
       unlearned: WORDS.filter(w => !known.has(w.id)).map(w => w.id),
+      backlogToday: due.length,
+      recentBacklogs,
     })
-    return { date: today, ...plan, doneCount: 0, answered: 0, correct: 0, completed: false }
+    return {
+      date: today,
+      reviewIds: plan.reviewIds,
+      newIds: plan.newIds,
+      dueBacklog: due.length,
+      newWordsPaused: plan.newWordsPaused,
+      doneCount: 0,
+      answered: 0,
+      correct: 0,
+      completed: false,
+    }
   }
 
   /** 完成当日必修:发蛋 + 连胜;同日幂等(以 session.completed 为准) */

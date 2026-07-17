@@ -38,4 +38,11 @@ describe('F4 首页进度 ViewModel', () => {
     expect(afterNewWordQuiz.newWordsLearnedToday).toBe(1)
     expect(afterNewWordQuiz.eggsEarnedToday).toBe(1)
   })
+
+  it('向暂停日任务板暴露真实暂停状态', () => {
+    const paused = snapshot(0)
+    paused.session.newWordsPaused = true
+    expect(assembleViewModel(paused).newWordsPaused).toBe(true)
+    expect(assembleViewModel(snapshot(0)).newWordsPaused).toBe(false)
+  })
 })

@@ -26,9 +26,13 @@ export interface LessonDictationScreenProps {
   todayTotal: number
   questionIndex?: number
   questionTotal?: number
+  headerTitle?: string
+  progressText?: string
+  stepChip?: string
+  allowForgot?: boolean
   onBack: () => void
   onAnswer: (answer: LessonDictationAnswer) => void
-  onForgot: (forgot: LessonDictationForgot) => void
+  onForgot?: (forgot: LessonDictationForgot) => void
   onContinue: () => void
   onCapturedContinue: () => void
   speakText?: (text: string) => boolean
@@ -46,6 +50,10 @@ export function LessonDictationScreen({
   todayTotal,
   questionIndex = 1,
   questionTotal = 3,
+  headerTitle,
+  progressText,
+  stepChip,
+  allowForgot = true,
   onBack,
   onAnswer,
   onForgot,
@@ -71,10 +79,10 @@ export function LessonDictationScreen({
   }
 
   const forgot = () => {
-    if (state === 'correct' || state === 'captured') return
+    if (!allowForgot || state === 'correct' || state === 'captured') return
     setInput('')
     setState('captured')
-    onForgot({ wordId: word.id })
+    onForgot?.({ wordId: word.id })
   }
 
   useEffect(() => {
@@ -92,19 +100,24 @@ export function LessonDictationScreen({
       wrongBookQueued: state === 'captured',
       chickCaptured: state === 'captured',
       rescueRoute: state === 'captured' ? ['listen', 'write', 'choose', 'dictate'] : null,
+      header: {
+        title: headerTitle ?? `默写 · 第 ${questionIndex} 题 / ${questionTotal}`,
+        progressText: progressText ?? `今日进度 ${todayDone} / ${todayTotal}`,
+        stepChip: stepChip ?? '写一写 · 会重试',
+      },
       progress: { done: todayDone, total: todayTotal, question: questionIndex, questionTotal },
       controls: state === 'captured'
         ? ['back', 'continue_next']
         : state === 'correct'
           ? ['back', 'continue']
-          : ['back', 'replay_word', 'input_answer', 'submit_answer', 'skip_unknown'],
+          : ['back', 'replay_word', 'input_answer', 'submit_answer', ...(allowForgot ? ['skip_unknown'] : [])],
     })
     testWindow.advanceTime = () => undefined
     return () => {
       delete testWindow.render_game_to_text
       delete testWindow.advanceTime
     }
-  }, [input, questionIndex, questionTotal, state, todayDone, todayTotal, word.meaning])
+  }, [allowForgot, headerTitle, input, progressText, questionIndex, questionTotal, state, stepChip, todayDone, todayTotal, word.meaning])
 
   return (
     <FarmStageShell ariaLabel="皮皮のEnglish 英文默写题">
@@ -114,7 +127,7 @@ export function LessonDictationScreen({
         <header className="lesson-choice-header-f4">
           <button className="lesson-choice-back-f4" type="button" onClick={onBack}><span aria-hidden="true" />回农场</button>
           <section className="lesson-choice-progress-f4" aria-label={`今日学习进度 ${todayDone} / ${todayTotal}`}>
-            <div className="lesson-choice-progress-copy-f4"><strong>默写 · 第 {questionIndex} 题 / {questionTotal}</strong><span>今日进度 {todayDone} / {todayTotal}</span></div>
+            <div className="lesson-choice-progress-copy-f4"><strong>{headerTitle ?? `默写 · 第 ${questionIndex} 题 / ${questionTotal}`}</strong><span>{progressText ?? `今日进度 ${todayDone} / ${todayTotal}`}</span></div>
             <div className="lesson-choice-progress-path-f4">
               <span className="lesson-choice-progress-fill-f4" style={{ width: `${progress}%` }} />
               <span className="lesson-choice-progress-dot-f4 is-done" /><span className="lesson-choice-progress-dot-f4 is-done" />
@@ -122,7 +135,7 @@ export function LessonDictationScreen({
             </div>
             <img className="lesson-choice-progress-hen-f4" src={f4AssetUrl('mother-f3.png')} alt="母鸡妈妈正在向终点走" />
           </section>
-          <span className="lesson-choice-step-chip-f4">写一写 · 会重试</span>
+          <span className="lesson-choice-step-chip-f4">{stepChip ?? '写一写 · 会重试'}</span>
         </header>
 
         <section className="lesson-choice-paper-f4 lesson-dictation-paper-f4">
@@ -169,9 +182,9 @@ export function LessonDictationScreen({
               </div>
 
               <div className="lesson-dictation-feedback-f4" role="status" aria-live="polite">
-                {state === 'ready' && <div className="is-ready"><span>✎</span><p><strong>想好以后再提交</strong><small>大小写都可以，系统会按正常英文判断。</small></p><button type="button" onClick={forgot}>想不起来</button></div>}
+                {state === 'ready' && <div className="is-ready"><span>✎</span><p><strong>想好以后再提交</strong><small>大小写都可以，系统会按正常英文判断。</small></p>{allowForgot && <button type="button" onClick={forgot}>想不起来</button>}</div>}
                 {state === 'correct' && <div className="is-correct"><span>✓</span><p><strong>写对啦！{word.word} 就是 {word.meaning}</strong><small>这个新朋友已经会写了。</small></p><button type="button" onClick={onContinue}>继续</button></div>}
-                {state === 'retry' && <div className="is-retry"><span>↶</span><p><strong>差一点，再写一次</strong><small>先修改答案；实在想不起来，也可以跳过。</small></p><button type="button" onClick={forgot}>想不起来</button></div>}
+                {state === 'retry' && <div className="is-retry"><span>↶</span><p><strong>差一点，再写一次</strong><small>{allowForgot ? '先修改答案；实在想不起来，也可以跳过。' : '修改答案，再试一次。'}</small></p>{allowForgot && <button type="button" onClick={forgot}>想不起来</button>}</div>}
               </div>
 
               {state !== 'correct' && <div className="lesson-dictation-actions-f4">

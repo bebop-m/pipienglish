@@ -46,6 +46,8 @@ export interface DailySession {
   answered: number
   correct: number
   completed: boolean
+  dueBacklog?: number // 构建当日队列时的到期总数(供 SPEC §5.1 连续积压判定;旧记录缺省按 0)
+  newWordsPaused?: boolean // 当日新词是否因积压暂停(文案归视觉层)
 }
 
 export const HATCH_MS = 24 * 60 * 60 * 1000

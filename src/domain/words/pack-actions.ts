@@ -1,0 +1,71 @@
+// 词包「动起来」:高频动词
+
+import { definePack, type Word } from './types'
+
+const w = definePack('动起来', 1)
+
+export const ACTION_WORDS: Word[] = [
+  // —— 移动 ——
+  w('go', '/ɡoʊ/', '去;走', '🚦', 'Ready, set, go!', '预备,开始!'),
+  w('come', '/kʌm/', '来', '👋', 'Come here, little chick!', '过来,小鸡!'),
+  w('run', '/rʌn/', '跑', '🏃', 'Run fast, the bus is coming!', '快跑,公交车来了!'),
+  w('walk', '/wɔːk/', '走路;散步', '🚶', 'We walk to school together.', '我们一起走路上学。'),
+  w('jump', '/dʒʌmp/', '跳', '🦘', 'Jump over the puddle!', '跳过小水坑!'),
+  w('fly', '/flaɪ/', '飞', '🕊️', 'Birds fly south in winter.', '鸟儿冬天飞去南方。'),
+  w('swim', '/swɪm/', '游泳', '🏊', 'Ducks swim without lessons.', '鸭子不用学就会游泳。'),
+  w('climb', '/klaɪm/', '爬', '🧗', 'Monkeys climb trees fast.', '猴子爬树很快。'),
+  w('ride', '/raɪd/', '骑', '🚴', 'I can ride without help now!', '我现在会自己骑车啦!'),
+  w('stand', '/stænd/', '站', '🧍', 'Stand up straight, please.', '请站直。'),
+  w('sit', '/sɪt/', '坐', '🪑', 'Sit down and rest a bit.', '坐下歇一会儿。'),
+  w('stop', '/stɑːp/', '停', '🛑', 'Stop at the red light.', '红灯停。'),
+  w('wait', '/weɪt/', '等', '⏳', 'Wait for the green light.', '等绿灯。'),
+  // —— 表达 ——
+  w('sing', '/sɪŋ/', '唱歌', '🎤', 'The hen sings in the morning.', '母鸡在早晨唱歌。'),
+  w('dance', '/dæns/', '跳舞', '💃', 'The chicks dance in a circle.', '小鸡们围成圈跳舞。'),
+  w('draw', '/drɔː/', '画画', '🖍️', 'I draw my family.', '我画我的家人。'),
+  w('speak', '/spiːk/', '说(语言)', '🗣️', 'Speak a little louder, please.', '请说大声一点。'),
+  w('say', '/seɪ/', '说', '💬', 'What did the cat say?', '猫说了什么?'),
+  w('talk', '/tɔːk/', '聊天;说话', '🗨️', 'The chicks talk all day.', '小鸡们聊了一整天。'),
+  w('tell', '/tel/', '告诉;讲', '📣', 'Tell me a funny story.', '给我讲个好笑的故事。'),
+  w('ask', '/æsk/', '问', '🙋', 'Ask the teacher for help.', '向老师求助。'),
+  w('cry', '/kraɪ/', '哭', '😢', 'Do not cry, I am here.', '别哭,有我呢。'),
+  w('laugh', '/læf/', '大笑', '😂', 'The joke made everyone laugh.', '这个笑话让大家都笑了。'),
+  // —— 学习 ——
+  w('read', '/riːd/', '读;看书', '📖', 'Read me a story, please.', '请给我读个故事。'),
+  w('write', '/raɪt/', '写', '✍️', 'I write my name in English.', '我用英语写自己的名字。'),
+  w('learn', '/lɜːrn/', '学习', '🧠', 'We learn four new words today.', '今天我们学四个新单词。'),
+  w('teach', '/tiːtʃ/', '教', '🧑‍🏫', 'I teach Mom English words.', '我教妈妈英语单词。'),
+  w('listen', '/ˈlɪsn/', '听', '🎧', 'Listen! The birds are singing.', '听!鸟儿在唱歌。'),
+  w('look', '/lʊk/', '看', '👀', 'Look at the rainbow!', '看那道彩虹!'),
+  w('see', '/siː/', '看见', '👁️', 'I see a star up there.', '我看见那儿有颗星星。'),
+  w('watch', '/wɑːtʃ/', '看(观看)', '⌚', 'We watch the chicks hatch.', '我们看小鸡破壳。'),
+  w('think', '/θɪŋk/', '想;思考', '💭', 'Think first, then answer.', '先想一想,再回答。'),
+  w('know', '/noʊ/', '知道', '💡', 'I know this word!', '这个单词我认识!'),
+  // —— 双手 ——
+  w('open', '/ˈoʊpən/', '打开', '📬', 'Open the box and see!', '打开盒子看看!'),
+  w('close', '/kloʊz/', '关上', '🚪', 'Close the window, it is windy.', '关上窗,起风了。'),
+  w('push', '/pʊʃ/', '推', '👐', 'Push the door to open it.', '推一下门就开了。'),
+  w('pull', '/pʊl/', '拉', '🪢', 'Pull the rope together!', '一起拉绳子!'),
+  w('give', '/ɡɪv/', '给', '🎁', 'Give the hen some corn.', '给母鸡喂点玉米。'),
+  w('take', '/teɪk/', '拿;带', '✊', 'Take an umbrella with you.', '带把伞。'),
+  w('get', '/ɡet/', '得到', '🙌', 'Finish and get an egg!', '完成就得到一颗蛋!'),
+  w('put', '/pʊt/', '放', '📥', 'Put the egg in the nest.', '把蛋放进窝里。'),
+  w('make', '/meɪk/', '做;制作', '🛠️', 'Let us make a paper plane.', '我们做纸飞机吧。'),
+  w('do', '/duː/', '做', '✅', 'Do your best every day.', '每天尽力就好。'),
+  w('help', '/help/', '帮助', '🤝', 'Can you help me carry this?', '你能帮我搬这个吗?'),
+  w('find', '/faɪnd/', '找到', '🔍', 'Can you find the little chick?', '你能找到那只小鸡吗?'),
+  w('buy', '/baɪ/', '买', '🛒', 'We buy eggs and bread.', '我们买鸡蛋和面包。'),
+  w('catch', '/kætʃ/', '接住;抓住', '🧤', 'Catch the ball!', '接住球!'),
+  w('throw', '/θroʊ/', '扔', '🤾', 'Throw the ball high!', '把球扔高高!'),
+  w('kick', '/kɪk/', '踢', '🦵', 'Kick the ball to me.', '把球踢给我。'),
+  w('hold', '/hoʊld/', '抱;拿着', '🤲', 'Hold my hand to cross.', '过马路牵着我的手。'),
+  // —— 生活 ——
+  w('play', '/pleɪ/', '玩', '🎮', 'Let us play after dinner.', '晚饭后我们一起玩吧。'),
+  w('wash', '/wɑːʃ/', '洗', '🧼', 'Wash the apples before eating.', '吃前把苹果洗一洗。'),
+  w('clean', '/kliːn/', '打扫', '🧹', 'We clean the room together.', '我们一起打扫房间。'),
+  w('brush', '/brʌʃ/', '刷', '🪥', 'Brush your teeth twice a day.', '每天刷两次牙。'),
+  w('sleep', '/sliːp/', '睡觉', '😴', 'The hen sleeps in her nest.', '母鸡在窝里睡觉。'),
+  w('want', '/wɑːnt/', '想要', '🌟', 'I want a little dog.', '我想要一只小狗。'),
+  w('like', '/laɪk/', '喜欢', '👍', 'I like rainy days too.', '我也喜欢下雨天。'),
+  w('live', '/lɪv/', '住;生活', '🏠', 'Where do penguins live?', '企鹅住在哪里?'),
+]
