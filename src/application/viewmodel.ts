@@ -148,6 +148,7 @@ export interface FarmHomeViewModel {
   incubating: IncubatingEggVM | null
   chicksTotal: number
   chicksVisible: FarmChickVM[]
+  chicksCaptured: FarmChickVM[] // 在救援篮里等待接回家;总数永不减少
   chicksAll: FarmChickVM[]
   chicksInCoop: number
   favoriteCount: number
@@ -219,6 +220,7 @@ export interface FarmSnapshot {
   session: DailySession
   chicksTotal: number
   latestChicks: PersistedChick[] // 当前场景最新 ≤40 只,bornOn 降序
+  capturedChicks?: PersistedChick[] // 被抓进救援篮的(不在草地上,但仍计入 chicksTotal)
   allSceneChicks?: PersistedChick[]
   favoriteCount?: number
   rescueCount: number
@@ -370,8 +372,9 @@ export function assembleViewModel(
       : null,
     chicksTotal: s.chicksTotal,
     chicksVisible: s.latestChicks.slice(0, VISIBLE_CHICK_CAP).map(chick => chickViewModel(chick, today)),
+    chicksCaptured: (s.capturedChicks ?? []).map(chick => chickViewModel(chick, today)),
     chicksAll: (s.allSceneChicks ?? s.latestChicks).map(chick => chickViewModel(chick, today)),
-    chicksInCoop: Math.max(0, s.chicksTotal - s.latestChicks.length),
+    chicksInCoop: Math.max(0, s.chicksTotal - s.latestChicks.length - (s.capturedChicks?.length ?? 0)),
     favoriteCount: s.favoriteCount ?? s.latestChicks.filter(chick => chick.favorite).length,
     rescueCount: s.rescueCount,
     cookingMeal: farm.cookingMeal,

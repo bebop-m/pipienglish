@@ -25,6 +25,51 @@ describe('每场景 40 只可见集合', () => {
     expect(collection.inCoop).toHaveLength(5)
   })
 
+  it('被抓的小鸡真的离开草地，鸡舍不补位，总数不减', () => {
+    const residents = chicks(10)
+    const collection = collectSceneChicks(residents, 'scene-1', 4)
+    expect(collection.visible).toHaveLength(6)
+    expect(collection.captured).toHaveLength(4)
+    // 最早孵化的先被抓，草地上留下最新的 6 只
+    expect(collection.captured.map(chick => chick.chickId)).toEqual([
+      'chick-4', 'chick-3', 'chick-2', 'chick-1',
+    ])
+    expect(collection.inCoop).toHaveLength(0) // 不从鸡舍补位
+    const total = collection.visible.length + collection.captured.length + collection.inCoop.length
+    expect(total).toBe(residents.length) // 一只都没丢
+  })
+
+  it('皮皮收藏的小鸡永远不会被抓走', () => {
+    const residents = chicks(6)
+    residents[0].favorite = true // 最早孵化，本该最先被抓
+    residents[1].favorite = true
+    const collection = collectSceneChicks(residents, 'scene-1', 3)
+    expect(collection.captured.some(chick => chick.favorite)).toBe(false)
+    expect(collection.captured.map(chick => chick.chickId)).toEqual(['chick-5', 'chick-4', 'chick-3'])
+    expect(collection.visible.map(chick => chick.chickId)).toEqual(['chick-2', 'chick-1', 'chick-6'])
+  })
+
+  it('救援队列长于可抓小鸡数时只抓走实际有的，且不会出现负数', () => {
+    expect(collectSceneChicks(chicks(2), 'scene-1', 9)).toMatchObject({
+      visible: [],
+      captured: [{ chickId: 'chick-2' }, { chickId: 'chick-1' }],
+      inCoop: [],
+    })
+    expect(collectSceneChicks([], 'scene-1', 5).captured).toEqual([])
+    expect(collectSceneChicks(chicks(3), 'scene-1', 0).captured).toEqual([])
+    expect(collectSceneChicks(chicks(3), 'scene-1', -2).visible).toHaveLength(3)
+  })
+
+  it('超过 40 只时先抓草地上的，不动鸡舍里休息的', () => {
+    const collection = collectSceneChicks(chicks(45), 'scene-1', 2)
+    expect(collection.visible).toHaveLength(38)
+    expect(collection.captured.map(chick => chick.chickId)).toEqual(['chick-7', 'chick-6'])
+    expect(collection.inCoop).toHaveLength(5) // 仍是最早的 5 只，未被牵连
+    expect(collection.inCoop.map(chick => chick.chickId)).toEqual([
+      'chick-5', 'chick-4', 'chick-3', 'chick-2', 'chick-1',
+    ])
+  })
+
   it('不同场景独立计算且不污染输入集合', () => {
     const sceneOne = chicks(41, 'scene-1')
     const sceneTwo = chicks(3, 'scene-2')

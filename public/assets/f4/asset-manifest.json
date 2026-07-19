@@ -43,6 +43,10 @@
     {
       "file": "mother-thumbsup-f4-v1.png",
       "sha256": "EBCFBB1898BEF2D31D5E0B2C8F2A2CFE1F35803DCD6DE0AE633B56CC6DF004C3"
+    },
+    {
+      "file": "audio/bgm-english-garden.mp3",
+      "sha256": "11A8B67D5B70FC5AA2243AC4F6EF728FC895E3DDF6741EF1F61DB69E8D4E8479"
     }
   ]
 }

@@ -301,6 +301,7 @@ function CompleteBoard({ vm, dispatch }: FarmHomeDailyProps) {
 function CoopPanel({ vm, dispatch }: FarmHomeDailyProps) {
   if (vm.overlay !== 'coop') return null
   const visibleIds = new Set(vm.chicksVisible.map(chick => chick.chickId))
+  const capturedIds = new Set(vm.chicksCaptured.map(chick => chick.chickId))
 
   return (
     <>
@@ -309,17 +310,18 @@ function CoopPanel({ vm, dispatch }: FarmHomeDailyProps) {
         <button className="panel-close-f4" type="button" aria-label="关闭鸡舍" onClick={() => dispatch({ type: 'CLOSE_COOP' })}>×</button>
         <p className="k-eyebrow">{vm.viewedScene.title} · 全部居民</p>
         <h2 id="coop-title-f4">小鸡鸡舍</h2>
-        <p className="coop-summary-f4">这里一只也不会丢。最喜欢 {vm.favoriteCount} / 8，农场外休息 {vm.chicksInCoop} 只。</p>
+        <p className="coop-summary-f4">这里一只也不会丢。最喜欢 {vm.favoriteCount} / 8，农场外休息 {vm.chicksInCoop} 只{vm.chicksCaptured.length > 0 ? `，${vm.chicksCaptured.length} 只在篮子里等你` : ''}。</p>
         <div className="coop-list-f4">
           {vm.chicksAll.map((chick, index) => {
             const visible = visibleIds.has(chick.chickId)
+            const captured = capturedIds.has(chick.chickId)
             const speaking = vm.chat?.primary.chickId === chick.chickId
             return (
-              <article className={`coop-chick-f4 ${chick.favorite ? 'is-favorite' : ''}`} key={chick.chickId}>
+              <article className={`coop-chick-f4 ${chick.favorite ? 'is-favorite' : ''} ${captured ? 'is-captured' : ''}`} key={chick.chickId}>
                 <img src={f4AssetUrl('chick-f3.png')} alt="" />
                 <span className="coop-chick-copy-f4">
                   <strong>小鸡 {index + 1}</strong>
-                  <small>{chick.favorite ? '★ 最喜欢 · 农场常驻' : visible ? '正在农场散步' : '正在鸡舍休息'}</small>
+                  <small>{captured ? '在篮子里等你来接' : chick.favorite ? '★ 最喜欢 · 农场常驻' : visible ? '正在农场散步' : '正在鸡舍休息'}</small>
                   {speaking && <em>{vm.chat!.primary.word} · {vm.chat!.primary.meaning}</em>}
                 </span>
                 <button type="button" onClick={() => dispatch({ type: 'CHICK_CHAT', chickId: chick.chickId, neighborIds: [] })}>说单词</button>

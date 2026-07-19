@@ -342,12 +342,16 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
   const visibleChicks = useMemo(() => {
     const candidates = vm.arrivingChick ? [vm.arrivingChick, ...vm.chicksVisible] : vm.chicksVisible
     const seen = new Set<string>()
-    return candidates.filter(chick => {
+    const unique = candidates.filter(chick => {
       if (seen.has(chick.chickId)) return false
       seen.add(chick.chickId)
       return true
-    }).slice(0, CHICK_HOMES.length)
-  }, [vm.arrivingChick, vm.chicksVisible])
+    })
+    // 草地固定 6 个站位。被抓走几只就空出几个站位,否则鸡多时(>6)
+    // 从 chicksVisible 里补位会让"少了小鸡"完全看不出来。
+    const slots = Math.max(0, CHICK_HOMES.length - vm.chicksCaptured.length)
+    return unique.slice(0, slots)
+  }, [vm.arrivingChick, vm.chicksCaptured.length, vm.chicksVisible])
   const specs = useMemo<ActorSpec[]>(
     () => [
       {

@@ -16,7 +16,16 @@ export interface BgmTrackDefinition {
   assetStatus: 'approved' | 'internal-placeholder'
 }
 
-export const BGM_TRACKS: readonly BgmTrackDefinition[] = []
+export const BGM_TRACKS: readonly BgmTrackDefinition[] = [
+  {
+    id: 'english-garden',
+    assetFilename: 'bgm-english-garden.mp3',
+    title: '英伦花园',
+    // 爸爸 2026-07-19 选定并提供。30s 无缝循环(接缝跳变 0.00006)、
+    // 峰值 -0.72dBFS 无削波、192kbps 立体声 705KB、带 Xing/Info gapless 头。
+    assetStatus: 'approved',
+  },
+]
 
 /** 当前生效曲目:第一首已批准曲目;没有则整个音乐功能对孩子不可见 */
 export function approvedBgmTrack(

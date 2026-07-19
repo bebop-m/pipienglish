@@ -9,6 +9,8 @@ export interface ChickCollectionEntry {
 
 export interface SceneChickCollection<T> {
   visible: T[]
+  /** 被抓进救援篮的小鸡：仍属本场景、总数不减，只是换了展示位(SPEC §2.5 软化条款③) */
+  captured: T[]
   inCoop: T[]
   favoriteCount: number
 }
@@ -17,10 +19,17 @@ function newestFirst<T extends ChickCollectionEntry>(left: T, right: T): number 
   return right.hatchedAt - left.hatchedAt || left.chickId.localeCompare(right.chickId)
 }
 
-/** 最喜欢优先，再按孵化时间从新到旧补足 40；返回值与输入均不被修改。 */
+/**
+ * 最喜欢优先，再按孵化时间从新到旧补足 40；返回值与输入均不被修改。
+ *
+ * capturedCount = 救援队列长度。被抓的小鸡从**草地上正在显示的非收藏小鸡**里取，
+ * 最早孵化的先被抓：皮皮亲手收藏的永远留在草地上，不会因为答错而被带走。
+ * 草地因此真的变少一只，鸡舍不补位，`chicksTotal` 不变。
+ */
 export function collectSceneChicks<T extends ChickCollectionEntry>(
   chicks: readonly T[],
   sceneId: string,
+  capturedCount = 0,
 ): SceneChickCollection<T> {
   const sceneChicks = chicks.filter(chick => chick.sceneId === sceneId)
   const favorites = sceneChicks.filter(chick => chick.favorite).sort(newestFirst)
@@ -28,14 +37,21 @@ export function collectSceneChicks<T extends ChickCollectionEntry>(
   // 正常写入永远不超过 8 个最喜欢；如果旧备份/损坏数据违反该不变量，
   // 仍优先保留收藏且绝不自动取消。40 个全收藏时，新鸡会安全进入鸡舍。
   const visibleFavorites = favorites.slice(0, VISIBLE_CHICK_CAP)
+  const visibleOthers = others.slice(0, Math.max(0, VISIBLE_CHICK_CAP - visibleFavorites.length))
+
+  // 救援队列可能长于草地上的可抓小鸡数(开局鸡少时)，只能抓走实际有的
+  const takenCount = Math.max(0, Math.min(Math.trunc(capturedCount) || 0, visibleOthers.length))
+  const captured = takenCount === 0 ? [] : visibleOthers.slice(visibleOthers.length - takenCount)
   const visible = [
     ...visibleFavorites,
-    ...others.slice(0, Math.max(0, VISIBLE_CHICK_CAP - visibleFavorites.length)),
+    ...visibleOthers.slice(0, visibleOthers.length - takenCount),
   ]
-  const visibleIds = new Set(visible.map(chick => chick.chickId))
+
+  const placedIds = new Set([...visible, ...captured].map(chick => chick.chickId))
   return {
     visible,
-    inCoop: sceneChicks.filter(chick => !visibleIds.has(chick.chickId)).sort(newestFirst),
+    captured,
+    inCoop: sceneChicks.filter(chick => !placedIds.has(chick.chickId)).sort(newestFirst),
     favoriteCount: favorites.length,
   }
 }

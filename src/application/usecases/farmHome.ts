@@ -702,7 +702,9 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
       ...chick,
       hatchedAt: persistedChickHatchedAt(chick),
     }))
-    const collection = collectSceneChicks(orderedSceneChicks, viewedScene.id)
+    // 救援篮只属于当前旅程场景;回访旧场景不该少鸡
+    const capturedHere = viewedScene.id === farm.activeSceneId ? rescueCount : 0
+    const collection = collectSceneChicks(orderedSceneChicks, viewedScene.id, capturedHere)
     return {
       farm,
       meta,
@@ -711,7 +713,8 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
       session: session ?? { date: today, reviewIds: [], newIds: [], doneCount: 0, answered: 0, correct: 0, completed: false },
       chicksTotal: sceneChicks.length,
       latestChicks: collection.visible,
-      allSceneChicks: [...collection.visible, ...collection.inCoop],
+      capturedChicks: collection.captured,
+      allSceneChicks: [...collection.visible, ...collection.captured, ...collection.inCoop],
       favoriteCount: collection.favoriteCount,
       rescueCount,
       now,
