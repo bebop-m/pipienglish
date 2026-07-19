@@ -1,65 +1,147 @@
-// 备份导出/导入(SPEC §6 硬需求):v2 全表;导入兼容 v1 与 v2
+// 手动 JSON 是唯一备份渠道：v3 导出；导入兼容 v1/v2/v3。
 
-import type { PipiDB, CardRow, FarmV1, KV } from './db'
-import { migrateFarmV1, defaultMeta } from './db'
+import type { DailySession } from '../domain/types'
+import type { CardRow, InkRow, KV, PipiDB, RescueRow, SeenRow } from './db'
+import { convertToV3Archive } from './farmMigration'
+import type {
+  DecorationRow,
+  OwnedCosmeticRow,
+  PersistedChick,
+  SceneMemoryRow,
+} from './farmPersistence'
 import { dayKey } from '../domain/time'
-import type { MetaState } from '../domain/types'
 
-export async function exportAll(d: PipiDB): Promise<string> {
-  const [cards, sessions, kv, chicks, seen, rescue] = await Promise.all([
-    d.cards.toArray(),
-    d.sessions.toArray(),
-    d.kv.toArray(),
-    d.chicks.toArray(),
-    d.seen.toArray(),
-    d.rescue.toArray(),
-  ])
-  // ink(字迹 Blob)v0.3 引入后单独处理;当前表为空
-  return JSON.stringify({ version: 2, exportedAt: new Date().toISOString(), cards, sessions, kv, chicks, seen, rescue })
+interface SerializedBlob {
+  type: string
+  base64: string
 }
 
-function reviveCards(cards: CardRow[]): CardRow[] {
-  for (const row of cards) {
-    row.card.due = new Date(row.card.due)
-    if (row.card.last_review) row.card.last_review = new Date(row.card.last_review)
+interface SerializedInkRow extends Omit<InkRow, 'png'> {
+  png: SerializedBlob
+}
+
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = ''
+  const chunkSize = 0x8000
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize))
   }
-  return cards
+  return btoa(binary)
+}
+
+function base64ToBytes(base64: string): Uint8Array {
+  const binary = atob(base64)
+  return Uint8Array.from(binary, character => character.charCodeAt(0))
+}
+
+async function serializeInk(rows: InkRow[]): Promise<SerializedInkRow[]> {
+  return Promise.all(rows.map(async row => ({
+    id: row.id,
+    wordId: row.wordId,
+    date: row.date,
+    png: {
+      type: row.png.type,
+      base64: bytesToBase64(new Uint8Array(await row.png.arrayBuffer())),
+    },
+  })))
+}
+
+function reviveInk(rows: unknown[]): InkRow[] {
+  return rows.map((value, index) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      throw new TypeError(`ink[${index}] must be an object`)
+    }
+    const row = value as Partial<SerializedInkRow>
+    if (typeof row.id !== 'string' || typeof row.wordId !== 'string' || typeof row.date !== 'string') {
+      throw new TypeError(`ink[${index}] must have id, wordId and date`)
+    }
+    if (!row.png || typeof row.png.type !== 'string' || typeof row.png.base64 !== 'string') {
+      throw new TypeError(`ink[${index}].png must be a serialized blob`)
+    }
+    return {
+      id: row.id,
+      wordId: row.wordId,
+      date: row.date,
+      png: new Blob([base64ToBytes(row.png.base64)], { type: row.png.type }),
+    }
+  })
+}
+
+export async function exportAll(d: PipiDB): Promise<string> {
+  const now = Date.now()
+  const [cards, sessions, kv, chicks, seen, rescue, ink, decorations, cosmetics, sceneMemory] = await d.transaction(
+    'r',
+    [d.cards, d.sessions, d.kv, d.chicks, d.seen, d.rescue, d.ink, d.decorations, d.cosmetics, d.sceneMemory],
+    async () => Promise.all([
+      d.cards.toArray(),
+      d.sessions.toArray(),
+      d.kv.toArray(),
+      d.chicks.toArray(),
+      d.seen.toArray(),
+      d.rescue.toArray(),
+      d.ink.toArray(),
+      d.decorations.toArray(),
+      d.cosmetics.toArray(),
+      d.sceneMemory.toArray(),
+    ]),
+  )
+  const converted = convertToV3Archive({
+    version: 3,
+    exportedAt: new Date(now).toISOString(),
+    cards,
+    sessions,
+    kv,
+    chicks,
+    seen,
+    rescue,
+    ink: await serializeInk(ink),
+    decorations,
+    cosmetics,
+    sceneMemory,
+  }, { now, today: dayKey() })
+  return JSON.stringify(converted)
 }
 
 export async function importAll(d: PipiDB, json: string): Promise<void> {
-  const data = JSON.parse(json)
-  if (data.version !== 1 && data.version !== 2) throw new Error('未知的备份版本')
+  const now = Date.now()
+  const converted = convertToV3Archive(JSON.parse(json), { now, today: dayKey() })
+  const ink = reviveInk(converted.ink)
 
-  await d.transaction('rw', [d.cards, d.sessions, d.kv, d.chicks, d.seen, d.rescue], async () => {
+  await d.transaction('rw', [
+    d.cards,
+    d.sessions,
+    d.kv,
+    d.chicks,
+    d.seen,
+    d.rescue,
+    d.ink,
+    d.decorations,
+    d.cosmetics,
+    d.sceneMemory,
+  ], async () => {
     await Promise.all([
-      d.cards.clear(), d.sessions.clear(), d.kv.clear(),
-      d.chicks.clear(), d.seen.clear(), d.rescue.clear(),
+      d.cards.clear(),
+      d.sessions.clear(),
+      d.kv.clear(),
+      d.chicks.clear(),
+      d.seen.clear(),
+      d.rescue.clear(),
+      d.ink.clear(),
+      d.decorations.clear(),
+      d.cosmetics.clear(),
+      d.sceneMemory.clear(),
     ])
-    await d.cards.bulkPut(reviveCards(data.cards ?? []))
-    await d.sessions.bulkPut(data.sessions ?? [])
-
-    if (data.version === 2) {
-      await d.kv.bulkPut(data.kv ?? [])
-      await d.chicks.bulkPut(data.chicks ?? [])
-      await d.seen.bulkPut(data.seen ?? [])
-      await d.rescue.bulkPut(data.rescue ?? [])
-      return
-    }
-
-    // v1 备份:套用与 DB 升级相同的变换
-    const now = Date.now()
-    const today = dayKey()
-    const kvRows = (data.kv ?? []) as KV[]
-    const oldFarm = kvRows.find(r => r.key === 'farm')?.value as FarmV1 | undefined
-    const oldMeta = (kvRows.find(r => r.key === 'meta')?.value ?? {}) as Partial<MetaState>
-    const { farmState, chicks } = migrateFarmV1(oldFarm, oldMeta.installDate ?? today, today, now)
-    await d.kv.bulkPut(kvRows.filter(r => r.key !== 'farm'))
-    await d.kv.put({ key: 'farmState', value: farmState })
-    await d.kv.put({ key: 'meta', value: { ...defaultMeta(today), ...oldMeta } })
-    if (chicks.length) await d.chicks.bulkAdd(chicks)
-    const seenRows = reviveCards(data.cards ?? [])
-      .filter(c => c.card.last_review)
-      .map(c => ({ wordId: c.wordId, lastSeenAt: (c.card.last_review as Date).getTime() }))
-    if (seenRows.length) await d.seen.bulkPut(seenRows)
+    await Promise.all([
+      d.cards.bulkPut(converted.cards as CardRow[]),
+      d.sessions.bulkPut(converted.sessions as DailySession[]),
+      d.kv.bulkPut(converted.kv as KV[]),
+      d.chicks.bulkPut(converted.chicks as PersistedChick[]),
+      d.seen.bulkPut(converted.seen as SeenRow[]),
+      d.rescue.bulkPut(converted.rescue as RescueRow[]),
+      d.ink.bulkPut(ink),
+      d.decorations.bulkPut(converted.decorations as DecorationRow[]),
+      d.cosmetics.bulkPut(converted.cosmetics as OwnedCosmeticRow[]),
+      d.sceneMemory.bulkPut(converted.sceneMemory as SceneMemoryRow[]),
+    ])
   })
 }

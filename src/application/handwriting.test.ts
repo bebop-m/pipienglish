@@ -4,10 +4,10 @@ import { describe, expect, it } from 'vitest'
 import { PipiDB } from './db'
 import { createFarmUsecases } from './usecases/farmHome'
 import { createHandwritingUsecases, HANDWRITING_ROUND_SIZE } from './usecases/handwriting'
-import { getKV, DEFAULT_FARM } from './db'
+import { getFarmStateV3 } from './db'
 import { mulberry32 } from '../domain/lesson'
 import { newCard, rate } from '../domain/srs'
-import type { FarmState } from '../domain/types'
+import { dayKeyOf } from '../domain/time'
 
 let dbSeq = 0
 const freshDb = () => new PipiDB(`pipitest-hw-${Date.now()}-${dbSeq++}`)
@@ -105,23 +105,23 @@ describe('写词游戏用例', () => {
     db.close()
   })
 
-  it('奖励(蛋经济 v2):每轮鸡蛋 +1 进库存,每日上限 5,超出返回 capped 且不加蛋', async () => {
+  it('奖励:每轮鸡蛋 +1 进库存,每日上限 10,超出返回 capped 且不加蛋', async () => {
     const db = freshDb()
     const now = Date.now()
-    await completedToday(db, now) // 完成必修 → eggStock 1(固定 1 颗)
+    await completedToday(db, now) // 完成必修 → eggStock 2
     const uc = createHandwritingUsecases(db)
 
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 10; i++) {
       expect(await uc.awardRound(now)).toBe('egg')
       expect(await uc.gameEggsToday(now)).toBe(i)
     }
-    let state = await getKV<FarmState>(db, 'farmState', DEFAULT_FARM)
-    expect(state.eggStock).toBe(1 + 5) // 必修 1 + 游戏 5
+    let state = await getFarmStateV3(db, { now, today: dayKeyOf(now) })
+    expect(state.eggStock).toBe(2 + 10)
 
-    expect(await uc.awardRound(now)).toBe('capped') // 第 6 轮:照常可玩,不发蛋
-    state = await getKV<FarmState>(db, 'farmState', DEFAULT_FARM)
-    expect(state.eggStock).toBe(6)
-    expect(await uc.gameEggsToday(now)).toBe(5)
+    expect(await uc.awardRound(now)).toBe('capped') // 第 11 轮:照常可玩,不发蛋
+    state = await getFarmStateV3(db, { now, today: dayKeyOf(now) })
+    expect(state.eggStock).toBe(12)
+    expect(await uc.gameEggsToday(now)).toBe(10)
     db.close()
   })
 
@@ -139,12 +139,12 @@ describe('写词游戏用例', () => {
     db.close()
   })
 
-  it('必修完成固定 1 颗蛋(满任务日也不再是 2 颗)', async () => {
+  it('必修完成固定 2 颗蛋', async () => {
     const db = freshDb()
     const now = Date.now()
     await completedToday(db, now)
-    const state = await getKV<FarmState>(db, 'farmState', DEFAULT_FARM)
-    expect(state.eggStock).toBe(1)
+    const state = await getFarmStateV3(db, { now, today: dayKeyOf(now) })
+    expect(state.eggStock).toBe(2)
     db.close()
   })
 })

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { PipiDB } from './db'
 import { createRescueUsecases } from './usecases/rescue'
 import { WORDS } from '../domain/words'
+import { persistedChickWithDefaults } from './farmPersistence'
 
 let dbSeq = 0
 const freshDb = () => new PipiDB(`pipitest-rescue-${Date.now()}-${dbSeq++}`)
@@ -79,7 +80,7 @@ describe('救援用例', () => {
       date: '2026-07-17', reviewIds: [], newIds: [word.id], doneCount: 2,
       answered: 1, correct: 1, completed: false,
     })
-    await db.chicks.put({ chickId: 'c1', bornOn: '2026-07-17', source: 'hatch', homeX: null, homeY: null })
+    await db.chicks.put(persistedChickWithDefaults({ chickId: 'c1', bornOn: '2026-07-17', source: 'hatch', homeX: null, homeY: null }))
     const before = {
       kv: await db.kv.toArray(),
       sessions: await db.sessions.toArray(),

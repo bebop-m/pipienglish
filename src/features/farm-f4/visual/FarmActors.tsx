@@ -60,6 +60,8 @@ function FarmActor({
   ambientTalk,
   onChat,
   onPlaced,
+  onFavorite,
+  favoriteActionVisible,
 }: {
   spec: ActorSpec
   motionEnabled: boolean
@@ -67,8 +69,10 @@ function FarmActor({
   ambientTalk: Talk
   onChat: () => void
   onPlaced: (home: StagePoint) => void
+  onFavorite: () => void
+  favoriteActionVisible: boolean
 }) {
-  const actorRef = useRef<HTMLButtonElement>(null)
+  const actorRef = useRef<HTMLDivElement>(null)
   const positionRef = useRef({ ...spec.home })
   const animationRef = useRef<Animation | null>(null)
   const timerRef = useRef<number | undefined>(undefined)
@@ -285,26 +289,49 @@ function FarmActor({
   const gestureClass = visibleTalk ? (spec.kind === 'farmer' ? 'gesture-wave' : spec.kind === 'mother' ? 'gesture-wiggle' : 'gesture-hop') : ''
 
   return (
-    <button
+    <div
       ref={actorRef}
-      className={`actor-f3 ${dragging ? 'is-dragging' : ''} ${visibleTalk ? 'is-talking' : ''} ${gestureClass}`}
+      className={`actor-f3 ${dragging ? 'is-dragging' : ''} ${visibleTalk ? 'is-talking' : ''} ${spec.chick?.isNewToday ? 'is-newly-hatched' : ''} ${gestureClass}`}
       data-kind={spec.kind}
       data-chick-id={spec.chick?.chickId}
-      type="button"
-      aria-label={spec.label}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={finishDrag}
-      onPointerCancel={event => finishDrag(event, true)}
-      onClick={onClick}
+      data-rarity={spec.chick?.rarity}
     >
-      <span className="actor-talk-f3" role="status" aria-live="polite" aria-atomic="true" aria-hidden={!visibleTalk}>
-        {visibleTalk && <>{visibleTalk.line}{visibleTalk.translation && <small>{visibleTalk.translation}</small>}</>}
-      </span>
-      <span className="sprite-shell-f3">
-        <img className="sprite-f3" src={spec.image} alt="" draggable={false} />
-      </span>
-    </button>
+      <button
+        className="actor-hit-f3"
+        type="button"
+        aria-label={spec.label}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={finishDrag}
+        onPointerCancel={event => finishDrag(event, true)}
+        onClick={onClick}
+      >
+        <span className="actor-talk-f3" role="status" aria-live="polite" aria-atomic="true" aria-hidden={!visibleTalk}>
+          {visibleTalk && <>{visibleTalk.line}{visibleTalk.translation && <small>{visibleTalk.translation}</small>}</>}
+        </span>
+        <span className="sprite-shell-f3">
+          <img className="sprite-f3" src={spec.image} alt="" draggable={false} />
+        </span>
+      </button>
+      {spec.chick && favoriteActionVisible && (
+        <button
+          className={`chick-favorite-button-f4 ${spec.chick.favorite ? 'is-favorite' : ''}`}
+          type="button"
+          aria-label={spec.chick.favorite ? '取消最喜欢' : '加入最喜欢'}
+          aria-pressed={spec.chick.favorite}
+          onPointerDown={event => event.stopPropagation()}
+          onClick={event => {
+            event.stopPropagation()
+            onFavorite()
+          }}
+        >★</button>
+      )}
+      {spec.chick && spec.chick.rarity !== 'normal' && (
+        <span className={`chick-rarity-badge-f4 is-${spec.chick.rarity}`}>
+          {spec.chick.rarity === 'special' ? '特别朋友' : '异色朋友'}
+        </span>
+      )}
+    </div>
   )
 }
 
@@ -312,7 +339,15 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
   const [ambient, setAmbient] = useState<Record<string, Talk>>({})
   const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const ambientTimer = useRef<number | undefined>(undefined)
-  const visibleChicks = useMemo(() => vm.chicksVisible.slice(0, CHICK_HOMES.length), [vm.chicksVisible])
+  const visibleChicks = useMemo(() => {
+    const candidates = vm.arrivingChick ? [vm.arrivingChick, ...vm.chicksVisible] : vm.chicksVisible
+    const seen = new Set<string>()
+    return candidates.filter(chick => {
+      if (seen.has(chick.chickId)) return false
+      seen.add(chick.chickId)
+      return true
+    }).slice(0, CHICK_HOMES.length)
+  }, [vm.arrivingChick, vm.chicksVisible])
   const specs = useMemo<ActorSpec[]>(
     () => [
       {
@@ -334,7 +369,7 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
       ...visibleChicks.map((chick, index) => ({
         id: chick.chickId,
         kind: 'chick' as const,
-        label: '农场小鸡，点按听单词，拖动可以搬家',
+        label: `${chick.rarity === 'special' ? '特别' : chick.rarity === 'color' ? '异色' : '普通'}农场小鸡，点按听单词，拖动可以搬家`,
         image: f4AssetUrl('chick-f3.png'),
         home: chick.home ?? CHICK_HOMES[index],
         talk: null,
@@ -399,6 +434,10 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
             }}
             onPlaced={home => {
               if (spec.kind === 'chick') dispatch({ type: 'CHICK_PLACED', chickId: spec.id, home })
+            }}
+            favoriteActionVisible={Boolean(spec.chick && vm.chat?.primary.chickId === spec.id)}
+            onFavorite={() => {
+              if (spec.kind === 'chick') dispatch({ type: 'TOGGLE_CHICK_FAVORITE', chickId: spec.id })
             }}
           />
         )

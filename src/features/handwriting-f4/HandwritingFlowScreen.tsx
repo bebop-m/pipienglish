@@ -1,5 +1,5 @@
 // 写词游戏容器(SPEC §2.4 + 蛋经济 v2):每题复用小皮已批准的 H-5 默写卡,无任何视觉主张。
-// 完成一轮 → 鸡蛋 +1(日上限 5,拿满后纯加练)→ 回农场;不限轮数,从木牌再进即新一轮。
+// 完成一轮 → 鸡蛋 +1(日上限 10,拿满后纯加练)→ 回农场;不限轮数,从木牌再进即新一轮。
 
 import { useEffect } from 'react'
 import { LessonDictationScreen } from '../lesson-f4/LessonDictationScreen'

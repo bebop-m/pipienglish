@@ -1,28 +1,88 @@
-// 蛋经济规则(F4 定稿 + 2026-07 爸爸裁决,SPEC §3.1 / 架构方案 §2.2)
+// 蛋经济规则(长期农场最终裁决,SPEC §3.1 / 架构方案 §2.2)
 // 纯函数:输入 FarmState,输出新 FarmState 或 null(守卫拒绝)
 
-import type { FarmState } from './types'
+import type { DailySession, FarmState } from './types'
 import { HATCH_MS, HATCHERY_SLOTS } from './types'
 
-/** 完成当日必修的奖励:固定 1 颗(2026-07-17 爸爸定稿蛋经济 v2:
- *  必修 1 颗/天 + 写词游戏每轮 1 颗(日上限 GAME_EGGS_DAILY_CAP),多劳多得走游戏侧) */
-export function eggsEarnedFor(_totalItems: number): 1 {
-  return 1
+export { hatchesAt, isHatchDue, remainingHatchMs } from './hatchTiming'
+
+/** 完成当日必修固定获得 2 颗；题量不改变奖励。 */
+export function eggsEarnedFor(_totalItems: number): 2 {
+  return 2
 }
 
-/** 写词游戏奖励蛋的每日上限(蛋经济 v2):防无限刷蛋,加练本身不设限 */
-export const GAME_EGGS_DAILY_CAP = 5
+export const DAILY_LESSON_EGGS = 2 as const
 
-/** 分配一颗蛋去孵化:占用编号最小的空巢位 */
+/** 写词游戏前 10 轮有奖励；第 11 轮起仍可无限加练。 */
+export const GAME_EGGS_DAILY_CAP = 10
+
+export interface EggBalance {
+  eggStock: number
+}
+
+export interface EggRewardResult<TFarm extends EggBalance = FarmState> {
+  session: DailySession
+  farm: TFarm
+  awarded: 0 | 1 | 2
+}
+
+/**
+ * 在同一事务里完成必修并发蛋。session.completed 是幂等键：已完成的
+ * DailySession 再次提交不会重复发奖。
+ */
+export function completeDailyLessonWithEggs<TFarm extends EggBalance>(
+  session: DailySession,
+  farm: TFarm,
+): EggRewardResult<TFarm> {
+  if (session.completed) return { session, farm, awarded: 0 }
+  return {
+    session: { ...session, completed: true },
+    farm: { ...farm, eggStock: farm.eggStock + DAILY_LESSON_EGGS },
+    awarded: DAILY_LESSON_EGGS,
+  }
+}
+
+/**
+ * 结算一轮写词游戏。奖励只属于传入的本地 dayKey 对应的已完成必修会话；
+ * gameEggs 达到 10 后返回 0，但游戏本身不被禁止。
+ */
+export function awardHandwritingRoundEgg(
+  session: DailySession,
+  farm: FarmState,
+  localDayKey: string,
+): EggRewardResult
+export function awardHandwritingRoundEgg<TFarm extends EggBalance>(
+  session: DailySession,
+  farm: TFarm,
+  localDayKey: string,
+): EggRewardResult<TFarm>
+export function awardHandwritingRoundEgg<TFarm extends EggBalance>(
+  session: DailySession,
+  farm: TFarm,
+  localDayKey: string,
+): EggRewardResult<TFarm> {
+  const gameEggs = session.gameEggs ?? 0
+  if (!session.completed || session.date !== localDayKey || gameEggs >= GAME_EGGS_DAILY_CAP) {
+    return { session, farm, awarded: 0 }
+  }
+  return {
+    session: { ...session, gameEggs: gameEggs + 1 },
+    farm: { ...farm, eggStock: farm.eggStock + 1 },
+    awarded: 1,
+  }
+}
+
+export function canAllocateEggToHatch(farm: FarmState): boolean {
+  return farm.eggStock > 0 && farm.incubating.length < HATCHERY_SLOTS
+}
+
+/** 分配一颗蛋去唯一巢位。稀有结果由 hatchRarity.placeEgg 确定。 */
 export function allocateEggToHatch(farm: FarmState, now: number): FarmState | null {
-  if (farm.eggStock <= 0 || farm.incubating.length >= HATCHERY_SLOTS) return null
-  const used = new Set(farm.incubating.map(e => e.slot))
-  const slot = ([0, 1, 2] as const).find(s => !used.has(s))
-  if (slot === undefined) return null
+  if (!canAllocateEggToHatch(farm)) return null
   return {
     ...farm,
     eggStock: farm.eggStock - 1,
-    incubating: [...farm.incubating, { slot, placedAt: now }],
+    incubating: [{ slot: 0, placedAt: now }],
   }
 }
 
@@ -34,26 +94,4 @@ export function settleHatches(farm: FarmState, now: number): { farm: FarmState; 
     farm: { ...farm, incubating: farm.incubating.filter(e => now < e.placedAt + HATCH_MS) },
     hatched: due.length,
   }
-}
-
-export function hatchesAt(placedAt: number): number {
-  return placedAt + HATCH_MS
-}
-
-/** 煎蛋:放蛋进锅(库存 -1,empty → raw) */
-export function putEggInPan(farm: FarmState): FarmState | null {
-  if (farm.eggStock <= 0 || farm.cooking !== 'empty') return null
-  return { ...farm, eggStock: farm.eggStock - 1, cooking: 'raw' }
-}
-
-/** 煎好(raw → ready;'cooking' 只是运行中的动画态,不落库,故也接受) */
-export function fryingDone(farm: FarmState): FarmState | null {
-  if (farm.cooking !== 'raw' && farm.cooking !== 'cooking') return null
-  return { ...farm, cooking: 'ready' }
-}
-
-/** 喂食完成(ready → empty);喂食是纯情感互动,无数值 */
-export function feedDone(farm: FarmState): FarmState | null {
-  if (farm.cooking !== 'ready') return null
-  return { ...farm, cooking: 'empty' }
 }

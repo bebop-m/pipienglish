@@ -4,11 +4,12 @@
 
 import { useState } from 'react'
 import type { FarmHomeBridge } from '../features/farm-f4/useFarmHome'
-import { db } from '../application/db'
+import { db, getFarmStateV3, setFarmStateV3 } from '../application/db'
 import { exportAll, importAll } from '../application/backup'
 import { dayKey } from '../domain/time'
-import { HATCH_MS, type FarmState } from '../domain/types'
+import { HATCH_MS } from '../domain/types'
 import { newCard, rate } from '../domain/srs'
+import { persistedChickWithDefaults } from '../application/farmPersistence'
 
 export function DevFarmView({ bridge }: { bridge: FarmHomeBridge }) {
   const { vm, dispatch, navigation, clearNavigation } = bridge
@@ -44,21 +45,19 @@ export function DevFarmView({ bridge }: { bridge: FarmHomeBridge }) {
           window.location.assign(window.location.pathname)
         })}
         {import.meta.env.DEV && btn('[测试] 推进孵化 24 小时', async () => {
-          const row = await db.kv.get('farmState')
-          if (!row) return
-          const farm = row.value as FarmState
-          await db.kv.put({
-            key: 'farmState',
-            value: {
-              ...farm,
-              incubating: farm.incubating.map(egg => ({ ...egg, placedAt: Date.now() - HATCH_MS - 1 })),
-            },
+          const now = Date.now()
+          const farm = await getFarmStateV3(db, { now, today: dayKey(new Date(now)) })
+          await setFarmStateV3(db, {
+            ...farm,
+            incubating: farm.incubating
+              ? { ...farm.incubating, placedAt: now - HATCH_MS - 1 }
+              : null,
           })
           window.location.reload()
-        }, vm.incubating.length === 0)}
+        }, vm.incubating === null)}
         {import.meta.env.DEV && btn('[测试] 准备群聊验收数据', async () => {
           const today = dayKey()
-          await db.chicks.bulkPut(['dev-a', 'dev-b', 'dev-c'].map(chickId => ({
+          await db.chicks.bulkPut(['dev-a', 'dev-b', 'dev-c'].map(chickId => persistedChickWithDefaults({
             chickId,
             bornOn: today,
             source: 'hatch' as const,
@@ -81,10 +80,11 @@ export function DevFarmView({ bridge }: { bridge: FarmHomeBridge }) {
       </div>
 
       <div className="dev-row">
-        {btn('蛋→孵化', () => dispatch({ type: 'ALLOCATE_EGG_TO_HATCH' }), vm.eggStock === 0 || vm.incubating.length >= 3)}
-        {btn('蛋→下锅', () => dispatch({ type: 'PUT_EGG_IN_PAN' }), vm.eggStock === 0 || vm.cooking !== 'empty')}
-        {btn('煎好', () => dispatch({ type: 'FRYING_DONE' }), vm.cooking !== 'raw')}
-        {btn('喂食', () => dispatch({ type: 'FEED_CHICK' }), vm.cooking !== 'ready')}
+        {btn('蛋→孵化', () => dispatch({ type: 'ALLOCATE_EGG_TO_HATCH' }), vm.eggStock === 0 || vm.incubating !== null)}
+        {btn('1 蛋单份', () => dispatch({ type: 'START_RECIPE', recipeId: 'single_fried_egg' }), !vm.availableRecipes.find(recipe => recipe.recipeId === 'single_fried_egg')?.enabled)}
+        {btn('料理完成', () => dispatch({ type: 'COOKING_DONE' }), vm.cookingMeal?.phase !== 'raw')}
+        {btn('享用单份', () => dispatch({ type: 'SERVE_SINGLE', chickId: vm.chicksVisible[0]?.chickId ?? '' }), vm.cookingMeal?.phase !== 'ready' || vm.cookingMeal.recipeId !== 'single_fried_egg' || vm.chicksVisible.length === 0)}
+        {btn('享用群餐', () => dispatch({ type: 'SERVE_GROUP' }), vm.cookingMeal?.phase !== 'ready' || vm.cookingMeal.recipeId === 'single_fried_egg')}
         {btn('群聊测试', () => dispatch({ type: 'CHICK_CHAT', chickId: 'dev-a', neighborIds: ['dev-b', 'dev-c'] }))}
       </div>
 

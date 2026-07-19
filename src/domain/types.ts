@@ -48,9 +48,10 @@ export interface DailySession {
   completed: boolean
   dueBacklog?: number // 构建当日队列时的到期总数(供 SPEC §5.1 连续积压判定;旧记录缺省按 0)
   newWordsPaused?: boolean // 当日新词是否因积压暂停(文案归视觉层)
-  gameEggs?: number // 今日写词游戏已领奖励蛋数(蛋经济 v2:日上限 GAME_EGGS_DAILY_CAP;旧记录缺省 0)
+  gameEggs?: number // 今日写词游戏已领奖励蛋数(日上限 GAME_EGGS_DAILY_CAP;旧记录缺省 0)
 }
 
 export const HATCH_MS = 24 * 60 * 60 * 1000
-export const HATCHERY_SLOTS = 3
+export const HATCHERY_SLOTS = 1
 export const VISIBLE_CHICK_CAP = 40
+export const FAVORITE_CHICK_CAP = 8

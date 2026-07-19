@@ -5,6 +5,7 @@ import '../../../styles/f4/stage.css'
 interface FarmStageShellProps {
   children?: ReactNode
   ariaLabel?: string
+  backgroundAssetUrl?: string
 }
 
 type StageCustomProperties = CSSProperties & {
@@ -13,7 +14,11 @@ type StageCustomProperties = CSSProperties & {
   '--f4-stage-scale': number
 }
 
-export function FarmStageShell({ children, ariaLabel = '皮皮のEnglish 小鸡农场' }: FarmStageShellProps) {
+export function FarmStageShell({
+  children,
+  ariaLabel = '皮皮のEnglish 小鸡农场',
+  backgroundAssetUrl,
+}: FarmStageShellProps) {
   const safeAreaRef = useRef<HTMLDivElement>(null)
   const stage = useStageScale(safeAreaRef)
   const stageStyle: StageCustomProperties = {
@@ -24,7 +29,11 @@ export function FarmStageShell({ children, ariaLabel = '皮皮のEnglish 小鸡�
 
   return (
     <div className="f4-viewport">
-      <div className="f4-bleed" aria-hidden="true" />
+      <div
+        className="f4-bleed"
+        style={backgroundAssetUrl ? { backgroundImage: `url("${backgroundAssetUrl}")` } : undefined}
+        aria-hidden="true"
+      />
 
       <div className="f4-safe-area" ref={safeAreaRef}>
         <main

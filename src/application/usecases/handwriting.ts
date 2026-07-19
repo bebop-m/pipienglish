@@ -1,15 +1,14 @@
 // 手写小游戏用例(SPEC §2.4 + 蛋经济 v2):完成必修后解锁,每轮 ≤10 题,陈旧度加权抽已学词。
 // 铁律:游戏结果不写 FSRS(自评+无限次游玩会污染排程),只更新"见面时间";
 // "想不起来"照常进救援(SPEC §2.5 含写词游戏)。
-// 奖励(2026-07-17 爸爸定稿):完成一轮得 1 颗鸡蛋进库存,每日上限 5 颗;超出上限照常可玩(纯加练)。
+// 奖励:完成一轮得 1 颗鸡蛋进库存,每日上限 10 颗;超出上限照常可玩(纯加练)。
 
 import type { PipiDB } from '../db'
-import { getKV, setKV, DEFAULT_FARM } from '../db'
-import { GAME_EGGS_DAILY_CAP } from '../../domain/eggEconomy'
+import { getFarmStateV3, setFarmStateV3 } from '../db'
+import { awardHandwritingRoundEgg } from '../../domain/eggEconomy'
 import { weightedSample } from '../../domain/staleness'
 import { dayKeyOf } from '../../domain/time'
 import { WORD_MAP } from '../../domain/words'
-import type { FarmState } from '../../domain/types'
 
 export const HANDWRITING_ROUND_SIZE = 10
 
@@ -67,12 +66,13 @@ export function createHandwritingUsecases(d: PipiDB) {
     let result: 'egg' | 'capped' = 'capped'
     await d.transaction('rw', d.kv, d.sessions, async () => {
       const session = await d.sessions.get(dayKeyOf(now))
-      const claimed = session?.gameEggs ?? 0
-      if (!session || claimed >= GAME_EGGS_DAILY_CAP) return
-      session.gameEggs = claimed + 1
-      await d.sessions.put(session)
-      const farm = await getKV<FarmState>(d, 'farmState', DEFAULT_FARM)
-      await setKV(d, 'farmState', { ...farm, eggStock: farm.eggStock + 1 })
+      if (!session) return
+      const today = dayKeyOf(now)
+      const farm = await getFarmStateV3(d, { now, today })
+      const reward = awardHandwritingRoundEgg(session, farm, today)
+      if (reward.awarded === 0) return
+      await d.sessions.put(reward.session)
+      await setFarmStateV3(d, reward.farm)
       result = 'egg'
     })
     return result

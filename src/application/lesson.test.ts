@@ -50,7 +50,7 @@ describe('学习流用例(应用层)', () => {
 
     const vm = await farm.loadViewModel(t0)
     expect(vm.state).toBe('daily_complete')
-    expect(vm.eggStock).toBe(1)
+    expect(vm.eggStock).toBe(2)
     expect(vm.streak).toBe(1)
 
     // 音频:描红×4 + 选择答对×4 + 收尾写对×4 = 12 次(听看卡进场自动播放归视觉层)

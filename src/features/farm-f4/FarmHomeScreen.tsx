@@ -6,6 +6,7 @@ import { useFarmHome } from './useFarmHome'
 import { DevFarmView } from '../../dev/DevShell'
 import { FarmStageShell } from './visual/FarmStageShell'
 import { FarmHomeDaily } from './visual/FarmHomeDaily'
+import { f4AssetUrl } from './assetUrl'
 
 export interface FarmHomeScreenProps {
   /** 路由层(App)消费导航意图;未接入的目标(手写游戏/救援/家长页)由 App 决定忽略或提示 */
@@ -34,7 +35,20 @@ export function FarmHomeScreen({ onNavigate }: FarmHomeScreenProps = {}) {
       henName: bridge.vm?.henName ?? null,
       eggs: bridge.vm?.eggStock ?? 0,
       chicks: bridge.vm?.chicksTotal ?? 0,
-      incubating: bridge.vm?.incubating.length ?? 0,
+      scene: bridge.vm?.activeSceneId ?? null,
+      viewedScene: bridge.vm?.viewedSceneId ?? null,
+      isViewingCurrentJourney: bridge.vm?.isViewingCurrentJourney ?? true,
+      pendingCelebrationChapter: bridge.vm?.pendingCelebrationScene?.chapter ?? null,
+      nextTravelChapter: bridge.vm?.nextTravelScene?.chapter ?? null,
+      favorites: bridge.vm?.favoriteCount ?? 0,
+      chicksInCoop: bridge.vm?.chicksInCoop ?? 0,
+      arrivingChickId: bridge.vm?.arrivingChick?.chickId ?? null,
+      incubating: bridge.vm?.incubating ? 1 : 0,
+      cookingMeal: bridge.vm?.cookingMeal ?? null,
+      listedDecorations: bridge.vm?.decorationCatalog.length ?? 0,
+      placedDecorations: bridge.vm?.placedDecorations.length ?? 0,
+      listedCosmetics: bridge.vm?.wardrobeCatalog.length ?? 0,
+      loadout: bridge.vm?.loadout ?? null,
       rescue: bridge.vm?.rescueCount ?? 0,
       overlay: bridge.vm?.overlay ?? 'none',
     })
@@ -42,7 +56,10 @@ export function FarmHomeScreen({ onNavigate }: FarmHomeScreenProps = {}) {
   }, [bridge.navigation, bridge.vm])
 
   return (
-    <FarmStageShell>
+    <FarmStageShell
+      backgroundAssetUrl={bridge.vm ? f4AssetUrl(bridge.vm.viewedScene.backgroundAssetId) : undefined}
+      ariaLabel={bridge.vm ? `${bridge.vm.viewedScene.title} · 皮皮のEnglish` : undefined}
+    >
       {forceDevShell
         ? <DevFarmView bridge={bridge} />
         : bridge.vm

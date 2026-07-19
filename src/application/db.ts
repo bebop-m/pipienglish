@@ -8,6 +8,24 @@ import type { RescueStage } from '../domain/rescue'
 import type { Chick, DailySession, FarmState, MetaState, Settings } from '../domain/types'
 import { HATCHERY_SLOTS } from '../domain/types'
 import { addDays, dayKey } from '../domain/time'
+import {
+  convertToV3Archive,
+  type FarmV1,
+  type KVRow,
+} from './farmMigration'
+import {
+  defaultCharacterLoadout,
+  defaultFarmStateV3,
+  farmStateV3ToLegacy,
+  isFarmStateV3,
+  legacyFarmStateToV3,
+  type DecorationRow,
+  type FarmStateV3,
+  type MigrationContext,
+  type OwnedCosmeticRow,
+  type PersistedChick,
+  type SceneMemoryRow,
+} from './farmPersistence'
 
 export interface CardRow {
   wordId: string
@@ -16,10 +34,7 @@ export interface CardRow {
   lastQuizType?: QuizKind // 上次低熟练复习的题型,供选择/听音交替(SPEC §5.3;非索引字段,无需迁移)
 }
 
-export interface KV {
-  key: string
-  value: unknown
-}
+export type KV = KVRow
 
 export interface SeenRow {
   wordId: string
@@ -40,14 +55,10 @@ export interface InkRow {
   png: Blob
 }
 
-/** v0.1 的 kv['farm'] 形状 */
-export interface FarmV1 {
-  henName: string
-  chicks: number
-  pendingEggs: { date: string; n: number }[]
-}
+export type { FarmV1 } from './farmMigration'
 
 export const DEFAULT_FARM: FarmState = { henName: null, eggStock: 0, incubating: [], cooking: 'empty' }
+export const DEFAULT_FARM_V3 = defaultFarmStateV3()
 export const DEFAULT_SETTINGS: Settings = { motionEnabled: true }
 
 export function defaultMeta(today = dayKey()): MetaState {
@@ -90,10 +101,13 @@ export class PipiDB extends Dexie {
   cards!: Table<CardRow, string>
   sessions!: Table<DailySession, string>
   kv!: Table<KV, string>
-  chicks!: Table<Chick, string>
+  chicks!: Table<PersistedChick, string>
   seen!: Table<SeenRow, string>
   rescue!: Table<RescueRow, string>
   ink!: Table<InkRow, string>
+  decorations!: Table<DecorationRow, [string, string]>
+  cosmetics!: Table<OwnedCosmeticRow, string>
+  sceneMemory!: Table<SceneMemoryRow, string>
 
   constructor(name = 'pipienglish') {
     super(name)
@@ -134,6 +148,54 @@ export class PipiDB extends Dexie {
           .map(c => ({ wordId: c.wordId, lastSeenAt: new Date(c.card.last_review as unknown as string | Date).getTime() }))
         if (seenRows.length) await tx.table('seen').bulkPut(seenRows)
       })
+    this.version(3)
+      .stores({
+        cards: 'wordId, due',
+        sessions: 'date',
+        kv: 'key',
+        chicks: 'chickId, sceneId, bornOn, [sceneId+favorite]',
+        seen: 'wordId, lastSeenAt',
+        rescue: 'wordId, capturedAt',
+        ink: 'id, wordId, date',
+        decorations: '[sceneId+itemId], sceneId',
+        cosmetics: 'itemId, acquiredAt',
+        sceneMemory: 'sceneId',
+      })
+      .upgrade(async tx => {
+        const [cards, sessions, kv, chicks, seen, rescue, ink] = await Promise.all([
+          tx.table('cards').toArray(),
+          tx.table('sessions').toArray(),
+          tx.table('kv').toArray(),
+          tx.table('chicks').toArray(),
+          tx.table('seen').toArray(),
+          tx.table('rescue').toArray(),
+          tx.table('ink').toArray(),
+        ])
+        const converted = convertToV3Archive({
+          version: 2,
+          cards,
+          sessions,
+          kv,
+          chicks,
+          seen,
+          rescue,
+          ink,
+        }, { now: Date.now(), today: dayKey() })
+
+        await tx.table('kv').clear()
+        await tx.table('chicks').clear()
+        await tx.table('kv').bulkPut(converted.kv)
+        if (converted.chicks.length) await tx.table('chicks').bulkPut(converted.chicks)
+      })
+    this.on('populate', tx => {
+      const today = dayKey()
+      return tx.table('kv').bulkPut([
+        { key: 'farmState', value: defaultFarmStateV3() },
+        { key: 'loadout', value: defaultCharacterLoadout() },
+        { key: 'settings', value: { ...DEFAULT_SETTINGS } },
+        { key: 'meta', value: defaultMeta(today) },
+      ])
+    })
   }
 }
 
@@ -141,9 +203,37 @@ export const db = new PipiDB()
 
 export async function getKV<T>(d: PipiDB, key: string, fallback: T): Promise<T> {
   const row = await d.kv.get(key)
-  return row ? (row.value as T) : fallback
+  if (!row) return fallback
+  if (key === 'farmState' && isFarmStateV3(row.value) && !isFarmStateV3(fallback)) {
+    return farmStateV3ToLegacy(row.value) as T
+  }
+  return row.value as T
 }
 
 export async function setKV(d: PipiDB, key: string, value: unknown): Promise<void> {
+  if (key === 'farmState' && value && typeof value === 'object' && Array.isArray((value as FarmState).incubating)) {
+    const current = await d.kv.get(key)
+    const currentFarm = isFarmStateV3(current?.value) ? current.value : undefined
+    await d.kv.put({
+      key,
+      value: legacyFarmStateToV3(value as FarmState, { now: Date.now(), today: dayKey() }, currentFarm),
+    })
+    return
+  }
   await d.kv.put({ key, value })
+}
+
+/** 规范 v3 农场状态读取；仅在遇到旧夹具/旧写入时使用注入上下文就地升级。 */
+export async function getFarmStateV3(d: PipiDB, context: MigrationContext): Promise<FarmStateV3> {
+  const row = await d.kv.get('farmState')
+  if (!row) return defaultFarmStateV3()
+  if (isFarmStateV3(row.value)) return row.value
+  const converted = legacyFarmStateToV3(row.value as FarmState, context)
+  await d.kv.put({ key: 'farmState', value: converted })
+  return converted
+}
+
+/** 新用例直接写规范 v3，绕过 legacy FarmState 兼容桥。 */
+export async function setFarmStateV3(d: PipiDB, value: FarmStateV3): Promise<void> {
+  await d.kv.put({ key: 'farmState', value })
 }

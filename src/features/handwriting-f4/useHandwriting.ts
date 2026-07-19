@@ -17,7 +17,7 @@ export interface HandwritingViewModel {
   empty: boolean
   /** 一轮写完(奖励结算已完成):容器退出回农场 */
   done: boolean
-  /** 本轮写完是否还有奖励蛋可拿(蛋经济 v2:日上限 5;拿满后照常可玩,纯加练) */
+  /** 本轮写完是否还有奖励蛋可拿(日上限 10;拿满后照常可玩,纯加练) */
   eggAvailable: boolean
   word: LessonWordVM | null
   index: number // 第 x 题(1 起)

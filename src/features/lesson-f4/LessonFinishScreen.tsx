@@ -75,7 +75,7 @@ export function LessonFinishScreen({ dayNumber, summary, onReturnFarm }: LessonF
               <section><small>连续学习</small><strong>{report.streakDays}</strong><span>天</span></section>
             </div>
 
-            <div className="lesson-finish-reward-f4"><span className="lesson-finish-egg-f4" aria-hidden="true" /><p><strong>母鸡妈妈下了一颗新鸡蛋</strong><small>回到农场就能看到它。</small></p><b>+{report.eggsEarned}</b></div>
+            <div className="lesson-finish-reward-f4"><span className="lesson-finish-egg-f4" aria-hidden="true" /><p><strong>今天农场收获了 {report.eggsEarned} 颗鸡蛋</strong><small>回到农场就能看到它们。</small></p><b>+{report.eggsEarned}</b></div>
             <button className="lesson-finish-return-f4" type="button" disabled={returning} onClick={returnFarm}>{returning ? '正在回农场…' : '回农场'}</button>
             <p className="lesson-finish-gentle-note-f4">今天已经完成了，接下来轻松玩一会儿吧。</p>
           </div>

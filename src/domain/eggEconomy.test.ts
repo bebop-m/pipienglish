@@ -1,71 +1,97 @@
 import { describe, expect, it } from 'vitest'
-import { allocateEggToHatch, eggsEarnedFor, feedDone, fryingDone, putEggInPan, settleHatches } from './eggEconomy'
-import { HATCH_MS, type FarmState } from './types'
+import {
+  allocateEggToHatch,
+  awardHandwritingRoundEgg,
+  canAllocateEggToHatch,
+  completeDailyLessonWithEggs,
+  eggsEarnedFor,
+  GAME_EGGS_DAILY_CAP,
+  hatchesAt,
+  isHatchDue,
+  remainingHatchMs,
+  settleHatches,
+} from './eggEconomy'
+import { HATCH_MS, type DailySession, type FarmState } from './types'
 
 const farm = (over: Partial<FarmState> = {}): FarmState => ({
   henName: '咕咕', eggStock: 0, incubating: [], cooking: 'empty', ...over,
 })
 
-describe('eggsEarnedFor', () => {
-  it('蛋经济 v2:必修完成固定 1 颗,多劳多得走写词游戏侧(日上限 5)', () => {
-    expect(eggsEarnedFor(8)).toBe(1)
-    expect(eggsEarnedFor(14)).toBe(1)
-    expect(eggsEarnedFor(33)).toBe(1)
+const session = (over: Partial<DailySession> = {}): DailySession => ({
+  date: '2026-07-19',
+  reviewIds: [],
+  newIds: [],
+  doneCount: 0,
+  answered: 0,
+  correct: 0,
+  completed: false,
+  ...over,
+})
+
+describe('每日与写词鸡蛋收入', () => {
+  it('必修固定发 2 颗，且 completed 使重复提交幂等', () => {
+    expect(eggsEarnedFor(8)).toBe(2)
+    expect(eggsEarnedFor(33)).toBe(2)
+
+    const first = completeDailyLessonWithEggs(session(), farm({ eggStock: 4 }))
+    expect(first.awarded).toBe(2)
+    expect(first.session.completed).toBe(true)
+    expect(first.farm.eggStock).toBe(6)
+
+    const duplicate = completeDailyLessonWithEggs(first.session, first.farm)
+    expect(duplicate).toEqual({ session: first.session, farm: first.farm, awarded: 0 })
+    expect(duplicate.session).toBe(first.session)
+    expect(duplicate.farm).toBe(first.farm)
+  })
+
+  it('同一本地日前 10 轮各发 1 颗，第 11 轮起纯加练', () => {
+    let currentSession = session({ completed: true })
+    let currentFarm = farm()
+    for (let round = 1; round <= GAME_EGGS_DAILY_CAP; round += 1) {
+      const result = awardHandwritingRoundEgg(currentSession, currentFarm, '2026-07-19')
+      expect(result.awarded).toBe(1)
+      expect(result.session.gameEggs).toBe(round)
+      currentSession = result.session
+      currentFarm = result.farm
+    }
+    expect(currentFarm.eggStock).toBe(10)
+
+    const practiceOnly = awardHandwritingRoundEgg(currentSession, currentFarm, '2026-07-19')
+    expect(practiceOnly.awarded).toBe(0)
+    expect(practiceOnly.session).toBe(currentSession)
+    expect(practiceOnly.farm).toBe(currentFarm)
+  })
+
+  it('未完成必修或传入的本地日不同均不发游戏蛋', () => {
+    const locked = awardHandwritingRoundEgg(session(), farm(), '2026-07-19')
+    expect(locked.awarded).toBe(0)
+    const wrongDay = awardHandwritingRoundEgg(session({ completed: true }), farm(), '2026-07-20')
+    expect(wrongDay.awarded).toBe(0)
   })
 })
 
-describe('allocateEggToHatch', () => {
-  it('占用编号最小的空巢位并扣库存', () => {
-    const next = allocateEggToHatch(farm({ eggStock: 2, incubating: [{ slot: 1, placedAt: 0 }] }), 1000)!
-    expect(next.eggStock).toBe(1)
-    expect(next.incubating.map(e => e.slot).sort()).toEqual([0, 1])
-    expect(next.incubating.find(e => e.slot === 0)!.placedAt).toBe(1000)
+describe('单巢与 24 小时边界', () => {
+  it('仅在有库存且唯一巢位空闲时允许放蛋', () => {
+    expect(canAllocateEggToHatch(farm({ eggStock: 1 }))).toBe(true)
+    expect(canAllocateEggToHatch(farm({ eggStock: 0 }))).toBe(false)
+    expect(canAllocateEggToHatch(farm({ eggStock: 2, incubating: [{ slot: 0, placedAt: 0 }] }))).toBe(false)
+
+    const next = allocateEggToHatch(farm({ eggStock: 2 }), 1000)!
+    expect(next).toMatchObject({ eggStock: 1, incubating: [{ slot: 0, placedAt: 1000 }] })
+    expect(allocateEggToHatch(next, 2000)).toBeNull()
   })
 
-  it('库存为 0 或巢位满时拒绝', () => {
-    expect(allocateEggToHatch(farm({ eggStock: 0 }), 0)).toBeNull()
-    const full = farm({
-      eggStock: 5,
-      incubating: [{ slot: 0, placedAt: 0 }, { slot: 1, placedAt: 0 }, { slot: 2, placedAt: 0 }],
-    })
-    expect(allocateEggToHatch(full, 0)).toBeNull()
-  })
-})
+  it('派生到期时间；差 1ms 未到，恰好 24h 到期', () => {
+    const placedAt = 1_000_000
+    const dueAt = placedAt + HATCH_MS
+    expect(hatchesAt(placedAt)).toBe(dueAt)
+    expect(isHatchDue(placedAt, dueAt - 1)).toBe(false)
+    expect(remainingHatchMs(placedAt, dueAt - 1)).toBe(1)
+    expect(isHatchDue(placedAt, dueAt)).toBe(true)
+    expect(remainingHatchMs(placedAt, dueAt)).toBe(0)
 
-describe('settleHatches(24 小时规则,V-1 裁决)', () => {
-  it('满 24h 破壳,不满不动;边界恰好 24h 算破壳', () => {
-    const t0 = 1_000_000
-    const state = farm({
-      incubating: [
-        { slot: 0, placedAt: t0 },              // 恰好到期
-        { slot: 1, placedAt: t0 + 1 },          // 差 1ms
-        { slot: 2, placedAt: t0 - 5000 },       // 早已到期
-      ],
-    })
-    const { farm: next, hatched } = settleHatches(state, t0 + HATCH_MS)
-    expect(hatched).toBe(2)
-    expect(next.incubating.map(e => e.slot)).toEqual([1])
-  })
-
-  it('无到期时原样返回', () => {
-    const state = farm({ incubating: [{ slot: 0, placedAt: 100 }] })
-    expect(settleHatches(state, 200).hatched).toBe(0)
-  })
-})
-
-describe('煎蛋状态机', () => {
-  it('empty→raw 扣库存;raw→ready;ready→empty', () => {
-    const raw = putEggInPan(farm({ eggStock: 1 }))!
-    expect(raw).toMatchObject({ eggStock: 0, cooking: 'raw' })
-    const ready = fryingDone(raw)!
-    expect(ready.cooking).toBe('ready')
-    expect(feedDone(ready)!.cooking).toBe('empty')
-  })
-
-  it('守卫:空库存不能下锅;锅非空不能再下;非 ready 不能喂', () => {
-    expect(putEggInPan(farm({ eggStock: 0 }))).toBeNull()
-    expect(putEggInPan(farm({ eggStock: 1, cooking: 'raw' }))).toBeNull()
-    expect(fryingDone(farm({ cooking: 'empty' }))).toBeNull()
-    expect(feedDone(farm({ cooking: 'raw' }))).toBeNull()
+    const state = farm({ incubating: [{ slot: 0, placedAt }] })
+    expect(settleHatches(state, dueAt - 1)).toEqual({ farm: state, hatched: 0 })
+    expect(settleHatches(state, dueAt)).toMatchObject({ farm: { incubating: [] }, hatched: 1 })
   })
 })
