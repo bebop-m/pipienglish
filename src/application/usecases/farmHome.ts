@@ -675,7 +675,12 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
 
   async function setMotion(enabled: boolean): Promise<void> {
     const settings = await getKV<Settings>(d, 'settings', DEFAULT_SETTINGS)
-    await setKV(d, 'settings', { ...settings, motionEnabled: enabled })
+    await setKV(d, 'settings', { ...DEFAULT_SETTINGS, ...settings, motionEnabled: enabled })
+  }
+
+  async function setMusic(enabled: boolean): Promise<void> {
+    const settings = await getKV<Settings>(d, 'settings', DEFAULT_SETTINGS)
+    await setKV(d, 'settings', { ...DEFAULT_SETTINGS, ...settings, musicEnabled: enabled })
   }
 
   async function snapshot(now = sources.now(), viewedSceneId?: string): Promise<FarmSnapshot> {
@@ -702,6 +707,7 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
       farm,
       meta,
       motionEnabled: settings.motionEnabled,
+      musicEnabled: settings.musicEnabled ?? DEFAULT_SETTINGS.musicEnabled ?? true,
       session: session ?? { date: today, reviewIds: [], newIds: [], doneCount: 0, answered: 0, correct: 0, completed: false },
       chicksTotal: sceneChicks.length,
       latestChicks: collection.visible,
@@ -744,6 +750,7 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
     favoriteChick,
     chickChat,
     setMotion,
+    setMusic,
     snapshot,
     loadViewModel,
   }

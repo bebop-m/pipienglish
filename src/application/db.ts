@@ -59,7 +59,7 @@ export type { FarmV1 } from './farmMigration'
 
 export const DEFAULT_FARM: FarmState = { henName: null, eggStock: 0, incubating: [], cooking: 'empty' }
 export const DEFAULT_FARM_V3 = defaultFarmStateV3()
-export const DEFAULT_SETTINGS: Settings = { motionEnabled: true }
+export const DEFAULT_SETTINGS: Settings = { motionEnabled: true, musicEnabled: true }
 
 export function defaultMeta(today = dayKey()): MetaState {
   return { streak: 0, lastDoneDate: null, totalDays: 0, installDate: today }

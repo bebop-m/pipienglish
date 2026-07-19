@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import type { RecipeId } from '../../../domain/meals'
 import type { FarmHomeEvent, FarmHomeViewModel } from '../../../application/viewmodel'
 import { f4AssetUrl } from '../assetUrl'
+import { approvedBgmTrack } from '../audio/bgmTracks'
 import { InstallHint } from '../../pwa/InstallHint'
 import { FarmActors } from './FarmActors'
 import {
@@ -470,6 +471,7 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
           <button className="sticker-chip coop-chip-f4" type="button" onClick={() => dispatch({ type: 'OPEN_COOP' })}>鸡舍 <strong>×{vm.chicksInCoop}</strong></button>
         </>}
         <button className="sticker-chip motion-toggle" type="button" aria-pressed={!vm.motionEnabled} onClick={() => dispatch({ type: 'SET_MOTION', enabled: !vm.motionEnabled })}>动效：{vm.motionEnabled ? '开' : '关'}</button>
+        {approvedBgmTrack() && <button className="sticker-chip motion-toggle" type="button" aria-pressed={!vm.musicEnabled} onClick={() => dispatch({ type: 'SET_MUSIC', enabled: !vm.musicEnabled })}>音乐：{vm.musicEnabled ? '开' : '关'}</button>}
         <button className="parent-button" type="button" onClick={() => dispatch({ type: 'OPEN_PARENT' })}>家长</button>
       </header>
 
@@ -520,10 +522,10 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
           </div>
         </section>}
 
-        <FarmDecorations vm={vm} layer="back" />
-        <FarmDecorations vm={vm} layer="actor" />
+        <FarmDecorations vm={vm} layer="back" dispatch={dispatch} />
+        <FarmDecorations vm={vm} layer="actor" dispatch={dispatch} />
         <FarmActors vm={vm} dispatch={dispatch} />
-        <FarmDecorations vm={vm} layer="front" />
+        <FarmDecorations vm={vm} layer="front" dispatch={dispatch} />
         {vm.state !== 'first_visit' && <CustomizationEntrances vm={vm} dispatch={dispatch} />}
         {currentJourney && vm.state !== 'first_visit' && <EggPanel vm={vm} dispatch={dispatch} onFeed={startFeeding} />}
         {vm.state !== 'first_visit' && <CoopPanel vm={vm} dispatch={dispatch} />}

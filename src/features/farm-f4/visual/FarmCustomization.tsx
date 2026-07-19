@@ -1,12 +1,15 @@
-import type { CSSProperties } from 'react'
+import { useRef, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import type {
   DecorationCatalogItemVM,
   FarmHomeEvent,
   FarmHomeViewModel,
   WardrobeItemVM,
 } from '../../../application/viewmodel'
+import { clampPointToPlacementBounds } from '../../../domain/farmCustomization'
 import type { SceneLayer } from '../../../domain/farmScenes'
+import type { StagePoint } from '../../../domain/types'
 import { f4AssetUrl } from '../assetUrl'
+import { STAGE_W, toStagePoint } from '../stage/stagePoint'
 import { APPROVED_STANDARD_CHARACTER_LAYERS } from './characterLayerContract'
 import { LayeredCharacter } from './LayeredCharacter'
 
@@ -37,23 +40,117 @@ export function decorationRenderLayout(item: DecorationCatalogItemVM): Decoratio
   }
 }
 
-export function FarmDecorations({ vm, layer }: { vm: FarmHomeViewModel; layer: SceneLayer }) {
+function decorationLayoutStyle(item: DecorationCatalogItemVM, home: StagePoint): CSSProperties {
+  const layout = decorationRenderLayout({ ...item, placement: { ...item.placement!, x: home.x, y: home.y } })!
+  return {
+    left: layout.left,
+    top: layout.top,
+    width: layout.width,
+    height: layout.height,
+    '--f7-depth-key': layout.depthKey,
+  } as CSSProperties
+}
+
+/** 已摆放贴纸:与小鸡一致的指针拖拽,落点钳回 placementBounds 后经 PLACE_DECORATION 免费持久化 */
+function DraggableDecoration({
+  item,
+  onPlaced,
+}: {
+  item: DecorationCatalogItemVM
+  onPlaced: (home: StagePoint) => void
+}) {
+  const elementRef = useRef<HTMLButtonElement>(null)
+  const homeRef = useRef<StagePoint>({ x: item.placement!.x, y: item.placement!.y })
+  const dragRef = useRef<{ pointerId: number; offset: StagePoint; start: StagePoint; origin: StagePoint; moved: boolean } | null>(null)
+
+  const applyHome = (home: StagePoint) => {
+    homeRef.current = home
+    const element = elementRef.current
+    if (!element) return
+    const style = decorationLayoutStyle(item, home)
+    element.style.left = `${style.left}px`
+    element.style.top = `${style.top}px`
+    element.style.setProperty('--f7-depth-key', `${home.y}`)
+  }
+
+  const stageCoordinates = (clientX: number, clientY: number) => {
+    const stage = elementRef.current?.closest<HTMLElement>('.f4-stage')
+    if (!stage) return null
+    const rect = stage.getBoundingClientRect()
+    return toStagePoint(clientX, clientY, rect, rect.width / STAGE_W)
+  }
+
+  const onPointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (event.button !== 0) return
+    const point = stageCoordinates(event.clientX, event.clientY)
+    if (!point) return
+    dragRef.current = {
+      pointerId: event.pointerId,
+      offset: { x: point.x - homeRef.current.x, y: point.y - homeRef.current.y },
+      start: point,
+      origin: { ...homeRef.current },
+      moved: false,
+    }
+    event.currentTarget.setPointerCapture(event.pointerId)
+    event.currentTarget.classList.add('is-dragging')
+    event.preventDefault()
+  }
+
+  const onPointerMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    const drag = dragRef.current
+    if (!drag || drag.pointerId !== event.pointerId) return
+    const point = stageCoordinates(event.clientX, event.clientY)
+    if (!point) return
+    if (Math.hypot(point.x - drag.start.x, point.y - drag.start.y) > 8) drag.moved = true
+    applyHome(clampPointToPlacementBounds(
+      { x: point.x - drag.offset.x, y: point.y - drag.offset.y },
+      item.definition.placementBounds,
+    ))
+    event.preventDefault()
+  }
+
+  const finishDrag = (event: ReactPointerEvent<HTMLButtonElement>, cancelled = false) => {
+    const drag = dragRef.current
+    if (!drag || drag.pointerId !== event.pointerId) return
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+    dragRef.current = null
+    event.currentTarget.classList.remove('is-dragging')
+    if (cancelled || !drag.moved) {
+      applyHome(drag.origin)
+      return
+    }
+    onPlaced(homeRef.current)
+  }
+
   return (
-    <div className={`farm-decorations-f7 is-${layer}`} aria-hidden="true">
+    <button
+      ref={elementRef}
+      className="farm-decoration-f7"
+      type="button"
+      aria-label={`拖动摆放${decorationLabel(item)}`}
+      style={decorationLayoutStyle(item, homeRef.current)}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={finishDrag}
+      onPointerCancel={event => finishDrag(event, true)}
+    >
+      <img src={f4AssetUrl(item.definition.assetId)} alt="" draggable={false} />
+    </button>
+  )
+}
+
+export function FarmDecorations({ vm, layer, dispatch }: { vm: FarmHomeViewModel; layer: SceneLayer; dispatch: (event: FarmHomeEvent) => Promise<void> }) {
+  return (
+    <div className={`farm-decorations-f7 is-${layer}`}>
       {vm.placedDecorations
         .filter(item => item.definition.layer === layer && item.definition.assetStatus === 'approved')
-        .map(item => {
-          const layout = decorationRenderLayout(item)
-          if (!layout) return null
-          const style: CSSProperties = {
-            left: layout.left,
-            top: layout.top,
-            width: layout.width,
-            height: layout.height,
-            '--f7-depth-key': layout.depthKey,
-          } as CSSProperties
-          return <img key={item.definition.id} src={f4AssetUrl(item.definition.assetId)} alt="" style={style} />
-        })}
+        .map(item => (
+          <DraggableDecoration
+            key={`${item.definition.id}:${item.placement!.x},${item.placement!.y}`}
+            item={item}
+            onPlaced={home => dispatch({ type: 'PLACE_DECORATION', sceneId: vm.viewedSceneId, itemId: item.definition.id, home })}
+          />
+        ))}
     </div>
   )
 }

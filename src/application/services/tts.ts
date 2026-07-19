@@ -38,6 +38,19 @@ export interface TtsDeps {
   createUtterance: ((text: string) => UtteranceLike) | null
 }
 
+// —— 播放事件监听(背景音乐闪避用):TTS 开口时降 BGM 音量,结束/取消后恢复 ——
+
+export interface SpeechListener {
+  onStart(): void
+  onEnd(): void
+}
+
+let speechListener: SpeechListener | null = null
+
+export function setSpeechListener(listener: SpeechListener | null): void {
+  speechListener = listener
+}
+
 export function createTtsService({ synthesis, createUtterance }: TtsDeps): TtsService {
   let voice: SpeechSynthesisVoice | null = null
 
@@ -61,9 +74,12 @@ export function createTtsService({ synthesis, createUtterance }: TtsDeps): TtsSe
         utter.lang = 'en-US'
         utter.rate = 0.85
         utter.volume = 1
+        utter.onend = () => speechListener?.onEnd()
+        speechListener?.onStart()
         synthesis.speak(utter)
         return true
       } catch {
+        speechListener?.onEnd()
         return false
       }
     },
@@ -72,6 +88,8 @@ export function createTtsService({ synthesis, createUtterance }: TtsDeps): TtsSe
         synthesis?.cancel()
       } catch {
         // 无声降级
+      } finally {
+        speechListener?.onEnd()
       }
     },
     isAvailable(): boolean {

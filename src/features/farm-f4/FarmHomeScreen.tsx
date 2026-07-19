@@ -4,6 +4,7 @@
 import { useEffect } from 'react'
 import { useFarmHome } from './useFarmHome'
 import { DevFarmView } from '../../dev/DevShell'
+import { setBgmActive } from './audio/bgmPlayer'
 import { FarmStageShell } from './visual/FarmStageShell'
 import { FarmHomeDaily } from './visual/FarmHomeDaily'
 import { f4AssetUrl } from './assetUrl'
@@ -24,6 +25,13 @@ export function FarmHomeScreen({ onNavigate }: FarmHomeScreenProps = {}) {
       onNavigate(navigation)
     }
   }, [navigation, clearNavigation, onNavigate])
+
+  // 背景音乐只在农场页播放:进入学习/救援/写词时本组件卸载即暂停,回农场续播
+  const musicEnabled = bridge.vm?.musicEnabled ?? false
+  useEffect(() => {
+    setBgmActive(musicEnabled)
+    return () => setBgmActive(false)
+  }, [musicEnabled])
 
   useEffect(() => {
     const testWindow = window as Window & { render_game_to_text?: () => string }

@@ -164,6 +164,7 @@ export interface FarmHomeViewModel {
   favoriteReplacement: FavoriteReplacementVM | null
   arrivingChick: FarmChickVM | null
   motionEnabled: boolean
+  musicEnabled: boolean
 }
 
 export type FarmHomeEvent =
@@ -207,12 +208,14 @@ export type FarmHomeEvent =
   | { type: 'CHAT_DISMISSED' }
   | { type: 'CHICK_PLACED'; chickId: string; home: StagePoint }
   | { type: 'SET_MOTION'; enabled: boolean }
+  | { type: 'SET_MUSIC'; enabled: boolean }
   | { type: 'OPEN_PARENT' }
 
 export interface FarmSnapshot {
   farm: FarmStateV3
   meta: MetaState
   motionEnabled: boolean
+  musicEnabled?: boolean // 旧快照/测试夹具缺省按开
   session: DailySession
   chicksTotal: number
   latestChicks: PersistedChick[] // 当前场景最新 ≤40 只,bornOn 降序
@@ -389,5 +392,6 @@ export function assembleViewModel(
     ownedCosmeticIds,
     loadout,
     motionEnabled: s.motionEnabled,
+    musicEnabled: s.musicEnabled ?? true,
   }
 }

@@ -3,6 +3,7 @@ import { defaultCharacterLoadout } from '../application/farmPersistence'
 import { INTERNAL_SCENE_1_COSMETIC_DRAFTS } from './farmCosmetics'
 import {
   assetIsListable,
+  clampPointToPlacementBounds,
   equipLoadoutItem,
   pointWithinPlacementBounds,
   unequipLoadoutItem,
@@ -17,6 +18,15 @@ describe('farm customization domain rules', () => {
     expect(pointWithinPlacementBounds({ x: 10, y: 40 }, bounds)).toBe(true)
     expect(pointWithinPlacementBounds({ x: 9, y: 40 }, bounds)).toBe(false)
     expect(pointWithinPlacementBounds({ x: Number.NaN, y: 35 }, bounds)).toBe(false)
+  })
+
+  it('clamps drag targets back inside placement bounds so persisted moves always pass the guard', () => {
+    const bounds = { xMin: 40, xMax: 1154, yMin: 560, yMax: 810 }
+    expect(clampPointToPlacementBounds({ x: 600, y: 700 }, bounds)).toEqual({ x: 600, y: 700 })
+    expect(clampPointToPlacementBounds({ x: -30, y: 900 }, bounds)).toEqual({ x: 40, y: 810 })
+    expect(clampPointToPlacementBounds({ x: 2000, y: 100 }, bounds)).toEqual({ x: 1154, y: 560 })
+    const clamped = clampPointToPlacementBounds({ x: 1300, y: 500 }, bounds)
+    expect(pointWithinPlacementBounds(clamped, bounds)).toBe(true)
   })
 
   it('validates target and slot while keeping ownership outside the loadout', () => {

@@ -14,6 +14,14 @@ export function assetIsListable(status: SceneAssetStatus, includeInternalPlaceho
   return status === 'approved' || includeInternalPlaceholders
 }
 
+/** 拖拽落点钳制:把地面锚点收回允许范围,保证提交给 placeDecoration 的坐标必然合法 */
+export function clampPointToPlacementBounds(point: StagePoint, bounds: PlacementBounds): StagePoint {
+  return {
+    x: Math.min(bounds.xMax, Math.max(bounds.xMin, point.x)),
+    y: Math.min(bounds.yMax, Math.max(bounds.yMin, point.y)),
+  }
+}
+
 export function pointWithinPlacementBounds(point: StagePoint, bounds: PlacementBounds): boolean {
   return Number.isFinite(point.x)
     && Number.isFinite(point.y)

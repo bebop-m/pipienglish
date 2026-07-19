@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createTtsService, selectEnglishVoice, speak, type SynthesisLike, type UtteranceLike } from './tts'
+import { createTtsService, selectEnglishVoice, setSpeechListener, speak, type SynthesisLike, type UtteranceLike } from './tts'
 
 function voice(lang: string, localService: boolean, name: string): SpeechSynthesisVoice {
   return { lang, localService, name, default: false, voiceURI: name } as SpeechSynthesisVoice
@@ -155,5 +155,39 @@ describe('连续播放取消', () => {
     const { synth, service } = setup()
     expect(service.speak('   ')).toBe(false)
     expect(synth.spoken).toHaveLength(0)
+  })
+})
+
+describe('背景音乐闪避回调', () => {
+  afterEach(() => setSpeechListener(null))
+
+  it('开口时通知降音量,onend 与 cancel 都会恢复', () => {
+    const events: string[] = []
+    setSpeechListener({ onStart: () => events.push('start'), onEnd: () => events.push('end') })
+    const { synth, service } = setup()
+
+    service.speak('apple')
+    expect(events).toEqual(['start'])
+    synth.spoken[0].onend?.()
+    expect(events).toEqual(['start', 'end'])
+
+    service.speak('banana')
+    service.cancel()
+    expect(events).toEqual(['start', 'end', 'start', 'end'])
+  })
+
+  it('提交失败也会恢复音量,不会把 BGM 永久压住', () => {
+    const events: string[] = []
+    setSpeechListener({ onStart: () => events.push('start'), onEnd: () => events.push('end') })
+    const service = createTtsService({
+      synthesis: {
+        getVoices: () => [],
+        speak: () => { throw new Error('unavailable') },
+        cancel: () => undefined,
+      },
+      createUtterance: text => new FakeUtterance(text),
+    })
+    expect(service.speak('apple')).toBe(false)
+    expect(events.at(-1)).toBe('end')
   })
 })

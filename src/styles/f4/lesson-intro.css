@@ -52,7 +52,9 @@
 .lesson-word-line-f4 h1 { margin: 0; color: #302925; font-size: 74px; line-height: .98; letter-spacing: -.035em; opacity: 0; transform: translateY(4px); transition: opacity 180ms ease-out, transform 180ms ease-out; }
 .lesson-word-line-f4 h1.is-visible { opacity: 1; transform: none; }
 .lesson-word-details-f4 { display: flex; align-items: center; gap: 20px; }
-.lesson-ipa-f4 { color: #8b6d5c; font-size: 20px; font-weight: 750; }
+/* 音标含 IPA 扩展区字符(ɡ ɪ ə 等),圆体展示字体无这些字形会混排回退;
+   统一走 system-ui(SF Pro/Segoe UI 均有完整 IPA 覆盖),字重放轻 */
+.lesson-ipa-f4 { color: #8b6d5c; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 20px; font-weight: 500; letter-spacing: .01em; }
 .lesson-meaning-f4 { color: #b75f42; font-size: 34px; font-weight: 900; }
 .lesson-word-block-f4 .lesson-word-details-f4 { display: block; }
 .lesson-word-block-f4 .lesson-ipa-f4 { display: block; margin: 10px 0 4px; }
@@ -67,9 +69,10 @@
 
 .lesson-word-stage-f4 { position: relative; min-height: 276px; padding: 44px 42px 28px; overflow: hidden; border: 2px dashed rgba(105,79,59,.38); border-radius: 29px 33px 28px 31px; background: linear-gradient(145deg,rgba(225,242,252,.78),rgba(255,249,226,.92) 54%,rgba(230,243,210,.72)); box-shadow: inset 0 0 0 8px rgba(255,255,255,.24); }
 .lesson-word-stage-f4 .lesson-word-line-f4 { justify-content: center; }
-.lesson-word-stage-f4 .lesson-word-line-f4 h1 { margin-top: 42px; font-size: 86px; }
+/* 86px 下 line-height .98 会让 p/g 降部伸出行盒,行高放宽并给下方细节行留出间距 */
+.lesson-word-stage-f4 .lesson-word-line-f4 h1 { margin-top: 42px; font-size: 86px; line-height: 1.05; }
 .lesson-word-stage-f4 .lesson-replay-f4 { position: absolute; z-index: 2; top: 14px; right: 18px; }
-.lesson-word-stage-f4 .lesson-word-details-f4 { justify-content: center; }
+.lesson-word-stage-f4 .lesson-word-details-f4 { justify-content: center; margin-top: 30px; }
 .lesson-word-stage-f4 .lesson-meaning-f4 { padding-left: 20px; border-left: 2px solid rgba(105,79,59,.28); }
 .lesson-listen-guide-f4 { position: absolute; top: 18px; left: 25px; color: #9a674e; font-size: 13px; font-weight: 850; }
 

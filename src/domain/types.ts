@@ -36,6 +36,7 @@ export interface MetaState {
 
 export interface Settings {
   motionEnabled: boolean
+  musicEnabled?: boolean // 农场背景音乐(2026-07-19 小皮需求);旧记录缺省按开
 }
 
 export interface DailySession {

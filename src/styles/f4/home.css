@@ -1091,10 +1091,25 @@
 .farm-decorations-f7.is-back { z-index: 8; }
 .farm-decorations-f7.is-actor { z-index: 19; }
 .farm-decorations-f7.is-front { z-index: 30; }
-.farm-decorations-f7 img {
+/* 单件已摆放贴纸:可指针拖拽,touch-action:none 防 iPad 拖动时页面滚动 */
+.farm-decoration-f7 {
   position: absolute;
+  padding: 0;
+  border: 0;
+  background: none;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: grab;
+  -webkit-tap-highlight-color: transparent;
+}
+.farm-decoration-f7.is-dragging { cursor: grabbing; }
+.farm-decoration-f7 img {
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   transform: translateZ(0);
+  -webkit-user-drag: none;
+  user-select: none;
 }
 .customization-entrances-f7 {
   position: absolute;

@@ -338,6 +338,9 @@ export function useFarmHome(): FarmHomeBridge {
         case 'SET_MOTION':
           await usecases.setMotion(event.enabled)
           break
+        case 'SET_MUSIC':
+          await usecases.setMusic(event.enabled)
+          break
         case 'OPEN_PARENT':
           setNavigation('parent')
           return
