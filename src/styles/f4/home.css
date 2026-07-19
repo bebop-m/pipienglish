@@ -203,9 +203,9 @@
   z-index: 65;
   top: 92px;
   left: 28px;
-  width: 390px;
-  min-height: 310px;
-  padding: 18px 21px 17px;
+  width: 370px;
+  min-height: 238px;
+  padding: 17px 20px 18px;
   border: 3px solid var(--ink);
   border-radius: 27px;
   background:
@@ -426,9 +426,24 @@
 }
 
 .task-board-f3 h1 {
-  margin-bottom: 6px;
-  font-size: 28px;
+  margin-bottom: 12px;
+  font-size: 27px;
 }
+
+.task-summary-f4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 15px;
+  padding: 9px 12px;
+  border-radius: 13px;
+  background: rgba(241, 218, 155, 0.38);
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.task-summary-f4 span:last-child { color: #a66043; }
 
 .k-copy {
   min-height: 49px;
@@ -483,7 +498,8 @@
 
 .task-board-f3 .k-button {
   width: 100%;
-  margin-top: 13px;
+  min-height: 54px;
+  margin-top: 14px;
 }
 
 .k-button:hover:not(:disabled) { transform: translateY(-1px) rotate(-0.3deg); }

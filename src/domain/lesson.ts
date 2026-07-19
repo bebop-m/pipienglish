@@ -234,7 +234,7 @@ export function applyLessonEvent(
 
   switch (event.type) {
     case 'STEP_DONE': {
-      // 描红"写好了"= 书写完成 → 自动播发音(SPEC §2.6);听看卡进场自动播 ×2 归视觉层
+      // 描红"写好了"= 书写完成 → 自动播发音(SPEC §2.6);听看卡进场自动播归视觉层
       if (step.type === 'trace') effects.push({ type: 'PLAY_WORD', wordId: step.wordId })
       advance = true
       break

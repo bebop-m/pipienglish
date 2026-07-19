@@ -39,6 +39,7 @@ describe('TTS 英语声音选择', () => {
       voice: SpeechSynthesisVoice | null = null
       lang = ''
       rate = 1
+      volume = 0
       constructor(public text: string) {}
     }
     vi.stubGlobal('window', { speechSynthesis: synthesis })
@@ -51,6 +52,7 @@ describe('TTS 英语声音选择', () => {
     expect(utterance.voice).toBe(localUs)
     expect(utterance.lang).toBe('en-US')
     expect(utterance.rate).toBe(0.85)
+    expect(utterance.volume).toBe(1)
   })
 
   it('设备语音实现抛错时仍然无声降级', () => {
@@ -72,6 +74,7 @@ class FakeUtterance implements UtteranceLike {
   voice: SpeechSynthesisVoice | null = null
   lang = ''
   rate = 0
+  volume = 0
   onend: (() => void) | null = null
   constructor(public text: string) {}
 }
@@ -131,7 +134,7 @@ describe('声音加载延迟', () => {
   })
 })
 
-describe('连续播放取消与重复播放', () => {
+describe('连续播放取消', () => {
   it('每次 speak 先 cancel:切卡/连点永远打断旧播放', () => {
     const { synth, service } = setup()
     service.speak('apple')
@@ -140,39 +143,17 @@ describe('连续播放取消与重复播放', () => {
     expect(synth.spoken.map(u => u.text)).toEqual(['apple', 'banana'])
   })
 
-  it('听看卡 ×2:onend 后自动重播一遍,共 2 次且第二遍不再续播', () => {
+  it('cancel() 会停止当前播放', () => {
     const { synth, service } = setup()
-    expect(service.speak('apple', 2)).toBe(true)
-    expect(synth.spoken).toHaveLength(1)
-    synth.spoken[0].onend?.()
-    expect(synth.spoken.map(u => u.text)).toEqual(['apple', 'apple'])
-    expect(synth.spoken[1].onend ?? null).toBeNull()
-  })
-
-  it('重播前被新播放打断:旧 onend 迟到也不插播旧词', () => {
-    const { synth, service } = setup()
-    service.speak('apple', 2)
-    const first = synth.spoken[0]
-    service.speak('banana')
-    first.onend?.()
-    expect(synth.spoken.map(u => u.text)).toEqual(['apple', 'banana'])
-  })
-
-  it('cancel() 同样使续播失效', () => {
-    const { synth, service } = setup()
-    service.speak('apple', 2)
+    service.speak('apple')
     service.cancel()
-    synth.spoken[0].onend?.()
     expect(synth.spoken).toHaveLength(1)
     expect(synth.cancelCount).toBe(2)
   })
 
-  it('空白文本不提交播放;times 向下取整且至少 1', () => {
+  it('空白文本不提交播放', () => {
     const { synth, service } = setup()
     expect(service.speak('   ')).toBe(false)
     expect(synth.spoken).toHaveLength(0)
-    service.speak('apple', 0)
-    expect(synth.spoken).toHaveLength(1)
-    expect(synth.spoken[0].onend ?? null).toBeNull()
   })
 })

@@ -4,10 +4,9 @@ import { f4AssetUrl } from '../farm-f4/assetUrl'
 import { FarmStageShell } from '../farm-f4/visual/FarmStageShell'
 import {
   lessonIllustrationFilename,
-  lessonProgressPercent,
-  repeatedWordUtterance,
   type LessonIntroWord,
 } from './lessonIntroModel'
+import { LessonProgress } from './LessonProgress'
 import '../../styles/f4/lesson-intro.css'
 
 export interface LessonIntroScreenProps {
@@ -44,12 +43,11 @@ export function LessonIntroScreen({
   const [wordVisible, setWordVisible] = useState(false)
   const steppedMs = useRef(0)
   const illustration = lessonIllustrationFilename(word)
-  const progress = lessonProgressPercent(todayDone, todayTotal)
 
   useEffect(() => {
     setWordVisible(false)
     steppedMs.current = 0
-    const utterance = repeatedWordUtterance(word.word)
+    const utterance = word.word.trim()
     const speakTimer = window.setTimeout(() => {
       if (utterance) speakText(utterance)
     }, 60)
@@ -103,20 +101,13 @@ export function LessonIntroScreen({
           <button className="lesson-back-f4" type="button" onClick={onBack}>
             <span aria-hidden="true" />回农场
           </button>
-          <section className="lesson-progress-f4" aria-label={`今日学习进度 ${todayDone} / ${todayTotal}`}>
-            <div className="lesson-progress-copy-f4">
-              <strong>{headerTitle ?? `新朋友 · 第 ${stepIndex} 步 / ${stepTotal}`}</strong>
-              <span>{progressText ?? `今日进度 ${todayDone} / ${todayTotal}`}</span>
-            </div>
-            <div className="lesson-progress-path-f4">
-              <span className="lesson-progress-fill-f4" style={{ width: `${progress}%` }} />
-              <span className="lesson-progress-dot-f4 is-done" />
-              <span className="lesson-progress-dot-f4 is-current" />
-              <span className="lesson-progress-dot-f4" />
-              <span className="lesson-progress-dot-f4" />
-            </div>
-            <img className="lesson-progress-hen-f4" src={f4AssetUrl('mother-f3.png')} alt="母鸡妈妈正在向终点走" />
-          </section>
+          <LessonProgress
+            variant="intro"
+            title={headerTitle ?? `新朋友 · 第 ${stepIndex} 步 / ${stepTotal}`}
+            progressText={progressText ?? `今日进度 ${todayDone} / ${todayTotal}`}
+            done={todayDone}
+            total={todayTotal}
+          />
           <span className="lesson-step-chip-f4">{stepChip ?? '听一听 · 看一看'}</span>
         </header>
 
@@ -125,7 +116,7 @@ export function LessonIntroScreen({
             <div className="lesson-art-f4">
               <span className="lesson-art-halo-f4" aria-hidden="true" />
               <img src={f4AssetUrl(illustration)} alt={`${word.meaning}的手绘插图`} />
-              <span className="lesson-listen-note-f4">先听两遍，再跟着读</span>
+              <span className="lesson-listen-note-f4">先听一遍，再跟着读</span>
             </div>
           ) : null}
 

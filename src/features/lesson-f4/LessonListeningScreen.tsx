@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { speak } from '../../application/services/tts'
-import { f4AssetUrl } from '../farm-f4/assetUrl'
 import { FarmStageShell } from '../farm-f4/visual/FarmStageShell'
-import { lessonProgressPercent, type LessonIntroWord } from './lessonIntroModel'
+import type { LessonIntroWord } from './lessonIntroModel'
+import { LessonProgress } from './LessonProgress'
 import {
   judgeLessonChoice,
   type LessonChoiceOption,
@@ -26,7 +26,7 @@ export interface LessonListeningScreenProps {
   questionIndex?: number
   questionTotal?: number
   onBack: () => void
-  onAnswer: (answer: LessonListeningAnswer) => void
+  onAnswer: (answer: LessonListeningAnswer) => void | Promise<void>
   onContinue: () => void
   speakText?: (text: string) => boolean
 }
@@ -50,22 +50,31 @@ export function LessonListeningScreen({
 }: LessonListeningScreenProps) {
   const [state, setState] = useState<LessonChoiceState>('ready')
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const progress = lessonProgressPercent(todayDone, todayTotal)
+  const answerPending = useRef(false)
   const targetVisible = shouldRevealListeningTarget(state)
 
   useEffect(() => {
     setState('ready')
     setSelectedId(null)
+    answerPending.current = false
     const timer = window.setTimeout(() => speakText(word.word), 120)
     return () => window.clearTimeout(timer)
   }, [speakText, word.id, word.word])
 
-  const choose = (option: LessonChoiceOption) => {
-    if (state === 'correct') return
+  const choose = async (option: LessonChoiceOption) => {
+    if (state === 'correct' || answerPending.current) return
+    answerPending.current = true
     const nextState = judgeLessonChoice(option.id, correctOptionId)
     setSelectedId(option.id)
     setState(nextState)
-    onAnswer({ selectedId: option.id, correct: nextState === 'correct' })
+    try {
+      await onAnswer({ selectedId: option.id, correct: nextState === 'correct' })
+    } catch {
+      setSelectedId(null)
+      setState('ready')
+    } finally {
+      answerPending.current = false
+    }
   }
 
   useEffect(() => {
@@ -99,15 +108,13 @@ export function LessonListeningScreen({
 
         <header className="lesson-choice-header-f4">
           <button className="lesson-choice-back-f4" type="button" onClick={onBack}><span aria-hidden="true" />回农场</button>
-          <section className="lesson-choice-progress-f4" aria-label={`今日学习进度 ${todayDone} / ${todayTotal}`}>
-            <div className="lesson-choice-progress-copy-f4"><strong>听一听 · 第 {questionIndex} 题 / {questionTotal}</strong><span>今日进度 {todayDone} / {todayTotal}</span></div>
-            <div className="lesson-choice-progress-path-f4">
-              <span className="lesson-choice-progress-fill-f4" style={{ width: `${progress}%` }} />
-              <span className="lesson-choice-progress-dot-f4 is-done" /><span className="lesson-choice-progress-dot-f4 is-current" />
-              <span className="lesson-choice-progress-dot-f4" /><span className="lesson-choice-progress-dot-f4" />
-            </div>
-            <img className="lesson-choice-progress-hen-f4" src={f4AssetUrl('mother-f3.png')} alt="母鸡妈妈正在向终点走" />
-          </section>
+          <LessonProgress
+            variant="choice"
+            title={`听一听 · 第 ${questionIndex} 题 / ${questionTotal}`}
+            progressText={`今日进度 ${todayDone} / ${todayTotal}`}
+            done={todayDone}
+            total={todayTotal}
+          />
           <span className="lesson-choice-step-chip-f4">听一听 · 会重试</span>
         </header>
 

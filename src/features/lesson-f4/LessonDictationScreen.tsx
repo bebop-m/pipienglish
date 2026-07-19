@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { speak } from '../../application/services/tts'
 import { f4AssetUrl } from '../farm-f4/assetUrl'
 import { FarmStageShell } from '../farm-f4/visual/FarmStageShell'
-import { lessonProgressPercent, type LessonIntroWord } from './lessonIntroModel'
+import type { LessonIntroWord } from './lessonIntroModel'
+import { LessonProgress } from './LessonProgress'
 import {
   dictationInputForState,
   judgeDictationAnswer,
@@ -31,8 +32,8 @@ export interface LessonDictationScreenProps {
   stepChip?: string
   allowForgot?: boolean
   onBack: () => void
-  onAnswer: (answer: LessonDictationAnswer) => void
-  onForgot?: (forgot: LessonDictationForgot) => void
+  onAnswer: (answer: LessonDictationAnswer) => void | Promise<void>
+  onForgot?: (forgot: LessonDictationForgot) => void | Promise<void>
   onContinue: () => void
   onCapturedContinue: () => void
   speakText?: (text: string) => boolean
@@ -64,25 +65,40 @@ export function LessonDictationScreen({
 }: LessonDictationScreenProps) {
   const [state, setState] = useState<LessonDictationState>(initialState)
   const [input, setInput] = useState(() => dictationInputForState(initialState, word.word))
-  const progress = lessonProgressPercent(todayDone, todayTotal)
+  const answerPending = useRef(false)
 
   useEffect(() => {
     setState(initialState)
     setInput(dictationInputForState(initialState, word.word))
+    answerPending.current = false
   }, [initialState, word.id, word.word])
 
-  const submit = () => {
-    if (!input.trim() || state === 'correct' || state === 'captured') return
+  const submit = async () => {
+    if (!input.trim() || state === 'correct' || state === 'captured' || answerPending.current) return
+    answerPending.current = true
     const nextState = judgeDictationAnswer(input, word.word)
     setState(nextState)
-    onAnswer({ value: input, correct: nextState === 'correct' })
+    try {
+      await onAnswer({ value: input, correct: nextState === 'correct' })
+    } catch {
+      setState('ready')
+    } finally {
+      answerPending.current = false
+    }
   }
 
-  const forgot = () => {
-    if (!allowForgot || state === 'correct' || state === 'captured') return
+  const forgot = async () => {
+    if (!allowForgot || state === 'correct' || state === 'captured' || answerPending.current) return
+    answerPending.current = true
     setInput('')
     setState('captured')
-    onForgot?.({ wordId: word.id })
+    try {
+      await onForgot?.({ wordId: word.id })
+    } catch {
+      setState('ready')
+    } finally {
+      answerPending.current = false
+    }
   }
 
   useEffect(() => {
@@ -126,15 +142,13 @@ export function LessonDictationScreen({
 
         <header className="lesson-choice-header-f4">
           <button className="lesson-choice-back-f4" type="button" onClick={onBack}><span aria-hidden="true" />回农场</button>
-          <section className="lesson-choice-progress-f4" aria-label={`今日学习进度 ${todayDone} / ${todayTotal}`}>
-            <div className="lesson-choice-progress-copy-f4"><strong>{headerTitle ?? `默写 · 第 ${questionIndex} 题 / ${questionTotal}`}</strong><span>{progressText ?? `今日进度 ${todayDone} / ${todayTotal}`}</span></div>
-            <div className="lesson-choice-progress-path-f4">
-              <span className="lesson-choice-progress-fill-f4" style={{ width: `${progress}%` }} />
-              <span className="lesson-choice-progress-dot-f4 is-done" /><span className="lesson-choice-progress-dot-f4 is-done" />
-              <span className="lesson-choice-progress-dot-f4 is-done" /><span className="lesson-choice-progress-dot-f4 is-current" />
-            </div>
-            <img className="lesson-choice-progress-hen-f4" src={f4AssetUrl('mother-f3.png')} alt="母鸡妈妈正在向终点走" />
-          </section>
+          <LessonProgress
+            variant="choice"
+            title={headerTitle ?? `默写 · 第 ${questionIndex} 题 / ${questionTotal}`}
+            progressText={progressText ?? `今日进度 ${todayDone} / ${todayTotal}`}
+            done={todayDone}
+            total={todayTotal}
+          />
           <span className="lesson-choice-step-chip-f4">{stepChip ?? '写一写 · 会重试'}</span>
         </header>
 

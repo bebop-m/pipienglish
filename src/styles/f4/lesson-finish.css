@@ -1,7 +1,7 @@
 @import './design-tokens.css';
 .lesson-finish-f4 { position: relative; width: 1194px; height: 834px; overflow: hidden; color: #342a24; font-family: var(--f4-font); font-weight: 700; }
 .lesson-finish-f4 button { color: inherit; font: inherit; -webkit-tap-highlight-color: transparent; }
-.lesson-finish-wash-f4 { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(224,247,255,.28), rgba(255,248,213,.24) 44%, rgba(246,220,135,.35)); backdrop-filter: blur(2px) saturate(.96); }
+.lesson-finish-wash-f4 { position: absolute; inset: 0; pointer-events: none; background: transparent; }
 .lesson-finish-topbar-f4 { position: absolute; z-index: 3; top: 22px; left: 38px; right: 38px; height: 62px; display: grid; grid-template-columns: 230px 1fr 150px; align-items: center; gap: 18px; }
 .lesson-finish-brand-f4, .lesson-finish-day-f4, .lesson-finish-done-f4 { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; border: 2px solid #4c3a31; border-radius: 999px; background: rgba(255,251,239,.96); box-shadow: 0 4px 0 rgba(64,48,37,.15); font-weight: 900; }
 .lesson-finish-brand-f4 { justify-content: flex-start; gap: 10px; padding: 0 18px; font-size: 19px; }

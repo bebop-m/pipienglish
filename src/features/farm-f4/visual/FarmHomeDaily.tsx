@@ -256,17 +256,17 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
   const [feedingTargetId, setFeedingTargetId] = useState<string | null>(null)
   const emptySlots = 3 - vm.incubating.length
   const progress = vm.totalItemsToday > 0 ? Math.min(100, (vm.learnedToday / vm.totalItemsToday) * 100) : 0
-  const taskCopy = vm.reviewCountToday > 0
-    ? `${vm.reviewCountToday} 个老朋友想你了！打完招呼再认识 ${vm.dailyTarget} 个新朋友。`
-    : `认识 ${vm.dailyTarget} 个新朋友，完成后母鸡妈妈会下蛋哦。`
-  const taskTitle = vm.newWordsPaused ? `连续 ${vm.streak} 天！` : '开始今天的单词！'
-  const displayedTaskCopy = vm.newWordsPaused
-    ? `今天复习 ${vm.reviewCountToday} 个老朋友。`
-    : taskCopy
+  const taskTitle = vm.newWordsPaused
+    ? '今天先复习老朋友'
+    : vm.learnedToday > 0 ? '继续今天的学习' : '开始今天的学习'
+  const taskSummary = vm.newWordsPaused
+    ? `复习 ${vm.reviewCountToday} 个`
+    : vm.reviewCountToday > 0
+      ? `复习 ${vm.reviewCountToday} · 新词 ${vm.dailyTarget}`
+      : `新词 ${vm.dailyTarget} 个`
   const hatcheryCopy = emptySlots > 0
     ? `蛋会各自在巢里轻轻晃动，还可以放入 ${emptySlots} 颗。`
     : '三个巢位都住进了小鸡宝宝，耐心等它们破壳吧。'
-  const displayedNewWords = vm.state === 'daily_complete' ? vm.dailyTarget : vm.newWordsLearnedToday
 
   const startFeeding = async () => {
     const candidates = vm.chicksVisible.slice(0, 6)
@@ -291,12 +291,10 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
           <span>皮皮のEnglish</span>
         </div>
         {vm.state !== 'first_visit' && <>
-          <div className="sticker-chip">今日单词 <strong>{displayedNewWords} / {vm.dailyTarget}</strong></div>
           <button className="sticker-chip egg-stock-f4" type="button" aria-label={`剩余鸡蛋 ${vm.eggStock} 颗，选择孵化或煎蛋`} onClick={() => dispatch({ type: 'OPEN_EGG_PANEL' })}>
             <img src={f4AssetUrl('egg-f4-v2.png')} alt="" /><span>鸡蛋</span><strong>{vm.eggStock}</strong>
           </button>
           <div className="sticker-chip">小鸡 <strong>{vm.chicksTotal}</strong></div>
-          <div className="sticker-chip">孵化中 <strong>{vm.incubating.length}</strong></div>
         </>}
         <button className="sticker-chip motion-toggle" type="button" aria-pressed={!vm.motionEnabled} onClick={() => dispatch({ type: 'SET_MOTION', enabled: !vm.motionEnabled })}>动效：{vm.motionEnabled ? '开' : '关'}</button>
         <button className="parent-button" type="button" onClick={() => dispatch({ type: 'OPEN_PARENT' })}>家长</button>
@@ -306,16 +304,15 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
 
       <section className="farm-stage-f3 farm-stage-f4" aria-label="会慢慢散步和生活互动的农场">
         {vm.state === 'first_visit' ? <FirstVisitBoard dispatch={dispatch} /> : vm.state === 'daily_complete' ? <CompleteBoard vm={vm} dispatch={dispatch} /> : <section className="task-board-f3" aria-labelledby="task-title-f4">
-          <p className="k-eyebrow">DAY {String(vm.dayNumber).padStart(2, '0')} · 今日农场任务</p>
+          <p className="k-eyebrow">DAY {String(vm.dayNumber).padStart(2, '0')} · 今日任务</p>
           <h1 id="task-title-f4">{taskTitle}</h1>
-          <p className="k-copy">{displayedTaskCopy}</p>
+          <div className="task-summary-f4"><span>{taskSummary}</span><span>约 {vm.estimatedMinutes} 分钟</span></div>
           <div className="progress-line">
-            <span>今日进度</span>
+            <span>已完成</span>
             <span className="progress-track"><span style={{ width: `${progress}%` }} /></span>
             <strong>{vm.learnedToday} / {vm.totalItemsToday}</strong>
           </div>
-          <button className="k-button" type="button" onClick={() => dispatch({ type: 'START_DAILY_LESSON' })}>开始学习！</button>
-          <div className="task-footer-f3"><span>约 {vm.estimatedMinutes} 分钟</span><span>🥚 奖励 ×{vm.eggsEarnedToday}</span><span>连续第 {vm.streak} 天</span></div>
+          <button className="k-button" type="button" onClick={() => dispatch({ type: 'START_DAILY_LESSON' })}>{vm.learnedToday > 0 ? '继续学习' : '开始学习'}</button>
         </section>}
 
         {vm.state !== 'first_visit' && <section className={`hatchery-wrap-f4 ${vm.overlay === 'hatchery_pop' ? 'is-open' : ''}`} aria-label="鸡蛋孵化区">

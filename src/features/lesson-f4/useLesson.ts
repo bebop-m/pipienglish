@@ -42,6 +42,7 @@ export function useLesson(): LessonBridge {
   const [vm, setVm] = useState<LessonViewModel | null>(null)
   const [finish, setFinish] = useState<LessonFinishVM | null>(null)
   const alive = useRef(true)
+  const stepDonePending = useRef(false)
 
   const refresh = useCallback(async () => {
     await farm.clockGuard() // 保障今日 session 存在(跨日打开学习页同样安全)
@@ -81,8 +82,14 @@ export function useLesson(): LessonBridge {
   }, [])
 
   const stepDone = useCallback(async () => {
-    await lesson.dispatch({ type: 'STEP_DONE' })
-    await refresh()
+    if (stepDonePending.current) return
+    stepDonePending.current = true
+    try {
+      await lesson.dispatch({ type: 'STEP_DONE' })
+      await refresh()
+    } finally {
+      stepDonePending.current = false
+    }
   }, [refresh])
 
   const next = useCallback(async () => {

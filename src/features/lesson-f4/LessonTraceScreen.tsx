@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { speak } from '../../application/services/tts'
-import { f4AssetUrl } from '../farm-f4/assetUrl'
 import { FarmStageShell } from '../farm-f4/visual/FarmStageShell'
-import { lessonProgressPercent, type LessonIntroWord } from './lessonIntroModel'
+import type { LessonIntroWord } from './lessonIntroModel'
+import { LessonProgress } from './LessonProgress'
 import {
   hasMeaningfulTrace,
   toTracePoint,
@@ -82,7 +82,6 @@ export function LessonTraceScreen({
   const [strokes, setStrokes] = useState<TraceStroke[]>([])
   const [complete, setComplete] = useState(false)
   const [needsInk, setNeedsInk] = useState(false)
-  const progress = lessonProgressPercent(todayDone, todayTotal)
   const hasInk = hasMeaningfulTrace(strokes)
 
   const repaint = useCallback((nextStrokes: TraceStroke[]) => {
@@ -212,15 +211,13 @@ export function LessonTraceScreen({
         <div className="lesson-trace-wash-f4" aria-hidden="true" />
         <header className="lesson-trace-header-f4">
           <button className="lesson-trace-back-f4" type="button" onClick={onBack}><span aria-hidden="true" />回农场</button>
-          <section className="lesson-trace-progress-f4" aria-label={`今日学习进度 ${todayDone} / ${todayTotal}`}>
-            <div className="lesson-trace-progress-copy-f4"><strong>{headerTitle ?? `新朋友 · 第 ${stepIndex} 步 / ${stepTotal}`}</strong><span>{progressText ?? `今日进度 ${todayDone} / ${todayTotal}`}</span></div>
-            <div className="lesson-trace-progress-path-f4">
-              <span className="lesson-trace-progress-fill-f4" style={{ width: `${progress}%` }} />
-              <span className="lesson-trace-progress-dot-f4 is-done" /><span className="lesson-trace-progress-dot-f4 is-current" />
-              <span className="lesson-trace-progress-dot-f4" /><span className="lesson-trace-progress-dot-f4" />
-            </div>
-            <img className="lesson-trace-progress-hen-f4" src={f4AssetUrl('mother-f3.png')} alt="母鸡妈妈正在向终点走" />
-          </section>
+          <LessonProgress
+            variant="trace"
+            title={headerTitle ?? `新朋友 · 第 ${stepIndex} 步 / ${stepTotal}`}
+            progressText={progressText ?? `今日进度 ${todayDone} / ${todayTotal}`}
+            done={todayDone}
+            total={todayTotal}
+          />
           <span className="lesson-trace-step-chip-f4">{stepChip ?? '写一写 · 不评分'}</span>
         </header>
 

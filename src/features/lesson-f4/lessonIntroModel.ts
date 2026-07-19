@@ -24,8 +24,3 @@ export function lessonProgressPercent(done: number, total: number): number {
   if (total <= 0) return 0
   return Math.max(0, Math.min(100, (done / total) * 100))
 }
-
-export function repeatedWordUtterance(word: string): string {
-  const clean = word.trim()
-  return clean ? `${clean}. ${clean}.` : ''
-}
