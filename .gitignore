@@ -4,4 +4,5 @@ dev-dist/
 .claude/
 *.log
 design-samples/.chrome-profile-*/
+scratch-bgm/
 

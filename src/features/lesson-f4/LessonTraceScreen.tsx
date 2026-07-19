@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import { speak } from '../../application/services/tts'
 import { FarmStageShell } from '../farm-f4/visual/FarmStageShell'
 import type { LessonIntroWord } from './lessonIntroModel'
 import { LessonProgress } from './LessonProgress'
 import {
+  fittedTraceModelScale,
   hasMeaningfulTrace,
   toTracePoint,
   TRACE_LOGICAL_HEIGHT,
@@ -73,6 +74,8 @@ export function LessonTraceScreen({
   speakText = speak,
 }: LessonTraceScreenProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const modelRef = useRef<HTMLSpanElement>(null)
+  const [modelScale, setModelScale] = useState(1)
   const activeStroke = useRef<TraceStroke | null>(null)
   const strokesRef = useRef<TraceStroke[]>([])
   const completionTimer = useRef<number | null>(null)
@@ -94,6 +97,17 @@ export function LessonTraceScreen({
   }, [])
 
   useEffect(() => repaint(strokes), [repaint, strokes])
+
+  // 底字始终按 172px 排版,只用 transform 等比缩放,量一次即可且不触发重排。
+  // 圆体在 iPad 上可能迟到加载,字体就绪后补测一次。
+  useLayoutEffect(() => {
+    const fit = () => {
+      const width = modelRef.current?.scrollWidth
+      if (width) setModelScale(fittedTraceModelScale(width))
+    }
+    fit()
+    document.fonts?.ready.then(fit).catch(() => undefined)
+  }, [word.word])
 
   const sendCompletion = useCallback(() => {
     if (completionSent.current) return
@@ -233,7 +247,12 @@ export function LessonTraceScreen({
           <div className={`lesson-trace-writing-f4 ${hasInk ? 'has-ink' : ''} ${complete ? 'is-complete' : ''} ${needsInk ? 'needs-ink' : ''}`}>
             <span className="lesson-trace-pencil-tab-f4" aria-hidden="true">像蜡笔一样写</span>
             <div className="lesson-trace-lines-f4" aria-hidden="true"><i /><i /><i /><i /></div>
-            <span className="lesson-trace-model-f4" aria-hidden="true">{word.word}</span>
+            <span
+              ref={modelRef}
+              className="lesson-trace-model-f4"
+              style={{ '--f4-trace-model-scale': modelScale } as CSSProperties}
+              aria-hidden="true"
+            >{word.word}</span>
             <canvas
               ref={canvasRef}
               className="lesson-trace-canvas-f4"

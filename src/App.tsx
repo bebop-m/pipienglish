@@ -16,7 +16,15 @@ import { HandwritingFlowScreen } from './features/handwriting-f4/HandwritingFlow
 const INTRO_PREVIEWS = {
   egg: { id: 'egg', word: 'egg', ipa: '/eɡ/', meaning: '鸡蛋', sentence: 'The hen laid an egg!', sentenceCn: '母鸡下了一颗蛋！', imageAssetId: 'egg-f4-v2' },
   because: { id: 'because', word: 'because', ipa: '/bɪˈkɒz/', meaning: '因为', sentence: 'I stayed inside because it rained.', sentenceCn: '因为下雨了，所以我待在屋里。' },
+  // 词库最长词(11 字母),用于校验描红底字与排版的溢出边界
+  supermarket: { id: 'supermarket', word: 'supermarket', ipa: '/ˈsuːpərmɑːrkɪt/', meaning: '超市', sentence: 'We buy meat at the supermarket.', sentenceCn: '我们在超市买肉。' },
 } as const
+
+type IntroPreviewKey = keyof typeof INTRO_PREVIEWS
+
+function introPreviewKey(value: string | null | undefined): IntroPreviewKey | null {
+  return value && value in INTRO_PREVIEWS ? value as IntroPreviewKey : null
+}
 
 const EGG_MEANING_OPTIONS = [
   { id: 'egg', label: '鸡蛋' },
@@ -29,12 +37,13 @@ export default function App() {
   const [route, setRoute] = useState<'farm' | 'lesson' | 'rescue' | 'handwriting'>('farm')
 
   const previewParams = import.meta.env.DEV ? new URLSearchParams(window.location.search) : null
-  const preview = previewParams?.get('lesson-intro')
-  if (preview === 'egg' || preview === 'because') {
+  const preview = introPreviewKey(previewParams?.get('lesson-intro'))
+  if (preview) {
     return <LessonIntroScreen word={INTRO_PREVIEWS[preview]} todayDone={3} todayTotal={18} onBack={() => undefined} onComplete={() => undefined} />
   }
-  if (previewParams?.get('lesson-trace') === 'egg') {
-    return <LessonTraceScreen word={INTRO_PREVIEWS.egg} todayDone={4} todayTotal={18} onBack={() => undefined} onComplete={() => undefined} />
+  const tracePreview = introPreviewKey(previewParams?.get('lesson-trace'))
+  if (tracePreview) {
+    return <LessonTraceScreen word={INTRO_PREVIEWS[tracePreview]} todayDone={4} todayTotal={18} onBack={() => undefined} onComplete={() => undefined} />
   }
   if (previewParams?.get('lesson-choice') === 'egg') {
     return (

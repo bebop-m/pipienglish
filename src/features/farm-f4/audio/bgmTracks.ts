@@ -3,6 +3,10 @@
 // 真实存在于 public/assets/f4/audio/ 后才登记为 approved;登记表为空或全为
 // internal-placeholder 时,儿童界面不显示音乐开关,播放器保持静默。
 // 要求:循环无缝、可商用授权、体积 ≤2MB(离线包体);登记时附来源与授权说明。
+//
+// 候选曲目由 `node scripts/make-bgm.mjs` 现场合成(原创波形,无采样无版权)。
+// 音频文件在小皮选定前不入库,避免未批准素材进离线预缓存;选定后只需
+// 把该曲 MP3 放进 public/assets/f4/audio/ 并在下方登记一条 approved。
 
 export interface BgmTrackDefinition {
   id: string
