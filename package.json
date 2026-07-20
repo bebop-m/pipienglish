@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "node scripts/check-fullbleed-layers.mjs && tsc && vite build",
+    "check:fullbleed": "node scripts/check-fullbleed-layers.mjs",
     "preview": "vite preview",
     "test": "vitest run"
   },

@@ -9,7 +9,7 @@ import type {
   PersistedChick,
   SceneMemoryRow,
 } from './farmPersistence'
-import { dayKey } from '../domain/time'
+import { dayKey, dayKeyOf } from '../domain/time'
 
 interface SerializedBlob {
   type: string
@@ -102,9 +102,17 @@ export async function exportAll(d: PipiDB): Promise<string> {
   return JSON.stringify(converted)
 }
 
-export async function importAll(d: PipiDB, json: string): Promise<void> {
-  const now = Date.now()
-  const converted = convertToV3Archive(JSON.parse(json), { now, today: dayKey() })
+/**
+ * 导入备份。v1/v2 的待孵蛋按「当天」结算，因此 clock 必须可注入：
+ * 用真实时钟做断言会让测试在跨过某一天后突然失败（2026-07-20 已发生过一次）。
+ */
+export async function importAll(
+  d: PipiDB,
+  json: string,
+  clock: { now?: number; today?: string } = {},
+): Promise<void> {
+  const now = clock.now ?? Date.now()
+  const converted = convertToV3Archive(JSON.parse(json), { now, today: clock.today ?? dayKeyOf(now) })
   const ink = reviveInk(converted.ink)
 
   await d.transaction('rw', [

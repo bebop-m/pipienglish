@@ -8,6 +8,15 @@ import { V1_REAL_BACKUP, V2_REAL_BACKUP, V3_REAL_BACKUP } from './fixtures/legac
 let dbSequence = 0
 const freshDb = () => new PipiDB(`pipitest-backup-${Date.now()}-${dbSequence++}`)
 
+/**
+ * 夹具里的待孵蛋按「当天」结算，必须钉死时钟：用真实时钟时，
+ * 一旦跨过 2026-07-19，v1 的三颗待孵蛋会被当成已孵化，断言从 8 只变 11 只。
+ */
+const IMPORT_CLOCK = {
+  now: new Date('2026-07-19T03:00:00.000Z').getTime(),
+  today: '2026-07-19',
+} as const
+
 async function farmState(db: PipiDB): Promise<FarmStateV3> {
   return (await db.kv.get('farmState'))!.value as FarmStateV3
 }
@@ -15,7 +24,7 @@ async function farmState(db: PipiDB): Promise<FarmStateV3> {
 describe('v1/v2/v3 JSON 导入', () => {
   it('v1 使用共享转换：旧数字鸡和待孵蛋零损失进入 v3', async () => {
     const db = freshDb()
-    await importAll(db, JSON.stringify(V1_REAL_BACKUP))
+    await importAll(db, JSON.stringify(V1_REAL_BACKUP), IMPORT_CLOCK)
 
     expect(await db.chicks.count()).toBe(8)
     expect((await db.chicks.toArray()).every(chick => (
@@ -40,7 +49,7 @@ describe('v1/v2/v3 JSON 导入', () => {
 
   it('v2 使用同一转换：三巢退款、学习记录及自定义 kv 全部保留', async () => {
     const db = freshDb()
-    await importAll(db, JSON.stringify(V2_REAL_BACKUP))
+    await importAll(db, JSON.stringify(V2_REAL_BACKUP), IMPORT_CLOCK)
 
     const farm = await farmState(db)
     expect(farm.eggStock).toBe(9)
@@ -60,7 +69,7 @@ describe('v1/v2/v3 JSON 导入', () => {
 
   it('v3 通过同一转换保持场景、隐藏外观、料理、保底和收藏资产', async () => {
     const db = freshDb()
-    await importAll(db, JSON.stringify(V3_REAL_BACKUP))
+    await importAll(db, JSON.stringify(V3_REAL_BACKUP), IMPORT_CLOCK)
 
     expect(await farmState(db)).toEqual(V3_REAL_BACKUP.kv[0].value)
     expect(await db.chicks.get('v3-special')).toMatchObject(V3_REAL_BACKUP.chicks[0])
@@ -76,7 +85,7 @@ describe('v1/v2/v3 JSON 导入', () => {
 describe('v3 导出与原子恢复', () => {
   it('v3 导出再导入保留所有表、Date 与 Ink Blob', async () => {
     const source = freshDb()
-    await importAll(source, JSON.stringify(V3_REAL_BACKUP))
+    await importAll(source, JSON.stringify(V3_REAL_BACKUP), IMPORT_CLOCK)
     await source.ink.put({
       id: 'ink-1',
       wordId: 'apple',
@@ -91,7 +100,7 @@ describe('v3 导出与原子恢复', () => {
     expect(typeof parsed.ink[0].png.base64).toBe('string')
 
     const restored = freshDb()
-    await importAll(restored, json)
+    await importAll(restored, json, IMPORT_CLOCK)
     expect(await farmState(restored)).toEqual(await farmState(source))
     expect(await restored.chicks.toArray()).toEqual(await source.chicks.toArray())
     expect(await restored.sessions.toArray()).toEqual(await source.sessions.toArray())
@@ -110,7 +119,7 @@ describe('v3 导出与原子恢复', () => {
 
   it('导入写入阶段失败时恢复导入前的全部数据', async () => {
     const db = freshDb()
-    await importAll(db, JSON.stringify(V3_REAL_BACKUP))
+    await importAll(db, JSON.stringify(V3_REAL_BACKUP), IMPORT_CLOCK)
     const before = {
       cards: await db.cards.toArray(),
       sessions: await db.sessions.toArray(),
@@ -132,7 +141,7 @@ describe('v3 导出与原子恢复', () => {
 
   it('未知版本在清空数据库前拒绝', async () => {
     const db = freshDb()
-    await importAll(db, JSON.stringify(V3_REAL_BACKUP))
+    await importAll(db, JSON.stringify(V3_REAL_BACKUP), IMPORT_CLOCK)
     const before = await db.chicks.toArray()
     await expect(importAll(db, JSON.stringify({ version: 4 }))).rejects.toThrow('未知的备份版本')
     expect(await db.chicks.toArray()).toEqual(before)

@@ -24,14 +24,8 @@
   text-rendering: optimizeLegibility;
 }
 
-.f4-home::before {
-  content: '';
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 23%, transparent 79%, rgba(64, 91, 38, 0.06));
-}
+/* 采光渐变已上移到 .f4-bleed::before(stage.css):它必须随背景铺满整个视口,
+   画在舞台里会在 letterbox 处露出矩形接缝。此处不得再加全屏着色层。 */
 
 .f4-home button {
   color: inherit;
@@ -851,6 +845,8 @@
 .rescue-entry-f4 span { position: absolute; right: -1px; top: 7px; padding: 6px 10px; border: 2px solid var(--ink); border-radius: 999px; background: #ff9fae; box-shadow: 0 3px 0 rgba(48, 41, 37, 0.17); font-size: 12px; font-weight: 950; }
 .rescue-pop-f4 { right: 112px; top: 42px; width: 238px; transform-origin: top right; }
 
+/* 只保留“点空白处关闭”的命中区;压暗由 .f4-bleed::after 在视口层完成
+   (data-dimmed),否则遮罩只盖住舞台,letterbox 处会露出未压暗的亮背景。 */
 .panel-backdrop-f4 {
   position: absolute;
   z-index: 90;
@@ -859,8 +855,7 @@
   height: 100%;
   padding: 0;
   border: 0;
-  background: rgba(61, 48, 38, 0.17);
-  backdrop-filter: blur(1px);
+  background: transparent;
   cursor: default;
 }
 

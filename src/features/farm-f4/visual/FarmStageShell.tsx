@@ -6,6 +6,10 @@ interface FarmStageShellProps {
   children?: ReactNode
   ariaLabel?: string
   backgroundAssetUrl?: string
+  /** 'farm' 启用农场采光渐变;全屏视觉处理一律画在 .f4-bleed 上,不能进舞台 */
+  surface?: 'farm'
+  /** 有面板打开时压暗整个视口(含 letterbox),而不是只压暗舞台 */
+  dimmed?: boolean
 }
 
 type StageCustomProperties = CSSProperties & {
@@ -18,6 +22,8 @@ export function FarmStageShell({
   children,
   ariaLabel = '皮皮のEnglish 小鸡农场',
   backgroundAssetUrl,
+  surface,
+  dimmed = false,
 }: FarmStageShellProps) {
   const safeAreaRef = useRef<HTMLDivElement>(null)
   const stage = useStageScale(safeAreaRef)
@@ -28,7 +34,7 @@ export function FarmStageShell({
   }
 
   return (
-    <div className="f4-viewport">
+    <div className="f4-viewport" data-surface={surface} data-dimmed={dimmed}>
       <div
         className="f4-bleed"
         style={backgroundAssetUrl ? { backgroundImage: `url("${backgroundAssetUrl}")` } : undefined}

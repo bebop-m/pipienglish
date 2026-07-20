@@ -10,11 +10,38 @@
   touch-action: none;
 }
 
+/*
+ * 全屏视觉层。舞台是固定 1194×834 的坐标系，会被缩放并 letterbox 居中；
+ * 因此**任何意在“盖住整个屏幕”的视觉处理都必须画在这一层**，不能画在舞台里，
+ * 否则 letterbox 露出的背景不会被覆盖，屏幕上就会出现一圈矩形接缝。
+ * 见 src/styles/f4/fullBleedLayers.test.ts 的自动守卫。
+ */
 .f4-bleed {
   position: absolute;
   inset: 0;
   background: var(--f4-sky) url('/assets/f4/farm-background-f3.png') center / cover no-repeat;
   pointer-events: none;
+}
+
+/* 农场专属的采光渐变(原 .f4-home::before)：随背景一起铺满视口 */
+.f4-viewport[data-surface='farm'] .f4-bleed::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 23%, transparent 79%, rgba(64, 91, 38, 0.06));
+}
+
+/* 面板遮罩(原 .panel-backdrop-f4 的着色)：同样铺满视口，避免只压暗舞台。
+   直接由 data-dimmed 生成，不用 opacity 过渡——backdrop-filter 叠加 opacity:0 时
+   浏览器会跳过合成，过渡可能卡在 0 导致遮罩不出现；原遮罩本来也是瞬时出现的。 */
+.f4-viewport[data-dimmed='true'] .f4-bleed::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(61, 48, 38, 0.17);
+  backdrop-filter: blur(1px);
 }
 
 .f4-safe-area {

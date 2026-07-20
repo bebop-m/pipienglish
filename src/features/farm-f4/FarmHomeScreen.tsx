@@ -2,12 +2,25 @@
 // 阶段 F 起，首页三种状态都进入正式 F4 视觉；开发壳仅显式查询参数可见。
 
 import { useEffect } from 'react'
+import type { FarmOverlay } from '../../application/viewmodel'
 import { useFarmHome } from './useFarmHome'
 import { DevFarmView } from '../../dev/DevShell'
 import { setBgmActive } from './audio/bgmPlayer'
 import { FarmStageShell } from './visual/FarmStageShell'
 import { FarmHomeDaily } from './visual/FarmHomeDaily'
 import { f4AssetUrl } from './assetUrl'
+
+/** 会铺 .panel-backdrop-f4 命中区的 overlay：压暗在视口层完成，两者必须一一对应。
+ *  hatchery_pop / rescue_pop 是就地小气泡，不压暗。 */
+const DIMMING_OVERLAYS = new Set<FarmOverlay>([
+  'egg_panel',
+  'coop',
+  'map',
+  'chapter_celebration',
+  'travel_meal_prompt',
+  'sticker_catalog',
+  'wardrobe',
+])
 
 export interface FarmHomeScreenProps {
   /** 路由层(App)消费导航意图;未接入的目标(手写游戏/救援/家长页)由 App 决定忽略或提示 */
@@ -67,6 +80,8 @@ export function FarmHomeScreen({ onNavigate }: FarmHomeScreenProps = {}) {
     <FarmStageShell
       backgroundAssetUrl={bridge.vm ? f4AssetUrl(bridge.vm.viewedScene.backgroundAssetId) : undefined}
       ariaLabel={bridge.vm ? `${bridge.vm.viewedScene.title} · 皮皮のEnglish` : undefined}
+      surface="farm"
+      dimmed={DIMMING_OVERLAYS.has(bridge.vm?.overlay ?? 'none')}
     >
       {forceDevShell
         ? <DevFarmView bridge={bridge} />
