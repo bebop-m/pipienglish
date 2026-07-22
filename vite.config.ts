@@ -22,10 +22,9 @@ export default defineConfig({
           'icon-192.png',
           'icon-512.png',
           'icon-maskable-512.png',
-          // 场景二仍是 FUTURE_FARM_SCENE_DRAFTS；发布授权前不得进入当前离线内容包。
-          'assets/f4/scenes/scene-2/**',
         ],
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        // 场景二苹果园背景约 4.9 MB，发布后必须与场景一一样支持离线进入。
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
       },
       manifest: {
         id: './',

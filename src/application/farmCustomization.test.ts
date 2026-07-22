@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { INTERNAL_SCENE_1_COSMETIC_DRAFTS } from '../domain/farmCosmetics'
-import { FARM_SCENE_DEFINITIONS, FUTURE_FARM_SCENE_DRAFTS } from '../domain/farmScenes'
+import { FARM_SCENE_DEFINITIONS } from '../domain/farmScenes'
 import { exportAll, importAll } from './backup'
 import { getFarmStateV3, PipiDB, setFarmStateV3 } from './db'
 import { defaultFarmStateV3 } from './farmPersistence'
@@ -20,12 +20,12 @@ async function seedEggs(db: PipiDB, eggStock = 200) {
 }
 
 describe('framework 7 release gating', () => {
-  it('publishes only scene 1 and hides every unapproved catalog entry in production', async () => {
+  it('publishes both scene packages while hiding every unapproved catalog entry in production', async () => {
     const db = freshDb()
     await seedEggs(db)
     const vm = await createFarmUsecases(db).loadViewModel(now)
 
-    expect(vm.availableChapter).toBe(1)
+    expect(vm.availableChapter).toBe(2)
     expect(vm.enterableChapter).toBe(1)
     expect(vm.sceneMap.map(scene => scene.id)).toEqual(['scene-1'])
     expect(vm.decorationCatalog).toEqual([])
@@ -114,10 +114,9 @@ describe('decoration ownership and placement transactions', () => {
       acknowledgedSceneChapter: 2,
       cookingMeal: { recipeId: 'single_fried_egg', eggCost: 1, phase: 'raw', startedAt: now },
     })
-    const definitions = [...FARM_SCENE_DEFINITIONS, ...FUTURE_FARM_SCENE_DRAFTS]
-    const uc = createFarmUsecases(db, { ...internalSources, sceneDefinitions: definitions })
+    const uc = createFarmUsecases(db, internalSources)
     const sceneOneItem = FARM_SCENE_DEFINITIONS[0].decorationCatalog[0]
-    const sceneTwoItem = FUTURE_FARM_SCENE_DRAFTS[0].decorationCatalog[0]
+    const sceneTwoItem = FARM_SCENE_DEFINITIONS[1].decorationCatalog[0]
 
     expect((await uc.buyDecoration('scene-1', sceneOneItem.id, now)).status).toBe('purchased')
     expect((await uc.buyDecoration('scene-2', sceneTwoItem.id, now)).status).toBe('purchased')

@@ -8,22 +8,19 @@ import {
 } from './farmScenes'
 
 describe('scene release package', () => {
-  it('publishes scene 1 only and keeps scene 2 outside production lookup', () => {
-    expect(availableChapter(FARM_SCENE_DEFINITIONS)).toBe(1)
-    expect(FARM_SCENE_DEFINITIONS.map(scene => scene.id)).toEqual(['scene-1'])
-    expect(sceneById('scene-2')).toBeNull()
-    expect(sceneByChapter(2)).toBeNull()
+  it('publishes scene 1 and scene 2 as one continuous production package', () => {
+    expect(availableChapter(FARM_SCENE_DEFINITIONS)).toBe(2)
+    expect(FARM_SCENE_DEFINITIONS.map(scene => scene.id)).toEqual(['scene-1', 'scene-2'])
+    expect(FUTURE_FARM_SCENE_DRAFTS).toEqual([])
 
-    const futureDefinitions = [...FARM_SCENE_DEFINITIONS, ...FUTURE_FARM_SCENE_DRAFTS]
-    const sceneTwo = sceneById('scene-2', futureDefinitions)
-    expect(sceneTwo?.assetStatus).toBe('internal-placeholder')
+    const sceneTwo = sceneById('scene-2')
+    expect(sceneTwo?.assetStatus).toBe('approved')
     expect(sceneTwo?.backgroundAssetId).toBe('scenes/scene-2/orchard-background.png')
-    expect(sceneByChapter(2, futureDefinitions)?.id).toBe('scene-2')
+    expect(sceneByChapter(2)?.id).toBe('scene-2')
   })
 
-  it('registers all eight approved hatchery states without publishing scene 2', () => {
-    const scenes = [...FARM_SCENE_DEFINITIONS, ...FUTURE_FARM_SCENE_DRAFTS]
-    for (const scene of scenes) {
+  it('registers all eight approved hatchery states for both published scenes', () => {
+    for (const scene of FARM_SCENE_DEFINITIONS) {
       expect(Object.keys(scene.hatcheryVisualStates)).toEqual([
         'empty',
         'whole',
@@ -39,7 +36,10 @@ describe('scene release package', () => {
       expect(scene.chickVariantIds.color).toEqual(['chick-color-approved-b'])
       expect(scene.chickVariantIds.special).toEqual(['chick-special-approved-f'])
     }
-    expect(FARM_SCENE_DEFINITIONS.map(scene => scene.id)).toEqual(['scene-1'])
+    expect(FARM_SCENE_DEFINITIONS.map(scene => scene.id)).toEqual(['scene-1', 'scene-2'])
+    expect(FARM_SCENE_DEFINITIONS[1].fixedVisuals).toMatchObject([
+      { id: 'scene-2-apple-juice-station', assetStatus: 'approved' },
+    ])
   })
 
   it('defines the complete scene 1 sticker economy without exposing draft art', () => {

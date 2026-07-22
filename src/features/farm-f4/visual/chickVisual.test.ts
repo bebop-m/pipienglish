@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import type { FarmChickVM, FarmSceneVM } from '../../../application/viewmodel'
-import { FARM_SCENE_DEFINITIONS, FUTURE_FARM_SCENE_DRAFTS } from '../../../domain/farmScenes'
+import { FARM_SCENE_DEFINITIONS } from '../../../domain/farmScenes'
 import { chickAssetId, chickCanvasSize, specialChickHome } from './chickVisual'
 
 function sceneVM(index: 0 | 1): FarmSceneVM {
-  const definition = index === 0 ? FARM_SCENE_DEFINITIONS[0] : FUTURE_FARM_SCENE_DRAFTS[0]
+  const definition = FARM_SCENE_DEFINITIONS[index]
   return definition as unknown as FarmSceneVM
 }
 

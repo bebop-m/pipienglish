@@ -20,7 +20,7 @@ async function seedProgress(db: PipiDB, totalDays: number, farm = defaultFarmSta
 }
 
 function sceneThree(): FarmSceneDefinition {
-  const base = FUTURE_FARM_SCENE_DRAFTS[0]
+  const base = FARM_SCENE_DEFINITIONS[1]
   return {
     ...base,
     id: 'scene-3',
@@ -45,20 +45,20 @@ function sceneThree(): FarmSceneDefinition {
 
 describe('框架 6 · 章节资格、庆祝与顺序旅行', () => {
   it.each([
-    [35, 1, null],
-    [36, 2, 2],
-    [71, 2, 2],
-    [72, 3, 2], // 本地只有场景 1/2，资格 3 也不会产生空白场景 3
-  ] as const)('totalDays=%i 的 eligible=%i，当前包待庆祝=%s', async (totalDays, eligible, _celebration) => {
+    [35, 1, 1, null],
+    [36, 2, 2, 2],
+    [71, 2, 2, 2],
+    [72, 3, 2, 2], // 本地发布到场景 2；资格 3 不会产生空白场景 3
+  ] as const)('totalDays=%i 的 eligible=%i，当前包可进入=%i，待庆祝=%s', async (totalDays, eligible, enterable, celebration) => {
     const db = freshDb()
     await seedProgress(db, totalDays)
     const vm = await createFarmUsecases(db).loadViewModel(now)
     expect(vm.eligibleChapter).toBe(eligible)
-    expect(vm.availableChapter).toBe(1)
-    expect(vm.enterableChapter).toBe(1)
-    expect(vm.pendingCelebrationScene).toBeNull()
-    expect(vm.nextTravelScene).toBeNull()
-    expect(vm.sceneMap.map(scene => scene.id)).toEqual(['scene-1'])
+    expect(vm.availableChapter).toBe(2)
+    expect(vm.enterableChapter).toBe(enterable)
+    expect(vm.pendingCelebrationScene?.chapter ?? null).toBe(celebration)
+    expect(vm.nextTravelScene?.chapter ?? null).toBe(celebration)
+    expect(vm.sceneMap.map(scene => scene.id)).toEqual(enterable === 1 ? ['scene-1'] : ['scene-1', 'scene-2'])
     db.close()
   })
 

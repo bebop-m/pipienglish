@@ -179,12 +179,7 @@ const SCENE_1_DECORATIONS: readonly DecorationCatalogItemDefinition[] = [
   decoration('scene-1', 'old-oak-landmark', 'landmark', 'back', 'extension'),
 ]
 
-/**
- * 当前可发布离线内容包。发布边界只包含场景 1；内部贴纸定义不会自动出现在儿童目录。
- * availableChapter 的生产值必须只从本数组推导。
- */
-export const FARM_SCENE_DEFINITIONS: readonly FarmSceneDefinition[] = [
-  {
+const SCENE_1_DEFINITION: FarmSceneDefinition = {
     id: 'scene-1',
     chapter: 1,
     title: '晴空农场',
@@ -218,15 +213,12 @@ export const FARM_SCENE_DEFINITIONS: readonly FarmSceneDefinition[] = [
       'mother-headwear-scene-1-extension',
       'mother-neckwear-scene-1-extension',
     ],
-  },
-]
+}
 
 const SCENE_2_COLOR_CHICK_VARIANT_IDS = [APPROVED_COLOR_CHICK_VARIANT_ID] as const
 const SCENE_2_SPECIAL_CHICK_VARIANT_IDS = [APPROVED_SPECIAL_CHICK_VARIANT_ID] as const
 
-/** 未来草案定义，不属于当前可发布包，生产查找和 availableChapter 均不会读取。 */
-export const FUTURE_FARM_SCENE_DRAFTS: readonly FarmSceneDefinition[] = [
-  {
+const SCENE_2_DEFINITION: FarmSceneDefinition = {
     id: 'scene-2',
     chapter: 2,
     title: '苹果园',
@@ -234,7 +226,7 @@ export const FUTURE_FARM_SCENE_DRAFTS: readonly FarmSceneDefinition[] = [
     unlockAtTotalDays: 36,
     backgroundAssetId: 'scenes/scene-2/orchard-background.png',
     thumbnailAssetId: 'scenes/scene-2/orchard-background.png',
-    assetStatus: 'internal-placeholder',
+    assetStatus: 'approved',
     freeSignAssetId: 'internal-placeholder:scene-2-travel-sign',
     visibleChickCap: 40,
     hatcheryVisualStates: hatcheryVisualStates('scene-2'),
@@ -265,8 +257,19 @@ export const FUTURE_FARM_SCENE_DRAFTS: readonly FarmSceneDefinition[] = [
       special: SCENE_2_SPECIAL_CHICK_VARIANT_IDS,
     },
     cosmeticItemIds: ['mother-headwear-scene-2-core'],
-  },
+}
+
+/**
+ * 当前可发布离线内容包。场景一与场景二均已通过资产和运行时验收；
+ * 内部贴纸、路牌与装扮定义仍由各自 assetStatus 独立过滤。
+ */
+export const FARM_SCENE_DEFINITIONS: readonly FarmSceneDefinition[] = [
+  SCENE_1_DEFINITION,
+  SCENE_2_DEFINITION,
 ]
+
+/** 下一批场景尚未建立冻结生产定义。 */
+export const FUTURE_FARM_SCENE_DRAFTS: readonly FarmSceneDefinition[] = []
 
 export function sceneById(
   sceneId: string,
