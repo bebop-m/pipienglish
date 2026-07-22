@@ -361,6 +361,9 @@ export function useFarmHome(): FarmHomeBridge {
         case 'CHICK_PLACED':
           await usecases.placeChick(event.chickId, event.home, undefined, coreRef.current?.viewedSceneId)
           break
+        case 'SCENE_ELEMENT_PLACED':
+          await usecases.placeSceneElement(event.elementId, event.home, undefined, coreRef.current?.viewedSceneId)
+          break
         case 'SET_MOTION':
           await usecases.setMotion(event.enabled)
           break

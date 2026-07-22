@@ -183,7 +183,7 @@ function FarmActor({
 
   const positionIsBlocked = (target: StagePoint) => {
     const actor = actorRef.current
-    if (!actor || spec.kind !== 'chick') return false
+    if (!actor) return false
     const actorBox = {
       left: target.x + spec.size.width * 0.17,
       right: target.x + spec.size.width * 0.83,
@@ -209,7 +209,7 @@ function FarmActor({
   }
 
   const onPointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
-    if (spec.kind !== 'chick' || event.button !== 0) return
+    if (event.button !== 0) return
     const point = stageCoordinates(event.clientX, event.clientY)
     if (!point) return
     syncPresentation()
@@ -329,11 +329,6 @@ function FarmActor({
           }}
         >★</button>
       )}
-      {spec.chick && spec.chick.rarity !== 'normal' && (
-        <span className={`chick-rarity-badge-f4 is-${spec.chick.rarity}`}>
-          {spec.chick.rarity === 'special' ? '特别朋友' : '异色朋友'}
-        </span>
-      )}
     </div>
   )
 }
@@ -382,7 +377,7 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
         kind: 'mother',
         label: vm.henName ? `母鸡妈妈：${vm.henName}` : '母鸡妈妈',
         image: f4AssetUrl(vm.viewedScene.characterVisuals.motherAssetId),
-        home: { x: 615, y: 530 },
+        home: vm.sceneElementHomes.mother ?? { x: 615, y: 530 },
         size: ACTOR_SIZE.mother,
         talk: { line: '咕咕，慢慢散步吧～', translation: "Let's take a walk!" },
       },
@@ -391,13 +386,13 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
         kind: 'farmer',
         label: '农场主小皮',
         image: f4AssetUrl(vm.viewedScene.characterVisuals.xiaopiAssetId),
-        home: { x: 835, y: 495 },
+        home: vm.sceneElementHomes.xiaopi ?? { x: 835, y: 495 },
         size: ACTOR_SIZE.farmer,
         talk: { line: '今天也一起加油！', translation: "Let's do our best!" },
       },
       ...chickSpecs,
     ]
-  }, [vm.henName, vm.viewedScene, visibleChicks])
+  }, [vm.henName, vm.sceneElementHomes, vm.viewedScene, visibleChicks])
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -444,7 +439,7 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
           : null
         return (
           <FarmActor
-            key={spec.id}
+            key={`${vm.viewedSceneId}:${spec.id}`}
             spec={spec}
             motionEnabled={effectiveMotion}
             chat={chat}
@@ -453,7 +448,11 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
               if (spec.kind === 'chick') dispatch({ type: 'CHICK_CHAT', chickId: spec.id, neighborIds: [] })
             }}
             onPlaced={home => {
-              if (spec.kind === 'chick') dispatch({ type: 'CHICK_PLACED', chickId: spec.id, home })
+              if (spec.kind === 'chick') {
+                dispatch({ type: 'CHICK_PLACED', chickId: spec.id, home })
+              } else {
+                dispatch({ type: 'SCENE_ELEMENT_PLACED', elementId: spec.kind === 'mother' ? 'mother' : 'xiaopi', home })
+              }
             }}
             favoriteActionVisible={Boolean(spec.chick && vm.chat?.primary.chickId === spec.id)}
             onFavorite={() => {

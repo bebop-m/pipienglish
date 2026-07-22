@@ -40,6 +40,7 @@ import {
   type OwnedCosmeticRow,
 } from './farmPersistence'
 import type { CharacterLoadout } from '../domain/farmCatalog'
+import type { MovableFarmElementId, SceneElementHomes } from '../domain/farmLayout'
 
 export type FarmHomeState = 'first_visit' | 'daily_incomplete' | 'daily_complete'
 export type FarmOverlay =
@@ -177,6 +178,7 @@ export interface FarmHomeViewModel {
   wardrobeCatalog: WardrobeItemVM[]
   ownedCosmeticIds: string[]
   loadout: CharacterLoadout
+  sceneElementHomes: SceneElementHomes
   overlay: FarmOverlay // 由视觉桥(useFarmHome)本地维护,不持久化
   chat: ChickChatVM | null
   favoriteReplacement: FavoriteReplacementVM | null
@@ -225,6 +227,7 @@ export type FarmHomeEvent =
   | { type: 'CHICK_CHAT'; chickId: string; neighborIds: string[] }
   | { type: 'CHAT_DISMISSED' }
   | { type: 'CHICK_PLACED'; chickId: string; home: StagePoint }
+  | { type: 'SCENE_ELEMENT_PLACED'; elementId: MovableFarmElementId; home: StagePoint }
   | { type: 'SET_MOTION'; enabled: boolean }
   | { type: 'SET_MUSIC'; enabled: boolean }
   | { type: 'OPEN_PARENT' }
@@ -247,6 +250,7 @@ export interface FarmSnapshot {
   decorationRows?: DecorationRow[]
   ownedCosmetics?: OwnedCosmeticRow[]
   loadout?: CharacterLoadout
+  sceneElementHomes?: SceneElementHomes
   cosmeticDefinitions?: readonly CosmeticItemDefinition[]
   includeInternalPlaceholders?: boolean
 }
@@ -415,6 +419,7 @@ export function assembleViewModel(
     wardrobeCatalog,
     ownedCosmeticIds,
     loadout,
+    sceneElementHomes: s.sceneElementHomes ?? {},
     motionEnabled: s.motionEnabled,
     musicEnabled: s.musicEnabled ?? true,
   }

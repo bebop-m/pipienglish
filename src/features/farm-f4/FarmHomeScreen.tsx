@@ -72,6 +72,7 @@ export function FarmHomeScreen({ onNavigate }: FarmHomeScreenProps = {}) {
       placedDecorations: bridge.vm?.placedDecorations.length ?? 0,
       listedCosmetics: bridge.vm?.wardrobeCatalog.length ?? 0,
       loadout: bridge.vm?.loadout ?? null,
+      sceneElementHomes: bridge.vm?.sceneElementHomes ?? {},
       rescue: bridge.vm?.rescueCount ?? 0,
       overlay: bridge.vm?.overlay ?? 'none',
     })
