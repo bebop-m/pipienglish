@@ -1,49 +1,55 @@
-# AI 任务入口 · 皮皮 English F4
+# AI 任务入口 · 按任务路由
 
-任何 AI 在修改架构、页面或图片前，先完整阅读本页指定的材料。不要只读一个模糊的“日系贴纸风”提示词开始工作。
+不要把全部规格、大文档和图片当作每个任务的固定上下文。先读核心门禁，再按本页路由补充最小必要材料；未被当前任务使用的文档不要完整重读。
 
-## 必读顺序
+## 永远必读的核心
 
-1. [`../01-product/SPEC.md`](../01-product/SPEC.md) —— 产品规则、状态和数据；
-2. [`../01-product/DESIGN_BRIEF.md`](../01-product/DESIGN_BRIEF.md) —— 页面与情感基调；
-3. [`../02-visual/F4_VISUAL_SYSTEM.md`](../02-visual/F4_VISUAL_SYSTEM.md) —— F4 精确画风、资产语法和新图片协议；
-4. [`../02-visual/F4_IPAD_FIDELITY.md`](../02-visual/F4_IPAD_FIDELITY.md) —— 1194×834 固定舞台、PWA 和视觉回归；
-5. [`../02-visual/F4_BASELINE_MANIFEST.md`](../02-visual/F4_BASELINE_MANIFEST.md) —— 已确认文件、图片尺寸和哈希；
-6. [`../03-workflow/CLAUDE_CODEX_VISUAL_CONTRACT.md`](../03-workflow/CLAUDE_CODEX_VISUAL_CONTRACT.md) —— 架构与视觉职责边界；
-7. [`../04-assets/ASSET_BACKLOG_F4.md`](../04-assets/ASSET_BACKLOG_F4.md) —— 后续独立图片清单；
-8. [`../reference-images/README.md`](../reference-images/README.md) —— 小皮确认的两张原始视觉参考图。
+1. [`CURRENT_TASK.md`](CURRENT_TASK.md)：任务编号、基线、许可路径、验证等级与禁止动作。
+2. [`../01-product/FARM_LONG_TERM_ECONOMY_PROPOSAL.md`](../01-product/FARM_LONG_TERM_ECONOMY_PROPOSAL.md) **仅 §2「最终裁决摘要」**。
+3. 本页的「开始任务前四问」。
+4. 本页的「固定共识与不可破坏项」。
 
-随后实际打开：
+先执行 `CURRENT_TASK.md` 的基线祖先校验。若改动路径越出 `allowed_paths`，立即停止并重新路由到独立任务；不得为继续工作而扩大范围。
 
-- [`../../design-samples/sticker-f-farm-v4.html`](../../design-samples/sticker-f-farm-v4.html)；
-- [`../../design-samples/assets/farm-background-f3.png`](../../design-samples/assets/farm-background-f3.png)；
-- [`../../design-samples/assets/chick-f3.png`](../../design-samples/assets/chick-f3.png)；
-- [`../reference-images/chick-character-style-reference.png`](../reference-images/chick-character-style-reference.png)；
-- [`../reference-images/pwa-icon-farm-master.png`](../reference-images/pwa-icon-farm-master.png)；
-- 当前任务涉及的对应角色或物件原图。
+## 任务路由
 
-## 固定共识
+| 任务类型 | 在核心之外追加读取 | 默认不读取 |
+|---|---|---|
+| 普通代码、测试、数据 | 与目标文件直接相邻的接口、测试和规格段落；[`../03-workflow/EXECUTION_BUDGET_POLICY.md`](../03-workflow/EXECUTION_BUDGET_POLICY.md) | 视觉 PNG、参考图、整套视觉文档 |
+| 长期农场架构/实现 | 农场提案 §11「ViewModel 与事件契约增量」及 §15「已知冲突」；目标涉及的数据/状态章节 | 与目标无关的视觉 PNG |
+| 章节/场景内容 | 农场提案至少 §3「36 日场景章节」+ §8.1「核心包硬契约」；涉及事件时再读 §11，涉及旧规则时再读 §15 | 其他章节的完整历史和未使用候选图 |
+| 视觉/UI 落地 | [`../02-visual/F4_VISUAL_SYSTEM.md`](../02-visual/F4_VISUAL_SYSTEM.md)、[`../02-visual/F4_IPAD_FIDELITY.md`](../02-visual/F4_IPAD_FIDELITY.md)、视觉契约及当前屏的批准基准 | 无关屏幕、无关角色原图 |
+| 新美术资产 | [`../04-assets/ASSET_BACKLOG_F4.md`](../04-assets/ASSET_BACKLOG_F4.md)、视觉系统 §9.2/§10、直接参考图说明；一次只做一张校准图 | 批量候选、无关页面截图 |
+| PWA/构建/Pages | 执行预算政策的 L3 与 PWA 风险段、`vite.config.*`、manifest/SW/相关 workflow | 产品大文档和视觉 PNG，除非资产清单本身被改 |
+| 历史追溯 | 先从当前文档定位明确问题，再按链接读取单个归档 | 整个归档目录 |
 
-- F4 已由小皮确认，不再重新探索整体风格。
+农场路由中的 §11 与 §15 不能省略；章节任务中的 §3 与 §8.1 不能省略。代码/数据任务默认不打开 PNG，只有哈希、尺寸或实际视觉验收属于任务范围时才读取对应图片。
+
+## 固定共识与不可破坏项
+
+- F4 已由小皮确认，不重新探索整体风格。
 - “贴纸”指画风、独立透明素材和视觉层级，不指统一白边或贴纸收集册布局。
 - 生产页面不是整张截图：背景/场景、独立物件、可动角色和 HTML/CSS UI 必须分层。
 - 1194×834 是不可重排的核心坐标系；其他 iPad Pro 横屏只整体等比缩放并延展外围背景。
 - 母版文件不可覆盖；新增和修订使用新文件名、新版本和新哈希。
 - Claude 负责架构、数据、状态和接口；Codex 负责视觉、资产、布局、动效、iPad 保真和视觉回归。
+- 未经爸爸/小皮批准的资产不得进入儿童生产界面。
+- 不得擅自实施“当前章＋下一章”五处产品规格变更；须爸爸另签并建立独立 F4-CHG。
+- 用户脏改动和现存 worktree 不得覆盖、清理、移动、删除或 prune。
 
-## 发给 Claude 的开场指令
+## 开始任务前四问
 
-> 先完整阅读 `docs/00-start/AI_START_HERE.md` 及其中列出的全部必读文档，并校验/查看 F4 母版。F4 已由小皮确认，你本轮只负责产品内部架构和方案规划：模块边界、领域模型、页面状态机、TypeScript 接口、事件、副作用、Dexie 数据迁移、离线与错误恢复、测试边界。不要生成或重设计视觉稿，不要修改 F4 Token、尺寸、布局、动效和图片，不要把任何真实 F4 资产换成字符图标、通用矢量图、组件库或占位素材。所有界面坐标以 1194×834 逻辑坐标表达。输出需符合 `docs/03-workflow/CLAUDE_CODEX_VISUAL_CONTRACT.md` §4，列出需要 Codex 实现的 ViewModel、事件和仍待视觉确认的状态；若架构冲动会改变已确认视觉，先说明冲突并停止该部分。
+1. 本任务修改哪一层（背景、场景物件、角色、UI、架构/数据）？
+2. 哪些文件/资产是直接参考，哪些不可修改，许可路径是什么？
+3. 输出使用什么逻辑尺寸、画布、锚点或数据契约？
+4. 用什么测试、截图、哈希或 diff 证明没有破坏 F4？
 
-## 发给视觉生成 AI 的开场指令
+答不清四项时，不开始生成资产或修改代码。
 
-> 本轮不是自由创作。先读取 `docs/02-visual/F4_VISUAL_SYSTEM.md` 和 `docs/reference-images/README.md`，明确我提供的每张图片分别是身份参考、画风参考、环境参考还是构图参考。只制作结构化需求单指定的一个独立资产，保持现有 F4 角色身份、线条、配色、材质、透明画布和锚点。不要输出界面截图，不要增加白色贴纸边、背景、文字、阴影或装饰粒子。生成结果必须经过视觉系统 §10 验收后才能接入项目。
+## 面向 Claude 的架构交付
 
-## 开始任务前必须回答的四句话
+只在架构任务路由命中时读取 [`../03-workflow/CLAUDE_CODEX_VISUAL_CONTRACT.md`](../03-workflow/CLAUDE_CODEX_VISUAL_CONTRACT.md) §4，并交付模块边界、领域模型、状态机、TypeScript 接口、事件、副作用、迁移/恢复和测试边界。若架构决定会改变已确认视觉或儿童可见行为，列明冲突并停止该部分。
 
-1. 本任务修改哪一层（背景、场景物件、角色、UI、架构）？
-2. 哪些 F4 文件/资产是直接参考，哪些不可修改？
-3. 输出使用什么逻辑尺寸、画布和锚点？
-4. 用什么截图、哈希或交互测试证明没有破坏 F4？
+## 面向视觉生成 AI 的资产交付
 
-答不清以上四项时，不开始生成或改代码。
+本轮不是自由创作。先确认当前任务只要求一张校准资产，写清身份/画风/环境/构图参考及透明画布、锚点和禁用元素。只有爸爸/小皮批准该单张校准后，才可冻结分层交付清单并批量生产、登记；候选不得接入生产代码。
