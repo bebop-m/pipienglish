@@ -1,26 +1,25 @@
-# 当前任务门禁 · F4 美术锚点路由修正
+# 当前任务门禁 · F4 视觉引用机检
 
 ```yaml
-task_id: F4-VISUAL-ROUTING-FIX-2026-07-22
-base_commit: 49c10aeffff6769a155950abe959d7c4389d0546
-created_at: 2026-07-22T11:12:19+08:00
+task_id: F4-VISUAL-REFERENCE-GATE-2026-07-22
+base_commit: 66241dfd3bc17c47411d1307d79c2b53578dd1e2
+created_at: 2026-07-22T11:21:46+08:00
 allowed_paths:
   - docs/00-start/CURRENT_TASK.md
-  - docs/00-start/AI_START_HERE.md
-  - docs/02-visual/F4_VISUAL_SYSTEM.md
-  - docs/03-workflow/changes/F4-CHG-029-f4-visual-anchor-routing.md
-  - docs/04-assets/ASSET_BACKLOG_F4.md
-validation_level: L1
+  - docs/03-workflow/EXECUTION_BUDGET_POLICY.md
+  - package.json
+  - scripts/check-visual-references.mjs
+  - scripts/check-visual-references.test.mjs
+validation_level: L3
 required_docs:
   - docs/00-start/AI_START_HERE.md
   - docs/02-visual/F4_VISUAL_SYSTEM.md#9-独立图片制作协议
-  - docs/02-visual/F4_BASELINE_MANIFEST.md
-  - docs/04-assets/ASSET_BACKLOG_F4.md#生产与准入门禁
-visual_references: not_applicable_documentation_only
+  - docs/03-workflow/EXECUTION_BUDGET_POLICY.md
+visual_references: not_applicable_non_visual_task
 forbidden_actions:
   - 修改任何 PNG、生产资产、哈希清单、运行时代码或儿童界面
-  - 生成、批准、登记或接入第二场景候选资产
-  - 修改第二场景主题或“当前章＋下一章”产品规则
+  - 生成、批准、登记或接入候选资产
+  - 修改产品规格、第二场景主题或“当前章＋下一章”规则
   - 修改 allowed_paths 以外的仓库文件
   - 删除、prune、移动、清理或修改任何现存 worktree
   - reset、checkout 或丢弃用户改动
@@ -29,26 +28,32 @@ forbidden_actions:
 
 ## 开工门禁
 
-1. 确认当前分支为本地 `codex/wip-*`，且不是 `main`。
-2. 执行 `git merge-base --is-ancestor 49c10aeffff6769a155950abe959d7c4389d0546 HEAD`；非零退出时立即停止。
-3. 修改前后分别汇总已跟踪、暂存和未跟踪路径，并与 `allowed_paths` 逐项核对。
-4. 一旦出现许可范围外路径，立即停止当前任务，不修补、不顺手整理；将越界工作重新路由到单独任务。
-5. 若目标路径已有与本任务冲突的脏改动，停止并说明，不覆盖。
+1. 当前分支必须是本地 `codex/wip-*`，且不是 `main`。
+2. 执行 `git merge-base --is-ancestor 66241dfd3bc17c47411d1307d79c2b53578dd1e2 HEAD`；非零退出立即停止。
+3. 修改前后合并核对已跟踪、暂存和未跟踪路径；越出 `allowed_paths` 立即停止并重新路由。
+4. 若目标路径已有冲突脏改动，停止说明，不覆盖。
 
-## 后续视觉任务必须填写的字段
+## 后续视觉任务的机器可检字段
 
-任何生成或编辑图片的下一任务，都必须在重写本文件时用真实路径填写以下字段；不得写成“参考附件”或留空：
+任何生成或编辑图片的后续任务，都必须把首个 YAML 块中的标量 `visual_references` 改成以下映射，并在生成前执行 `npm run check:visual-references`：
 
 ```yaml
 visual_references:
-  identity_reference: []
-  style_reference: []
-  environment_reference: []
-  composition_reference: []
-  allowed_changes: []
-  must_preserve: []
+  asset_kind: character_variant
+  identity_reference:
+    - design-samples/assets/chick-f3.png
+  style_reference:
+    - docs/reference-images/chick-character-style-reference.png
+  environment_reference:
+    - design-samples/assets/farm-background-f3.png
+  composition_reference:
+    - design-samples/sticker-f-farm-v4.html
+  allowed_changes:
+    - 羽毛配色
+  must_preserve:
+    - F4 家族比例与五官
 ```
 
-开始生成前必须实际打开 `identity_reference` 和任务路由要求的最小锚图，并复述每张图的唯一职责。场景总览、界面截图和背景图默认只能进入 `environment_reference` 或 `composition_reference`；若身份锚图缺失或职责冲突，立即停止。
+`asset_kind` 可用值为 `character`、`character_variant`、`background`、`prop`、`ui`。角色类必须提供身份锚图；`character_variant` 必须提供非空 `allowed_changes`。所有四类参考都必须是磁盘上真实存在的文件路径。背景、场景总览和截图只进入 `environment_reference` 或 `composition_reference`，不得进入 `identity_reference` 或 `style_reference`；新背景的环境母图也填在环境槽。
 
-本任务只修复减负方案遗漏的美术锚点门禁并澄清 F4 贴图/小鸡变体口径，不改变任何已锁定资产或产品行为。
+只有确认不生成、不编辑、不评审图片的任务才可使用 `visual_references: not_applicable_non_visual_task`。本任务只实现门禁，不处理或改动任何图片。
