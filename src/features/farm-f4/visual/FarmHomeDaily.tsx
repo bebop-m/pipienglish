@@ -12,6 +12,7 @@ import { approvedBgmTrack } from '../audio/bgmTracks'
 import { InstallHint } from '../../pwa/InstallHint'
 import { FarmActors } from './FarmActors'
 import { chickAssetId } from './chickVisual'
+import { StageDraggable } from './StageDraggable'
 import {
   CustomizationEntrances,
   DecorationCatalogPanel,
@@ -24,6 +25,11 @@ interface FarmHomeDailyProps {
   vm: FarmHomeViewModel
   dispatch: (event: FarmHomeEvent) => Promise<void>
 }
+
+const HATCHERY_HOME = { x: 12, y: 544 } as const
+const HATCHERY_SIZE = { width: 304, height: 286 } as const
+const RESCUE_HOME = { x: 1033, y: 252 } as const
+const RESCUE_SIZE = { width: 142, height: 154 } as const
 
 export function compactHatchRemaining(remainingMs: number): string {
   if (remainingMs <= 0) return '即将破壳'
@@ -546,8 +552,16 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
           <button className="k-button" type="button" onClick={() => dispatch({ type: 'START_DAILY_LESSON' })}>{vm.learnedToday > 0 ? '继续学习' : '开始学习'}</button>
         </section>}
 
-        {currentJourney && vm.state !== 'first_visit' && <section className={`hatchery-wrap-f4 ${vm.overlay === 'hatchery_pop' ? 'is-open' : ''}`} aria-label="鸡蛋孵化区">
-          <button className="hatchery-button-f4" type="button" aria-expanded={vm.overlay === 'hatchery_pop'} onClick={() => dispatch({ type: 'TOGGLE_HATCHERY_POP' })}>
+        {currentJourney && vm.state !== 'first_visit' && <StageDraggable
+          key={`${vm.viewedSceneId}:hatchery`}
+          className={`hatchery-wrap-f4 ${vm.overlay === 'hatchery_pop' ? 'is-open' : ''}`}
+          ariaLabel="可拖动的鸡蛋孵化区"
+          home={vm.sceneElementHomes.hatchery ?? null}
+          defaultHome={HATCHERY_HOME}
+          size={HATCHERY_SIZE}
+          onPlaced={home => dispatch({ type: 'SCENE_ELEMENT_PLACED', elementId: 'hatchery', home })}
+        >
+          <button data-stage-drag-handle className="hatchery-button-f4" type="button" aria-expanded={vm.overlay === 'hatchery_pop'} onClick={() => dispatch({ type: 'TOGGLE_HATCHERY_POP' })}>
             <img
               className="hatchery-state-f4"
               src={f4AssetUrl(hatcheryAssetId)}
@@ -575,10 +589,18 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
               {!nestAvailable ? '小鸡宝宝正在长大' : vm.eggStock === 0 ? '没有剩余鸡蛋' : '放入一颗鸡蛋孵化'}
             </button>
           </div>
-        </section>}
+        </StageDraggable>}
 
-        {currentJourney && vm.state !== 'first_visit' && <section className={`rescue-wrap-f4 ${vm.overlay === 'rescue_pop' ? 'is-open' : ''}`} aria-label="等待救援的小鸡">
-          <button className="rescue-entry-f4" type="button" aria-expanded={vm.overlay === 'rescue_pop'} onClick={() => dispatch({ type: 'TOGGLE_RESCUE_POP' })}>
+        {currentJourney && vm.state !== 'first_visit' && <StageDraggable
+          key={`${vm.viewedSceneId}:rescue`}
+          className={`rescue-wrap-f4 ${vm.overlay === 'rescue_pop' ? 'is-open' : ''}`}
+          ariaLabel="可拖动的等待救援小鸡框"
+          home={vm.sceneElementHomes.rescue ?? null}
+          defaultHome={RESCUE_HOME}
+          size={RESCUE_SIZE}
+          onPlaced={home => dispatch({ type: 'SCENE_ELEMENT_PLACED', elementId: 'rescue', home })}
+        >
+          <button data-stage-drag-handle className="rescue-entry-f4" type="button" aria-expanded={vm.overlay === 'rescue_pop'} onClick={() => dispatch({ type: 'TOGGLE_RESCUE_POP' })}>
             <img src={f4AssetUrl('rescue-basket-f4.png')} alt="在篮子里安全探头、等待救援的小鸡" />
             <span>待救 ×{vm.rescueCount}</span>
           </button>
@@ -587,7 +609,7 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
             <p>完成错词补练，它们就会开开心心回到农场。</p>
             <button type="button" disabled={vm.rescueCount === 0} onClick={() => dispatch({ type: 'OPEN_RESCUE' })}>去救援</button>
           </div>
-        </section>}
+        </StageDraggable>}
 
         {vm.viewedScene.fixedVisuals.map(visual => (
           <img

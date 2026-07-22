@@ -545,7 +545,9 @@
   border: 0;
   background: transparent;
   appearance: none;
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
   will-change: transform;
 }
 
@@ -568,9 +570,6 @@
 .actor-f3[data-kind='chick'] {
   width: 116px;
   height: 116px;
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
 }
 
 .actor-hit-f3:focus-visible {
@@ -601,7 +600,7 @@
 .chick-favorite-button-f4:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(48, 41, 37, 0.17); }
 .chick-favorite-button-f4:focus-visible { outline: 4px solid rgba(255, 255, 255, .95); outline-offset: 2px; }
 
-.actor-f3[data-kind='chick'].is-dragging {
+.actor-f3.is-dragging {
   z-index: 88;
   cursor: grabbing;
 }
@@ -698,27 +697,6 @@
   animation: hatch-arrival-f4 900ms cubic-bezier(.2, .78, .25, 1) both;
 }
 
-.chick-rarity-badge-f4 {
-  position: absolute;
-  z-index: 5;
-  left: 50%;
-  bottom: -7px;
-  min-width: 70px;
-  padding: 4px 8px;
-  border: 1.5px solid var(--ink);
-  border-radius: 999px;
-  background: #d8efff;
-  box-shadow: 0 2px 0 rgba(48, 41, 37, 0.15);
-  transform: translateX(-50%);
-  color: var(--ink);
-  font-size: 10px;
-  font-weight: 900;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.chick-rarity-badge-f4.is-special { background: #ffe4a8; }
-
 @keyframes hatch-arrival-f4 {
   0% { opacity: 0; transform: translateY(20px) scale(.72) rotate(-5deg); }
   65% { opacity: 1; transform: translateY(-7px) scale(1.08) rotate(3deg); }
@@ -728,8 +706,6 @@
 .hatchery-wrap-f4 {
   position: absolute;
   z-index: 56;
-  left: 12px;
-  bottom: 4px;
   width: 304px;
   height: 286px;
 }
@@ -837,13 +813,33 @@
 .hatchery-wrap-f4.is-open .hatchery-pop-f4,
 .rescue-wrap-f4.is-open .rescue-pop-f4 { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
 
-.rescue-wrap-f4 { position: absolute; z-index: 58; right: 19px; top: 252px; width: 142px; height: 154px; }
+.rescue-wrap-f4 { position: absolute; z-index: 58; width: 142px; height: 154px; }
 .rescue-entry-f4 { position: absolute; inset: 0; padding: 0; border: 0; cursor: pointer; background: transparent; }
 .rescue-entry-f4 img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 5px rgba(48, 41, 37, 0.15)); transition: transform 180ms ease; }
 .rescue-entry-f4:hover img { transform: rotate(-2deg) translateY(-3px); }
 .rescue-entry-f4:active img { transform: translateY(1px) scale(0.98); }
 .rescue-entry-f4 span { position: absolute; right: -1px; top: 7px; padding: 6px 10px; border: 2px solid var(--ink); border-radius: 999px; background: #ff9fae; box-shadow: 0 3px 0 rgba(48, 41, 37, 0.17); font-size: 12px; font-weight: 950; }
 .rescue-pop-f4 { right: 112px; top: 42px; width: 238px; transform-origin: top right; }
+
+.stage-draggable-f4 [data-stage-drag-handle] {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.stage-draggable-f4.is-dragging {
+  z-index: 90;
+}
+
+.stage-draggable-f4.is-dragging [data-stage-drag-handle] {
+  cursor: grabbing;
+}
+
+.stage-draggable-f4.is-dragging .hatchery-state-f4,
+.stage-draggable-f4.is-dragging .rescue-entry-f4 img {
+  transform: translateY(-7px) scale(1.03);
+  filter: drop-shadow(0 15px 8px rgba(48, 41, 37, 0.22));
+}
 
 /* 只保留“点空白处关闭”的命中区;压暗由 .f4-bleed::after 在视口层完成
    (data-dimmed),否则遮罩只盖住舞台,letterbox 处会露出未压暗的亮背景。 */

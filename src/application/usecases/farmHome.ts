@@ -68,6 +68,11 @@ import {
   unequipLoadoutItem,
 } from '../../domain/farmCustomization'
 import type { CharacterLoadout } from '../../domain/farmCatalog'
+import {
+  normalizeSceneElementHomes,
+  sceneElementHomesKey,
+  type MovableFarmElementId,
+} from '../../domain/farmLayout'
 
 const CHAT_NEIGHBOR_CAP = 3
 const CHAT_TTL_MS = 4_000
@@ -591,6 +596,24 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
     })
   }
 
+  async function placeSceneElement(
+    elementId: MovableFarmElementId,
+    home: StagePoint,
+    now = sources.now(),
+    sceneId?: string,
+  ): Promise<boolean> {
+    if (!Number.isFinite(home.x) || !Number.isFinite(home.y)) return false
+    return d.transaction('rw', d.kv, async () => {
+      const farm = await getFarm(now)
+      const scene = enteredScene(farm, sceneId)
+      if (!scene) return false
+      const key = sceneElementHomesKey(scene.id)
+      const current = normalizeSceneElementHomes(await getKV<unknown>(d, key, {}))
+      await setKV(d, key, { ...current, [elementId]: { x: home.x, y: home.y } })
+      return true
+    })
+  }
+
   /** 收藏、取消及显式替换在同一事务中完成；并发第 8/9 次点击会串行重读最新状态。 */
   async function favoriteChick(
     chickId: string,
@@ -688,7 +711,7 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
     const farm = await getFarm(now)
     const viewedScene = enteredScene(farm, viewedSceneId)
     if (!viewedScene) throw new Error('At least one local farm scene definition is required')
-    const [meta, settings, session, sceneChicks, rescueCount, decorationRows, ownedCosmetics, loadout] = await Promise.all([
+    const [meta, settings, session, sceneChicks, rescueCount, decorationRows, ownedCosmetics, loadout, sceneElementHomes] = await Promise.all([
       getMeta(now),
       getKV<Settings>(d, 'settings', DEFAULT_SETTINGS),
       d.sessions.get(today),
@@ -697,6 +720,7 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
       d.decorations.where('sceneId').equals(viewedScene.id).toArray(),
       d.cosmetics.toArray(),
       getLoadout(),
+      getKV<unknown>(d, sceneElementHomesKey(viewedScene.id), {}),
     ])
     const orderedSceneChicks = sceneChicks.map(chick => ({
       ...chick,
@@ -723,6 +747,7 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
       decorationRows,
       ownedCosmetics,
       loadout,
+      sceneElementHomes: normalizeSceneElementHomes(sceneElementHomes),
       cosmeticDefinitions: sources.cosmeticDefinitions,
       includeInternalPlaceholders: sources.includeInternalPlaceholders,
     }
@@ -750,6 +775,7 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
     equipCosmetic,
     unequipCosmetic,
     placeChick,
+    placeSceneElement,
     favoriteChick,
     chickChat,
     setMotion,

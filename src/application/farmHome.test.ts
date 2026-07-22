@@ -216,6 +216,30 @@ describe('首页三状态与蛋经济全链路', () => {
     db.close()
   })
 
+  it('小皮、母鸡、鸡窝与待救援框按场景持久化拖放落点', async () => {
+    const db = freshDb()
+    const uc = createFarmUsecases(db)
+    const sceneOneHomes = {
+      mother: { x: 510, y: 505 },
+      xiaopi: { x: 790, y: 480 },
+      hatchery: { x: 36, y: 520 },
+      rescue: { x: 980, y: 270 },
+    } as const
+
+    for (const [elementId, home] of Object.entries(sceneOneHomes)) {
+      expect(await uc.placeSceneElement(elementId as keyof typeof sceneOneHomes, home, undefined, 'scene-1')).toBe(true)
+    }
+    expect(await uc.placeSceneElement('mother', { x: Number.NaN, y: 1 })).toBe(false)
+    expect((await uc.loadViewModel()).sceneElementHomes).toEqual(sceneOneHomes)
+
+    const farm = await getFarmStateV3(db, { now: Date.now(), today: '2026-07-22' })
+    await setFarmStateV3(db, { ...farm, activeSceneId: 'scene-2', acknowledgedSceneChapter: 2 })
+    expect(await uc.placeSceneElement('mother', { x: 610, y: 530 }, undefined, 'scene-2')).toBe(true)
+    expect((await uc.loadViewModel(undefined, 'scene-2')).sceneElementHomes).toEqual({ mother: { x: 610, y: 530 } })
+    expect((await uc.loadViewModel(undefined, 'scene-1')).sceneElementHomes).toEqual(sceneOneHomes)
+    db.close()
+  })
+
   it('40 只可见上限的数据侧真实化,其余计入鸡舍', async () => {
     const db = freshDb()
     const uc = createFarmUsecases(db)
