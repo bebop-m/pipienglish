@@ -363,9 +363,9 @@ describe('首页三状态与蛋经济全链路', () => {
     expect(persisted.incubating).toMatchObject({
       placedAt: t0,
       rarity: 'color',
-      variantId: 'chick-color-scene-1-a',
+      variantId: 'chick-color-approved-b',
     })
-    expect(randomCalls).toBe(2)
+    expect(randomCalls).toBe(1)
 
     const vm = await uc.loadViewModel(t0)
     expect(vm.incubating).toEqual({ placedAt: t0, hatchesAt: t0 + HATCH_MS, remainingMs: HATCH_MS })
@@ -404,13 +404,13 @@ describe('首页三状态与蛋经济全链路', () => {
     expect(await db.chicks.get('travel-special-chick')).toMatchObject({
       sceneId: 'scene-2',
       rarity: 'special',
-      variantId: 'chick-special-scene-1-a',
+      variantId: 'chick-special-approved-f',
     })
     expect((await uc.loadViewModel(t0 + HATCH_MS)).chicksVisible[0]).toMatchObject({
       chickId: 'travel-special-chick',
       sceneId: 'scene-2',
       rarity: 'special',
-      variantId: 'chick-special-scene-1-a',
+      variantId: 'chick-special-approved-f',
     })
     db.close()
   })

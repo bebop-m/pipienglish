@@ -3,6 +3,7 @@ import type { FarmChickVM, FarmHomeEvent, FarmHomeViewModel } from '../../../app
 import type { StagePoint } from '../../../domain/types'
 import { f4AssetUrl } from '../assetUrl'
 import { STAGE_H, STAGE_W, toStagePoint } from '../stage/stagePoint'
+import { chickAssetId, chickCanvasSize, specialChickHome } from './chickVisual'
 
 type ActorKind = 'mother' | 'farmer' | 'chick'
 type Talk = { line: string; translation: string } | null
@@ -13,6 +14,7 @@ interface ActorSpec {
   label: string
   image: string
   home: StagePoint
+  size: { width: number; height: number }
   talk: Talk
   chick?: FarmChickVM
 }
@@ -41,8 +43,7 @@ function randomBetween(min: number, max: number) {
   return min + Math.random() * (max - min)
 }
 
-function actorZone(kind: ActorKind, home: StagePoint) {
-  const size = ACTOR_SIZE[kind]
+function actorZone(kind: ActorKind, home: StagePoint, size: ActorSpec['size']) {
   const radiusX = kind === 'chick' ? 125 : 110
   const radiusY = kind === 'chick' ? 86 : 72
   return {
@@ -157,7 +158,7 @@ function FarmActor({
     const schedule = () => {
       timerRef.current = window.setTimeout(async () => {
         if (disposed) return
-        const zone = actorZone(spec.kind, spec.home)
+        const zone = actorZone(spec.kind, spec.home, spec.size)
         await moveTo({ x: randomBetween(zone.minX, zone.maxX), y: randomBetween(zone.minY, zone.maxY) })
         if (!disposed) schedule()
       }, randomBetween(2600, 5600))
@@ -184,10 +185,10 @@ function FarmActor({
     const actor = actorRef.current
     if (!actor || spec.kind !== 'chick') return false
     const actorBox = {
-      left: target.x + ACTOR_SIZE.chick.width * 0.17,
-      right: target.x + ACTOR_SIZE.chick.width * 0.83,
-      top: target.y + ACTOR_SIZE.chick.height * 0.12,
-      bottom: target.y + ACTOR_SIZE.chick.height * 0.92,
+      left: target.x + spec.size.width * 0.17,
+      right: target.x + spec.size.width * 0.83,
+      top: target.y + spec.size.height * 0.12,
+      bottom: target.y + spec.size.height * 0.92,
     }
     const obstacles = [
       { element: actor.closest('.farm-stage-f3')?.querySelector<HTMLElement>('.task-board-f3'), topInset: 0 },
@@ -231,7 +232,7 @@ function FarmActor({
     const point = stageCoordinates(event.clientX, event.clientY)
     const actor = actorRef.current
     if (!point || !actor) return
-    const size = ACTOR_SIZE.chick
+    const size = spec.size
     const next = {
       x: Math.min(STAGE_W - size.width - 18, Math.max(18, point.x - drag.offset.x)),
       y: Math.min(STAGE_H - size.height - 10, Math.max(300, point.y - drag.offset.y)),
@@ -295,6 +296,8 @@ function FarmActor({
       data-kind={spec.kind}
       data-chick-id={spec.chick?.chickId}
       data-rarity={spec.chick?.rarity}
+      data-variant-id={spec.chick?.variantId}
+      style={{ width: spec.size.width, height: spec.size.height }}
     >
       <button
         className="actor-hit-f3"
@@ -352,36 +355,49 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
     const slots = Math.max(0, CHICK_HOMES.length - vm.chicksCaptured.length)
     return unique.slice(0, slots)
   }, [vm.arrivingChick, vm.chicksCaptured.length, vm.chicksVisible])
-  const specs = useMemo<ActorSpec[]>(
-    () => [
+  const specs = useMemo<ActorSpec[]>(() => {
+    let specialAnchorUsed = false
+    const chickSpecs = visibleChicks.map((chick, index): ActorSpec => {
+      const canvasSize = chickCanvasSize(chick)
+      const useSpecialAnchor = chick.rarity === 'special' && chick.home === null && !specialAnchorUsed
+      if (useSpecialAnchor) specialAnchorUsed = true
+      return {
+        id: chick.chickId,
+        kind: 'chick',
+        label: `${chick.rarity === 'special' ? '特别' : chick.rarity === 'color' ? '异色' : '普通'}农场小鸡，点按听单词，拖动可以搬家`,
+        image: f4AssetUrl(chickAssetId(chick, vm.viewedScene)),
+        home: chick.home
+          ?? (useSpecialAnchor
+            ? specialChickHome(vm.viewedScene.characterVisuals.specialChickAnchor)
+            : CHICK_HOMES[index]),
+        size: { width: canvasSize, height: canvasSize },
+        talk: null,
+        chick,
+      }
+    })
+
+    return [
       {
         id: 'mother',
         kind: 'mother',
         label: vm.henName ? `母鸡妈妈：${vm.henName}` : '母鸡妈妈',
-        image: f4AssetUrl('mother-f3.png'),
+        image: f4AssetUrl(vm.viewedScene.characterVisuals.motherAssetId),
         home: { x: 615, y: 530 },
+        size: ACTOR_SIZE.mother,
         talk: { line: '咕咕，慢慢散步吧～', translation: "Let's take a walk!" },
       },
       {
         id: 'farmer',
         kind: 'farmer',
         label: '农场主小皮',
-        image: f4AssetUrl('xiaopi-f3.png'),
+        image: f4AssetUrl(vm.viewedScene.characterVisuals.xiaopiAssetId),
         home: { x: 835, y: 495 },
+        size: ACTOR_SIZE.farmer,
         talk: { line: '今天也一起加油！', translation: "Let's do our best!" },
       },
-      ...visibleChicks.map((chick, index) => ({
-        id: chick.chickId,
-        kind: 'chick' as const,
-        label: `${chick.rarity === 'special' ? '特别' : chick.rarity === 'color' ? '异色' : '普通'}农场小鸡，点按听单词，拖动可以搬家`,
-        image: f4AssetUrl('chick-f3.png'),
-        home: chick.home ?? CHICK_HOMES[index],
-        talk: null,
-        chick,
-      })),
-    ],
-    [vm.henName, visibleChicks],
-  )
+      ...chickSpecs,
+    ]
+  }, [vm.henName, vm.viewedScene, visibleChicks])
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)')

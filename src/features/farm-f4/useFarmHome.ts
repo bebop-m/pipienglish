@@ -5,12 +5,14 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { db } from '../../application/db'
 import { createFarmUsecases } from '../../application/usecases/farmHome'
 import { speak } from '../../application/services/tts'
+import { HATCH_OUTCOME_DISPLAY_MS, TWO_SHELLS_DISPLAY_MS } from '../../domain/hatcheryVisual'
 import type {
   ChickChatVM,
   FavoriteReplacementVM,
   FarmHomeEvent,
   FarmHomeViewModel,
   FarmOverlay,
+  HatchTransitionVM,
 } from '../../application/viewmodel'
 
 const usecases = createFarmUsecases(db)
@@ -19,7 +21,7 @@ const HATCH_ARRIVAL_MS = 1_050
 
 type CoreFarmHomeViewModel = Omit<
   FarmHomeViewModel,
-  'overlay' | 'chat' | 'favoriteReplacement' | 'arrivingChick'
+  'overlay' | 'chat' | 'favoriteReplacement' | 'arrivingChick' | 'hatchTransition'
 >
 
 export interface FarmHomeBridge {
@@ -36,10 +38,12 @@ export function useFarmHome(): FarmHomeBridge {
   const [chat, setChat] = useState<ChickChatVM | null>(null)
   const [favoriteReplacement, setFavoriteReplacement] = useState<FavoriteReplacementVM | null>(null)
   const [arrivingChick, setArrivingChick] = useState<FarmHomeViewModel['arrivingChick']>(null)
+  const [hatchTransition, setHatchTransition] = useState<HatchTransitionVM | null>(null)
   const [navigation, setNavigation] = useState<'lesson' | 'handwriting' | 'rescue' | 'parent' | null>(null)
   const guardTimer = useRef<number | undefined>(undefined)
   const guardRun = useRef<Promise<void> | null>(null)
   const arrivalTimer = useRef<number | undefined>(undefined)
+  const hatchTransitionTimer = useRef<number | undefined>(undefined)
   const chatRequest = useRef(0)
   const coreRef = useRef<CoreFarmHomeViewModel | null>(null)
 
@@ -63,7 +67,7 @@ export function useFarmHome(): FarmHomeBridge {
       const arrival = result.hatchedChickId
         ? next.chicksAll.find(chick => chick.chickId === result.hatchedChickId) ?? null
         : null
-      if (!before || !arrival) {
+      if (!arrival) {
         commitCore(next)
         return
       }
@@ -71,14 +75,35 @@ export function useFarmHome(): FarmHomeBridge {
       const stillOwned = new Set(next.chicksAll.map(chick => chick.chickId))
       commitCore({
         ...next,
-        chicksVisible: before.chicksVisible.filter(chick => stillOwned.has(chick.chickId)),
+        chicksVisible: before
+          ? before.chicksVisible.filter(chick => stillOwned.has(chick.chickId))
+          : next.chicksVisible.filter(chick => chick.chickId !== arrival.chickId),
       })
-      setArrivingChick(arrival)
+      setArrivingChick(null)
       window.clearTimeout(arrivalTimer.current)
-      arrivalTimer.current = window.setTimeout(async () => {
-        setArrivingChick(null)
-        await refresh()
-      }, HATCH_ARRIVAL_MS)
+      window.clearTimeout(hatchTransitionTimer.current)
+      const transition = {
+        chickId: arrival.chickId,
+        sceneId: arrival.sceneId,
+        rarity: arrival.rarity,
+        variantId: arrival.variantId,
+      } as const
+      setHatchTransition({ ...transition, phase: 'two_shells' })
+      hatchTransitionTimer.current = window.setTimeout(() => {
+        setHatchTransition({ ...transition, phase: 'outcome' })
+        hatchTransitionTimer.current = window.setTimeout(async () => {
+          setHatchTransition(null)
+          if (coreRef.current?.viewedSceneId !== arrival.sceneId) {
+            await refresh()
+            return
+          }
+          setArrivingChick(arrival)
+          arrivalTimer.current = window.setTimeout(async () => {
+            setArrivingChick(null)
+            await refresh()
+          }, HATCH_ARRIVAL_MS)
+        }, HATCH_OUTCOME_DISPLAY_MS)
+      }, TWO_SHELLS_DISPLAY_MS)
     })()
     guardRun.current = task
     void task.finally(() => {
@@ -100,6 +125,7 @@ export function useFarmHome(): FarmHomeBridge {
       window.removeEventListener('focus', onVisible)
       window.clearInterval(guardTimer.current)
       window.clearTimeout(arrivalTimer.current)
+      window.clearTimeout(hatchTransitionTimer.current)
     }
   }, [runGuard])
 
@@ -351,7 +377,7 @@ export function useFarmHome(): FarmHomeBridge {
   )
 
   return {
-    vm: core ? { ...core, overlay, chat, favoriteReplacement, arrivingChick } : null,
+    vm: core ? { ...core, overlay, chat, favoriteReplacement, arrivingChick, hatchTransition } : null,
     dispatch,
     navigation,
     clearNavigation: useCallback(() => setNavigation(null), []),

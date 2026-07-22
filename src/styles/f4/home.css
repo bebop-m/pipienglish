@@ -743,70 +743,70 @@
   background: transparent;
 }
 
-.single-nest-f4 {
-  position: absolute;
-  left: 57px;
-  top: 92px;
-  width: 190px;
-  height: 108px;
-  border: 4px solid #79583e;
-  border-radius: 50% 50% 42% 42%;
-  background: #e7c985;
-  box-shadow: inset 0 -18px 0 rgba(137, 91, 52, 0.14), 0 9px 7px rgba(65, 43, 27, 0.18);
-  transform: rotate(-1deg);
-  transition: transform 180ms ease;
-}
-
-.single-nest-f4::before {
-  content: '';
-  position: absolute;
-  inset: 17px 22px 29px;
-  border-radius: 50%;
-  background: rgba(115, 77, 45, 0.2);
-}
-
-.hatchery-button-f4:hover .single-nest-f4 { transform: rotate(-1deg) translateY(-3px); }
-.hatchery-button-f4:active .single-nest-f4 { transform: rotate(-1deg) translateY(1px) scale(0.99); }
 .hatchery-button-f4:focus-visible { outline: 5px solid rgba(255, 255, 255, 0.94); outline-offset: -17px; border-radius: 28px; }
 
-.hatchery-egg-f4 {
+.hatchery-state-f4 {
   position: absolute;
   z-index: 3;
-  left: 129px;
-  top: 105px;
-  width: 46px;
-  height: 58px;
   object-fit: contain;
-  opacity: 0;
   pointer-events: none;
-  transform-origin: 50% 92%;
   filter: drop-shadow(0 4px 3px rgba(77, 45, 26, 0.18));
 }
 
-.hatchery-egg-f4.is-incubating { opacity: 1; }
-.hatchery-egg-f4.is-incubating { animation: egg-wobble-f4 4.4s ease-in-out infinite; }
-
-@keyframes egg-wobble-f4 {
-  0%, 75%, 100% { transform: rotate(0); }
-  81% { transform: rotate(-5deg) translateY(-2px); }
-  87% { transform: rotate(5deg) translateY(-2px); }
-  93% { transform: rotate(-3deg); }
+.scene-fixed-visual-f4 {
+  position: absolute;
+  z-index: 15;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 7px 6px rgba(48, 41, 37, 0.14));
 }
 
 .hatchery-status-f4 {
   position: absolute;
   z-index: 5;
-  left: 20px;
-  right: 18px;
-  bottom: 5px;
-  display: block;
-  padding: 9px 12px;
-  border: 2px solid var(--ink);
-  border-radius: 16px;
-  background: rgba(255, 249, 233, 0.97);
-  box-shadow: 0 4px 0 rgba(48, 41, 37, 0.17);
+  left: 135px;
+  bottom: -1px;
+  display: inline-flex;
+  width: 92px;
+  min-width: 92px;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 4px 10px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: translateX(-50%);
   text-align: center;
+  color: #49382f;
   font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 5px rgba(255, 250, 234, 0.8);
+  white-space: nowrap;
+}
+
+.hatchery-status-f4::before,
+.hatchery-status-f4::after {
+  position: absolute;
+  bottom: 4px;
+  left: 9px;
+  width: 74px;
+  height: 3px;
+  border-radius: 3px;
+  content: '';
+}
+
+.hatchery-status-f4::before {
+  background: rgba(255, 250, 232, 0.82);
+  box-shadow: 0 0 0 1px rgba(92, 65, 49, 0.45);
+}
+
+.hatchery-status-f4::after {
+  background: #ef9360;
+  transform: scaleX(var(--hatch-progress, 0));
+  transform-origin: left center;
+  transition: transform 220ms ease-out;
 }
 
 .hatchery-pop-f4,
@@ -1179,7 +1179,6 @@
 }
 
 .motion-paused .sprite-f3,
-.motion-paused .hatchery-egg-f4,
 .motion-paused .actor-f3.is-newly-hatched[data-kind='chick'] .sprite-shell-f3,
 .motion-paused .pan-egg-f4,
 .motion-paused .pan-sizzle-f4 { animation: none; }
@@ -1201,7 +1200,6 @@
   .sticker-chip,
   .parent-button,
   .task-board-f3,
-  .hatchery-status-f4,
   .actor-talk-f3 { background-color: var(--cream); }
 
   .panel-backdrop-f4 { backdrop-filter: none; background: rgba(61, 48, 38, 0.34); }
@@ -1212,7 +1210,6 @@
   .sticker-chip,
   .parent-button,
   .task-board-f3,
-  .hatchery-status-f4,
   .hatchery-pop-f4,
   .rescue-pop-f4,
   .kitchen-panel-f4 { border-width: 4px; }

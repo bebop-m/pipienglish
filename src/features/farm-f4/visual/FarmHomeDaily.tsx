@@ -1,10 +1,17 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react'
 import type { RecipeId } from '../../../domain/meals'
+import { HATCH_MS } from '../../../domain/types'
+import {
+  hatchOutcomeVisualState,
+  incubationHatcheryVisualState,
+} from '../../../domain/hatcheryVisual'
+import type { HatcheryVisualState } from '../../../domain/farmScenes'
 import type { FarmHomeEvent, FarmHomeViewModel } from '../../../application/viewmodel'
 import { f4AssetUrl } from '../assetUrl'
 import { approvedBgmTrack } from '../audio/bgmTracks'
 import { InstallHint } from '../../pwa/InstallHint'
 import { FarmActors } from './FarmActors'
+import { chickAssetId } from './chickVisual'
 import {
   CustomizationEntrances,
   DecorationCatalogPanel,
@@ -18,15 +25,32 @@ interface FarmHomeDailyProps {
   dispatch: (event: FarmHomeEvent) => Promise<void>
 }
 
-export function friendlyHatchRemaining(remainingMs: number): string {
-  if (remainingMs <= 0) return '马上就要破壳啦'
+export function compactHatchRemaining(remainingMs: number): string {
+  if (remainingMs <= 0) return '即将破壳'
   const hourMs = 60 * 60 * 1000
-  if (remainingMs >= hourMs) return `约 ${Math.ceil(remainingMs / hourMs)} 小时`
-  return `约 ${Math.max(1, Math.ceil(remainingMs / 60_000))} 分钟`
+  if (remainingMs >= hourMs) return `${Math.ceil(remainingMs / hourMs)} 小时`
+  return `${Math.max(1, Math.ceil(remainingMs / 60_000))} 分钟`
+}
+
+export function hatchProgressRatio(remainingMs: number | null, isHatching: boolean): number {
+  if (isHatching) return 1
+  if (remainingMs === null) return 0
+  return Math.max(0, Math.min(1, 1 - remainingMs / HATCH_MS))
 }
 
 export function chapterCelebrationTravelLabel(nextTravelScene: FarmHomeViewModel['nextTravelScene']): string {
   return nextTravelScene ? `先去第 ${nextTravelScene.chapter} 章` : '现在出发'
+}
+
+export function currentHatcheryVisualState(vm: Pick<
+  FarmHomeViewModel,
+  'incubating' | 'hatchTransition' | 'viewedSceneId'
+>): HatcheryVisualState {
+  const transition = vm.hatchTransition?.sceneId === vm.viewedSceneId ? vm.hatchTransition : null
+  if (!transition) return incubationHatcheryVisualState(vm.incubating)
+  return transition.phase === 'two_shells'
+    ? 'twoShells'
+    : hatchOutcomeVisualState(transition.rarity)
 }
 
 function FeedFlight({ targetId, motionEnabled, onArrive }: {
@@ -108,7 +132,7 @@ function EggPanel({ vm, dispatch, onFeed }: FarmHomeDailyProps & { onFeed: (chic
 
   const meal = vm.cookingMeal
   const state: 'empty' | 'raw' | 'cooking' | 'ready' = frying ? 'cooking' : meal?.phase ?? 'empty'
-  const nestAvailable = vm.incubating === null
+  const nestAvailable = vm.incubating === null && vm.hatchTransition === null
   const recipeCopy = meal ? RECIPE_COPY[meal.recipeId] : null
   const kitchenCopy =
     state === 'raw'
@@ -318,7 +342,7 @@ function CoopPanel({ vm, dispatch }: FarmHomeDailyProps) {
             const speaking = vm.chat?.primary.chickId === chick.chickId
             return (
               <article className={`coop-chick-f4 ${chick.favorite ? 'is-favorite' : ''} ${captured ? 'is-captured' : ''}`} key={chick.chickId}>
-                <img src={f4AssetUrl('chick-f3.png')} alt="" />
+                <img src={f4AssetUrl(chickAssetId(chick, vm.viewedScene))} alt="" />
                 <span className="coop-chick-copy-f4">
                   <strong>小鸡 {index + 1}</strong>
                   <small>{captured ? '在篮子里等你来接' : chick.favorite ? '★ 最喜欢 · 农场常驻' : visible ? '正在农场散步' : '正在鸡舍休息'}</small>
@@ -344,7 +368,7 @@ function CoopPanel({ vm, dispatch }: FarmHomeDailyProps) {
             <div>
               {vm.favoriteReplacement.candidates.map((chick, index) => (
                 <button key={chick.chickId} type="button" onClick={() => dispatch({ type: 'REPLACE_FAVORITE_CHICK', replaceChickId: chick.chickId })}>
-                  <img src={f4AssetUrl('chick-f3.png')} alt="" />替换小鸡 {index + 1}
+                  <img src={f4AssetUrl(chickAssetId(chick, vm.viewedScene))} alt="" />替换小鸡 {index + 1}
                 </button>
               ))}
             </div>
@@ -426,7 +450,13 @@ function TravelMealPrompt({ vm, dispatch }: FarmHomeDailyProps) {
 
 export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
   const [feedingTargetId, setFeedingTargetId] = useState<string | null>(null)
-  const nestAvailable = vm.incubating === null
+  const activeHatchTransition = vm.hatchTransition?.sceneId === vm.viewedSceneId
+    ? vm.hatchTransition
+    : null
+  const nestAvailable = vm.incubating === null && activeHatchTransition === null
+  const hatcheryVisualState = currentHatcheryVisualState(vm)
+  const hatcheryAssetId = vm.viewedScene.hatcheryVisualStates[hatcheryVisualState]
+  const hatcheryRenderBox = vm.viewedScene.hatcheryRenderBox
   const progress = vm.totalItemsToday > 0 ? Math.min(100, (vm.learnedToday / vm.totalItemsToday) * 100) : 0
   const taskTitle = vm.newWordsPaused
     ? '今天先复习老朋友'
@@ -436,10 +466,29 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
     : vm.reviewCountToday > 0
       ? `复习 ${vm.reviewCountToday} · 新词 ${vm.dailyTarget}`
       : `新词 ${vm.dailyTarget} 个`
-  const hatcheryCopy = nestAvailable
-    ? '放进一颗鸡蛋，明天会认识一只新朋友。'
-    : '小鸡宝宝正在里面慢慢长大。'
-  const hatchRemaining = vm.incubating ? friendlyHatchRemaining(vm.incubating.remainingMs) : null
+  const hatcheryCopy = activeHatchTransition
+    ? activeHatchTransition.phase === 'two_shells'
+      ? '咔嚓！蛋壳已经分成两半啦。'
+      : '新朋友已经破壳，马上就到草地上见面。'
+    : nestAvailable
+      ? '放进一颗鸡蛋，明天会认识一只新朋友。'
+      : '小鸡宝宝正在里面慢慢长大。'
+  const hatchRemaining = vm.incubating ? compactHatchRemaining(vm.incubating.remainingMs) : null
+  const hatcheryStatus = activeHatchTransition
+    ? activeHatchTransition.phase === 'two_shells'
+      ? '破壳中'
+      : '新朋友'
+    : hatchRemaining
+      ? hatchRemaining
+      : '等待鸡蛋'
+  const hatcheryStatusLabel = activeHatchTransition
+    ? activeHatchTransition.phase === 'two_shells'
+      ? '鸡蛋正在破壳'
+      : '新小鸡已经破壳，马上进入草地'
+    : hatchRemaining
+      ? `距离孵化还有${hatchRemaining}`
+      : '孵化小屋正在等待一颗鸡蛋'
+  const hatcheryProgress = hatchProgressRatio(vm.incubating?.remainingMs ?? null, activeHatchTransition !== null)
   const currentJourney = vm.sceneCapabilities.learning
 
   const startFeeding = async (chickId: string) => {
@@ -499,9 +548,25 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
 
         {currentJourney && vm.state !== 'first_visit' && <section className={`hatchery-wrap-f4 ${vm.overlay === 'hatchery_pop' ? 'is-open' : ''}`} aria-label="鸡蛋孵化区">
           <button className="hatchery-button-f4" type="button" aria-expanded={vm.overlay === 'hatchery_pop'} onClick={() => dispatch({ type: 'TOGGLE_HATCHERY_POP' })}>
-            <span className="single-nest-f4" aria-hidden="true" />
-            <img className={`hatchery-egg-f4 ${vm.incubating ? 'is-incubating' : ''}`} src={f4AssetUrl('egg-f4-v2.png')} alt={vm.incubating ? '正在唯一巢位里孵化的鸡蛋' : ''} />
-            <span className="hatchery-status-f4"><strong>{hatchRemaining ? `孵化小屋 · 还要 ${hatchRemaining}` : '孵化小屋 · 等一颗鸡蛋'}</strong></span>
+            <img
+              className="hatchery-state-f4"
+              src={f4AssetUrl(hatcheryAssetId)}
+              alt={activeHatchTransition ? '刚刚破壳的新小鸡' : vm.incubating ? '正在唯一巢位里孵化的鸡蛋' : '等待鸡蛋的孵化小屋'}
+              style={{
+                left: hatcheryRenderBox.x - 12,
+                top: hatcheryRenderBox.y - 544,
+                width: hatcheryRenderBox.width,
+                height: hatcheryRenderBox.height,
+              }}
+            />
+            <span
+              className="hatchery-status-f4"
+              aria-label={hatcheryStatusLabel}
+              aria-live="polite"
+              style={{ '--hatch-progress': hatcheryProgress } as CSSProperties}
+            >
+              <strong>{hatcheryStatus}</strong>
+            </span>
           </button>
           <div className="hatchery-pop-f4">
             <strong>给新小鸡留一个位置</strong>
@@ -524,6 +589,20 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
           </div>
         </section>}
 
+        {vm.viewedScene.fixedVisuals.map(visual => (
+          <img
+            className="scene-fixed-visual-f4"
+            key={visual.id}
+            src={f4AssetUrl(visual.assetId)}
+            alt={visual.alt}
+            style={{
+              left: visual.renderBox.x,
+              top: visual.renderBox.y,
+              width: visual.renderBox.width,
+              height: visual.renderBox.height,
+            }}
+          />
+        ))}
         <FarmDecorations vm={vm} layer="back" dispatch={dispatch} />
         <FarmDecorations vm={vm} layer="actor" dispatch={dispatch} />
         <FarmActors vm={vm} dispatch={dispatch} />

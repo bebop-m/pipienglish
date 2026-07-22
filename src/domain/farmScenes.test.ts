@@ -15,8 +15,31 @@ describe('scene release package', () => {
     expect(sceneByChapter(2)).toBeNull()
 
     const futureDefinitions = [...FARM_SCENE_DEFINITIONS, ...FUTURE_FARM_SCENE_DRAFTS]
-    expect(sceneById('scene-2', futureDefinitions)?.assetStatus).toBe('internal-placeholder')
+    const sceneTwo = sceneById('scene-2', futureDefinitions)
+    expect(sceneTwo?.assetStatus).toBe('internal-placeholder')
+    expect(sceneTwo?.backgroundAssetId).toBe('scenes/scene-2/orchard-background.png')
     expect(sceneByChapter(2, futureDefinitions)?.id).toBe('scene-2')
+  })
+
+  it('registers all eight approved hatchery states without publishing scene 2', () => {
+    const scenes = [...FARM_SCENE_DEFINITIONS, ...FUTURE_FARM_SCENE_DRAFTS]
+    for (const scene of scenes) {
+      expect(Object.keys(scene.hatcheryVisualStates)).toEqual([
+        'empty',
+        'whole',
+        'hairlineCrack',
+        'largeCrack',
+        'twoShells',
+        'normalHatch',
+        'colorHatch',
+        'specialHatch',
+      ])
+      expect(Object.values(scene.hatcheryVisualStates).every(assetId => assetId.startsWith(`scenes/${scene.id}/hatchery/`))).toBe(true)
+      expect(scene.hatcheryRenderBox).toEqual({ x: 58, y: 643, width: 177, height: 177 })
+      expect(scene.chickVariantIds.color).toEqual(['chick-color-approved-b'])
+      expect(scene.chickVariantIds.special).toEqual(['chick-special-approved-f'])
+    }
+    expect(FARM_SCENE_DEFINITIONS.map(scene => scene.id)).toEqual(['scene-1'])
   })
 
   it('defines the complete scene 1 sticker economy without exposing draft art', () => {
