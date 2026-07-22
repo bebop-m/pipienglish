@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "copiedOn": "2026-07-17",
+  "updatedOn": "2026-07-22",
   "sourceRoot": "design-samples/assets",
   "rule": "Byte-for-byte production copies; locked sources remain unchanged.",
   "assets": [
@@ -47,6 +48,94 @@
     {
       "file": "audio/bgm-english-garden.mp3",
       "sha256": "11A8B67D5B70FC5AA2243AC4F6EF728FC895E3DDF6741EF1F61DB69E8D4E8479"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/01-empty.png",
+      "sha256": "AF69A76D265DCBBAC0D04F115901B0EC889A33FFCFA09E8C0232C023BBC61669"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/02-whole.png",
+      "sha256": "194BAA1FD2844AA78B8611CBB6628B67EE4E0E4B7176BDFD9F1D04B450A6CAD0"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/03-hairline-crack.png",
+      "sha256": "39379BB315978A845A06D0C0D2F987ED80F3D21D1422C8F3D97422091F62304C"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/04-large-crack.png",
+      "sha256": "321A0E3673D19705939032D4B648D42DDFB9D455B38C21A6705369BF5FB3A839"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/05-two-shells.png",
+      "sha256": "B57932C7E63C51FA343A7058C6669494E5801A97097198F8BA83B24A4AA99B53"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/06-normal-hatch.png",
+      "sha256": "24A3798D8F6C2B95AE9FB4C4248E80CB4071206949A3E44BD917AC29C454E89D"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/07-color-hatch.png",
+      "sha256": "4C2C797EAEDC44F84947C47B80424F5778017BE56FEF51D44F93EB4F415CF89E"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/08-special-hatch.png",
+      "sha256": "DD7B562C314329CA00715F9AF5BE6233ACBAD645ECBAC640DB3402A32EF0C409"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/01-empty.png",
+      "sha256": "DFFC26CBF999F9EB83A20BB7014D7F054DCB4F5132AC0E07502238411D8C8437"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/02-whole.png",
+      "sha256": "09FC4CD1DD08CB1C2CC21D0A4B6DF203D02EF204A9E310B3716BA4B1870A6547"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/03-hairline-crack.png",
+      "sha256": "860164C69BFC258E6870372A97EA9085315B9BF6E3DC6B5E6775D364BAB10C56"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/04-large-crack.png",
+      "sha256": "0C9B34F39C4564D59D37A82525BCCF1BAE9F8DCB084E70E4DDC1716B5D5E3CC4"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/05-two-shells.png",
+      "sha256": "1317E2376936418FBCE72B656BB198961E075FC347AFC33D47C721B356628F8F"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/06-normal-hatch.png",
+      "sha256": "52FADF132EA8F5EA3C7C4FA78F8916AC3AB97BF1B71751E4AE210266DC940287"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/07-color-hatch.png",
+      "sha256": "66003AC86F7EF97DC587A13EC56FD77734EC9B09CD052CEDBC13F8DDFDC4BE14"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/08-special-hatch.png",
+      "sha256": "20B2A064442EB3B641FFC078EEA7F99A769306CF32EFED4361B021BB14239C5A"
+    },
+    {
+      "file": "chicks/chick-color-approved-b.png",
+      "sha256": "2A55EE50686DB7866DB6893A09768A8839F78B256F364DBC5720A17FF1C38694"
+    },
+    {
+      "file": "chicks/chick-special-approved-f.png",
+      "sha256": "FA9A9E247417B8557C50FBAC0B010D6C71BFBAF9BACEA137A582DE888C29BC1D"
+    },
+    {
+      "file": "scenes/scene-2/orchard-background.png",
+      "sha256": "BE8068D7DA86BA450171A6B526EFA556A2A24CF00EB64C2139C306E8E43BC3A3"
+    },
+    {
+      "file": "scenes/scene-2/xiaopi.png",
+      "sha256": "D63131CDD4770BC5A4645F40EB21544555DFFAC281852B3D5385F9319DF246CE"
+    },
+    {
+      "file": "scenes/scene-2/mother.png",
+      "sha256": "DD99BD5EC643D2D8652FF7DD530ECF86C61D34A302407433349CA772B06977AE"
+    },
+    {
+      "file": "scenes/scene-2/apple-juice-station.png",
+      "sha256": "0ECCF413FFDEFE01373BEC540C907CA71CC10EE0980FB077B3C5E23108A19E97"
     }
   ]
 }

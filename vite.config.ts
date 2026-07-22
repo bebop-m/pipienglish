@@ -17,8 +17,14 @@ export default defineConfig({
         // mp3 = 农场背景音乐，同样必须离线可用，否则断网时音乐静默。
         globPatterns: ['**/*.{js,css,html,png,webmanifest,json,mp3}'],
         // manifest 与其中声明的图标会由插件自动加入；避免扫描阶段重复登记同一 URL。
-        globIgnores: ['manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'],
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        globIgnores: [
+          'manifest.webmanifest',
+          'icon-192.png',
+          'icon-512.png',
+          'icon-maskable-512.png',
+        ],
+        // 场景二苹果园背景约 4.9 MB，发布后必须与场景一一样支持离线进入。
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
       },
       manifest: {
         id: './',

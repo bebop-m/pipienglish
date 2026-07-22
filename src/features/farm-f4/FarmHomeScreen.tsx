@@ -7,7 +7,7 @@ import { useFarmHome } from './useFarmHome'
 import { DevFarmView } from '../../dev/DevShell'
 import { setBgmActive } from './audio/bgmPlayer'
 import { FarmStageShell } from './visual/FarmStageShell'
-import { FarmHomeDaily } from './visual/FarmHomeDaily'
+import { currentHatcheryVisualState, FarmHomeDaily } from './visual/FarmHomeDaily'
 import { f4AssetUrl } from './assetUrl'
 
 /** 会铺 .panel-backdrop-f4 命中区的 overlay：压暗在视口层完成，两者必须一一对应。
@@ -65,6 +65,8 @@ export function FarmHomeScreen({ onNavigate }: FarmHomeScreenProps = {}) {
       chicksInCoop: bridge.vm?.chicksInCoop ?? 0,
       arrivingChickId: bridge.vm?.arrivingChick?.chickId ?? null,
       incubating: bridge.vm?.incubating ? 1 : 0,
+      hatchTransition: bridge.vm?.hatchTransition?.phase ?? null,
+      hatcheryVisualState: bridge.vm ? currentHatcheryVisualState(bridge.vm) : null,
       cookingMeal: bridge.vm?.cookingMeal ?? null,
       listedDecorations: bridge.vm?.decorationCatalog.length ?? 0,
       placedDecorations: bridge.vm?.placedDecorations.length ?? 0,

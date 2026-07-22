@@ -12,13 +12,14 @@ export type CosmeticCatalogKind =
  * ID 映射到批准的 F4 位图，但备份与数据库迁移不得依赖文件名。
  */
 export const DEFAULT_NORMAL_CHICK_VARIANT_ID = 'chick-normal-default-f4' as const
-/** 稳定逻辑 ID；对应稀有小鸡资产映射待框架 8 批准。 */
+/** G3/G4 冻结的跨场景共享款式；旧存档逻辑 ID 仍由视觉层按 rarity 安全回退。 */
+export const APPROVED_COLOR_CHICK_VARIANT_ID = 'chick-color-approved-b' as const
+export const APPROVED_SPECIAL_CHICK_VARIANT_ID = 'chick-special-approved-f' as const
 export const SCENE_1_COLOR_CHICK_VARIANT_IDS = [
-  'chick-color-scene-1-a',
-  'chick-color-scene-1-b',
+  APPROVED_COLOR_CHICK_VARIANT_ID,
 ] as const
 export const SCENE_1_SPECIAL_CHICK_VARIANT_IDS = [
-  'chick-special-scene-1-a',
+  APPROVED_SPECIAL_CHICK_VARIANT_ID,
 ] as const
 export const DEFAULT_XIAOPI_HEAD_LOOK_ID = 'xiaopi-headlook-default-straw-hat-f4' as const
 export const DEFAULT_XIAOPI_OUTFIT_ID = 'xiaopi-outfit-default-blue-overalls-f4' as const

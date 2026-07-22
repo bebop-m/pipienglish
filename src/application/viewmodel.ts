@@ -23,7 +23,11 @@ import {
   FARM_SCENE_DEFINITIONS,
   sceneById,
   type DecorationCatalogItemDefinition,
+  type FixedSceneVisualDefinition,
   type FarmSceneDefinition,
+  type HatcheryVisualStates,
+  type SceneCharacterVisuals,
+  type StageRenderBox,
 } from '../domain/farmScenes'
 import {
   FARM_COSMETIC_DEFINITIONS,
@@ -68,6 +72,14 @@ export interface FarmChickVM {
   isNewToday: boolean
 }
 
+export interface HatchTransitionVM {
+  chickId: string
+  sceneId: string
+  phase: 'two_shells' | 'outcome'
+  rarity: ChickRarity
+  variantId: string
+}
+
 export interface FavoriteReplacementVM {
   targetChickId: string
   candidates: FarmChickVM[]
@@ -87,6 +99,10 @@ export interface FarmSceneVM {
   backgroundAssetId: string
   thumbnailAssetId: string
   assetStatus: 'approved' | 'internal-placeholder'
+  hatcheryVisualStates: HatcheryVisualStates
+  hatcheryRenderBox: StageRenderBox
+  characterVisuals: SceneCharacterVisuals
+  fixedVisuals: readonly FixedSceneVisualDefinition[]
   active: boolean
   viewed: boolean
   entered: boolean
@@ -146,6 +162,7 @@ export interface FarmHomeViewModel {
   eggStock: number
   eggsEarnedToday: number // 完成前 = 预告值(任务板「奖励 ×N」),完成后 = 实得值
   incubating: IncubatingEggVM | null
+  hatchTransition: HatchTransitionVM | null
   chicksTotal: number
   chicksVisible: FarmChickVM[]
   chicksCaptured: FarmChickVM[] // 在救援篮里等待接回家;总数永不减少
@@ -251,7 +268,7 @@ function chickViewModel(chick: PersistedChick, today: string): FarmChickVM {
 /** 纯函数:快照 → 核心 VM(overlay/chat/入场态由视觉桥本地合并) */
 export function assembleViewModel(
   s: FarmSnapshot,
-): Omit<FarmHomeViewModel, 'overlay' | 'chat' | 'favoriteReplacement' | 'arrivingChick'> {
+): Omit<FarmHomeViewModel, 'overlay' | 'chat' | 'favoriteReplacement' | 'arrivingChick' | 'hatchTransition'> {
   const { farm, meta, session } = s
   const state: FarmHomeState =
     farm.henName == null ? 'first_visit' : session.completed ? 'daily_complete' : 'daily_incomplete'
@@ -282,6 +299,10 @@ export function assembleViewModel(
     backgroundAssetId: scene.backgroundAssetId,
     thumbnailAssetId: scene.thumbnailAssetId,
     assetStatus: scene.assetStatus,
+    hatcheryVisualStates: scene.hatcheryVisualStates,
+    hatcheryRenderBox: scene.hatcheryRenderBox,
+    characterVisuals: scene.characterVisuals,
+    fixedVisuals: scene.fixedVisuals,
     active: scene.id === activeDefinition.id,
     viewed: scene.id === viewedDefinition.id,
     entered: scene.chapter <= activeChapter,

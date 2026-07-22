@@ -1,59 +1,65 @@
-# 当前任务门禁 · F4 视觉引用机检
+# 当前任务门禁 · 场景一／二冻结孵化素材接入完成
 
 ```yaml
-task_id: F4-VISUAL-REFERENCE-GATE-2026-07-22
-base_commit: 66241dfd3bc17c47411d1307d79c2b53578dd1e2
-created_at: 2026-07-22T11:21:46+08:00
+task_id: SCENE-1-2-FROZEN-HATCHERY-INTEGRATION-2026-07-22
+base_commit: fe4a4ac30a36ff82f36178407cbb5558cff50db6
+created_at: 2026-07-22T14:45:00+08:00
 allowed_paths:
   - docs/00-start/CURRENT_TASK.md
-  - docs/03-workflow/EXECUTION_BUDGET_POLICY.md
-  - package.json
-  - scripts/check-visual-references.mjs
-  - scripts/check-visual-references.test.mjs
+  - docs/02-visual/F4_VISUAL_SYSTEM.md
+  - docs/04-assets/ASSET_BACKLOG_F4.md
+  - progress.md
+  - public/assets/f4/asset-manifest.json
+  - public/assets/f4/chicks/**
+  - public/assets/f4/scenes/**
+  - src/application/**
+  - src/domain/**
+  - src/features/farm-f4/**
+  - src/styles/f4/home.css
+  - vite.config.ts
+  - C:/Users/86181/.codex/visualizations/2026/07/22/019f8909-7034-7642-b3d2-844ebaeae431/**
 validation_level: L3
 required_docs:
   - docs/00-start/AI_START_HERE.md
-  - docs/02-visual/F4_VISUAL_SYSTEM.md#9-独立图片制作协议
-  - docs/03-workflow/EXECUTION_BUDGET_POLICY.md
-visual_references: not_applicable_non_visual_task
-forbidden_actions:
-  - 修改任何 PNG、生产资产、哈希清单、运行时代码或儿童界面
-  - 生成、批准、登记或接入候选资产
-  - 修改产品规格、第二场景主题或“当前章＋下一章”规则
-  - 修改 allowed_paths 以外的仓库文件
-  - 删除、prune、移动、清理或修改任何现存 worktree
-  - reset、checkout 或丢弃用户改动
-  - 将 WIP 合入 main、push 或部署
-```
-
-## 开工门禁
-
-1. 当前分支必须是本地 `codex/wip-*`，且不是 `main`。
-2. 执行 `git merge-base --is-ancestor 66241dfd3bc17c47411d1307d79c2b53578dd1e2 HEAD`；非零退出立即停止。
-3. 修改前后合并核对已跟踪、暂存和未跟踪路径；越出 `allowed_paths` 立即停止并重新路由。
-4. 若目标路径已有冲突脏改动，停止说明，不覆盖。
-
-## 后续视觉任务的机器可检字段
-
-任何生成或编辑图片的后续任务，都必须把首个 YAML 块中的标量 `visual_references` 改成以下映射，并在生成前执行 `npm run check:visual-references`：
-
-```yaml
+  - docs/02-visual/F4_VISUAL_SYSTEM.md#94-所有新建场景的永久生产门禁
+  - docs/05-architecture/F7_SCENE_STICKERS_WARDROBE_GATE_AND_TEST_PLAN.md
 visual_references:
   asset_kind: character_variant
   identity_reference:
     - design-samples/assets/chick-f3.png
+    - design-samples/assets/xiaopi-f3.png
+    - design-samples/assets/mother-f3.png
   style_reference:
     - docs/reference-images/chick-character-style-reference.png
   environment_reference:
     - design-samples/assets/farm-background-f3.png
   composition_reference:
-    - design-samples/sticker-f-farm-v4.html
+    - D:/Projects/pipienglish-recovery/2026-07-22-f4-stage-a-3c42/visual-regression/long-term-farm-stage-a/stage-a-orchard-overview-1194x834.png
   allowed_changes:
-    - 羽毛配色
+    - 冻结源文件的等比缩放、透明化、统一画布、脚底或地面锚点平移与机械分层摆放
   must_preserve:
-    - F4 家族比例与五官
+    - 冻结主体的 RGB、造型、纹理、线条、批准配色和 F4 场景一可见轮廓比例
+forbidden_actions:
+  - 重新生成、重画、补画、概括或风格迁移任何已批准角色、小鸡、鸡窝、驿站
+  - 使用生成式整图合成
+  - 覆盖或混入任何现存用户改动
+  - 提交本任务范围外的并行脏改动
+  - 部署
 ```
 
-`asset_kind` 可用值为 `character`、`character_variant`、`background`、`prop`、`ui`。角色类必须提供身份锚图；`character_variant` 必须提供非空 `allowed_changes`。所有四类参考都必须是磁盘上真实存在的文件路径。背景、场景总览和截图只进入 `environment_reference` 或 `composition_reference`，不得进入 `identity_reference` 或 `style_reference`；新背景的环境母图也填在环境槽。
+## 当前批准状态
 
-只有确认不生成、不编辑、不评审图片的任务才可使用 `visual_references: not_applicable_non_visual_task`。本任务只实现门禁，不处理或改动任何图片。
+- G1 候选定稿：已完成；仅使用爸爸指定的普通 F4、异色 B、特殊 F、小皮、母鸡 C、鸡窝 B、驿站 A 与苹果园构图参考。
+- 场景二鸡窝状态源：爸爸最新指定的八格冻结矩阵是唯一像素来源，依次为 `空窝 → 完整蛋 → 细裂纹 → 大裂纹 → 两半蛋壳 → 普通破壳／异色破壳／特殊破壳`。逐格提取时只允许白底透明化、整格等比缩放、统一画布和地面锚点；不得替换或调整格内的蛋、裂纹、蛋壳、鸡窝或破壳结果。
+- F4 鸡蛋模型退出本方案：场景二不再引用 `egg-f4-v2.png`，也不再引用此前独立制作的裂纹／蛋壳源；运行时只按 `incubating`、已批准的剩余时间分段和最终孵化结果整张切换八格派生贴图，不得现场叠蛋或重组状态。
+- G2 独立校准：2026-07-22 爸爸在查看三鸡透明版、统一画布版和并排校准板后指示“继续我们的任务”，据此进入 G3。
+- G3 整体校准：已批准 v5。场景一使用冻结红白篷车鸡窝状态组；场景一、二鸡窝整格显示尺寸均在 v4 基础上缩小 25%，特殊小鸡可见轮廓放大 20%，普通与异色小鸡尺寸不变。异色 B 与特殊 F 同时配置给场景一和场景二。
+- G4 批量授权：已批准并完成。22 个冻结目标已逐文件复制到新生产路径并登记 SHA-256，没有覆盖旧资产；33 个清单资产最终复核全部匹配。
+- 代码接入：已完成。两个场景均按业务状态整张切换八张鸡窝贴图；完整蛋 `>50%`、细裂纹 `20%–50%`、大裂纹 `≤20%`，两半蛋壳 `800ms`、结果贴图 `1500ms`。孵化前不读取或显示 rarity/variant。
+- 倒计时：爸爸批准采用 2A“上字下线”；显示等待鸡蛋、小时／分钟、破壳中、新朋友，短进度线按 24 小时孵化周期实时推进。
+- 场景二发布：爸爸已明确批准合并执行。场景二已进入 `FARM_SCENE_DEFINITIONS`，`availableChapter=2`；苹果园 12 个生产资产进入当前 Service Worker 预缓存。未批准的路牌、贴纸和装扮仍按各自 `assetStatus` 过滤，不生成占位图片节点。
+- 提交与推送：爸爸已批准剩余发布改动与工作树文档合并提交并推送当前分支；不包含直接合并到 `main` 或部署。
+
+## 验证边界
+
+最终验收通过：场景一／二的空窝、10 小时、25 分钟、破壳中、新朋友五态贴图、倒计时、进度线与 `render_game_to_text` 一致；场景二完整生产页无占位图片节点。Vitest 45 个文件、251/251 通过，生产 PWA 构建与全屏视觉层守卫通过，场景一／二预缓存引用分别为 8／12，Playwright 控制台 0 错误。验收材料位于仓库外 `final-hatchery-acceptance/` 与 `scene2-release-acceptance/`。
