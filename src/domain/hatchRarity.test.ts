@@ -26,16 +26,18 @@ const pools: HatchVariantPools = {
   special: ['special-a'],
 }
 
-describe('83/15/2 与隐藏保底', () => {
-  it('概率阈值严格覆盖普通 83%、异色 15%、特殊 2%', () => {
+describe('83/13/4 与隐藏保底', () => {
+  it('概率阈值严格覆盖普通 83%、异色 13%、特殊 4%', () => {
     expect(NORMAL_HATCH_PROBABILITY).toBe(0.83)
-    expect(COLOR_HATCH_PROBABILITY).toBe(0.15)
-    expect(SPECIAL_HATCH_PROBABILITY).toBe(0.02)
+    expect(COLOR_HATCH_PROBABILITY).toBe(0.13)
+    expect(SPECIAL_HATCH_PROBABILITY).toBe(0.04)
+    // 异色上界必须精确落在 0.96，避免 normal + color 相加产生浮点误差。
+    expect(NORMAL_HATCH_PROBABILITY + COLOR_HATCH_PROBABILITY).toBe(0.96)
     expect(rollHatchRarity(emptyState(), () => 0).rarity).toBe('normal')
     expect(rollHatchRarity(emptyState(), () => 0.829999).rarity).toBe('normal')
     expect(rollHatchRarity(emptyState(), () => 0.83).rarity).toBe('color')
-    expect(rollHatchRarity(emptyState(), () => 0.979999).rarity).toBe('color')
-    expect(rollHatchRarity(emptyState(), () => 0.98).rarity).toBe('special')
+    expect(rollHatchRarity(emptyState(), () => 0.959999).rarity).toBe('color')
+    expect(rollHatchRarity(emptyState(), () => 0.96).rarity).toBe('special')
   })
 
   it('normalHatchStreak>=9 时基础普通提升为异色，但基础特殊仍保留', () => {
@@ -47,9 +49,17 @@ describe('83/15/2 与隐藏保底', () => {
     })
   })
 
-  it('nonSpecialHatchStreak>=35 强制特殊，双保底时特殊优先且不读取概率随机数', () => {
+  it('nonSpecialHatchStreak>=23 强制特殊，双保底时特殊优先且不读取概率随机数', () => {
     const random = vi.fn(() => 0)
-    expect(rollHatchRarity({ normalHatchStreak: 9, nonSpecialHatchStreak: 35 }, random)).toEqual({
+    expect(rollHatchRarity({ normalHatchStreak: 9, nonSpecialHatchStreak: 23 }, random)).toEqual({
+      rarity: 'special', normalHatchStreak: 0, nonSpecialHatchStreak: 0,
+    })
+    expect(random).not.toHaveBeenCalled()
+  })
+
+  it('旧存档超过新阈值的连续计数下次放蛋立即兑现特殊保底', () => {
+    const random = vi.fn(() => 0)
+    expect(rollHatchRarity({ normalHatchStreak: 12, nonSpecialHatchStreak: 30 }, random)).toEqual({
       rarity: 'special', normalHatchStreak: 0, nonSpecialHatchStreak: 0,
     })
     expect(random).not.toHaveBeenCalled()

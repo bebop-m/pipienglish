@@ -41,10 +41,10 @@ export type PlaceEggResult =
     }
 
 export const NORMAL_HATCH_PROBABILITY = 0.83
-export const COLOR_HATCH_PROBABILITY = 0.15
-export const SPECIAL_HATCH_PROBABILITY = 0.02
+export const COLOR_HATCH_PROBABILITY = 0.13
+export const SPECIAL_HATCH_PROBABILITY = 0.04
 export const NORMAL_PITY_THRESHOLD = 9
-export const NON_SPECIAL_PITY_THRESHOLD = 35
+export const NON_SPECIAL_PITY_THRESHOLD = 23
 
 function unitRandom(random: () => number): number {
   const value = random()
@@ -68,7 +68,7 @@ function updateStreaks(rarity: ChickRarity, streaks: HatchStreaks): HatchStreaks
   }
 }
 
-/** 按“特殊保底 → 83/15/2 → 异色保底”的固定优先级抽取并更新计数。 */
+/** 按“特殊保底 → 83/13/4 → 异色保底”的固定优先级抽取并更新计数。 */
 export function rollHatchRarity(streaks: HatchStreaks, random: () => number): HatchRoll {
   let rarity: ChickRarity
   if (streaks.nonSpecialHatchStreak >= NON_SPECIAL_PITY_THRESHOLD) {
