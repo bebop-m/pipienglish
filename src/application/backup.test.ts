@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { DEFAULT_NORMAL_CHICK_VARIANT_ID } from '../domain/farmCatalog'
 import { exportAll, importAll } from './backup'
 import { PipiDB } from './db'
+import { createFarmUsecases } from './usecases/farmHome'
 import type { FarmStateV3 } from './farmPersistence'
 import { V1_REAL_BACKUP, V2_REAL_BACKUP, V3_REAL_BACKUP } from './fixtures/legacyBackups'
 
@@ -78,6 +79,31 @@ describe('v1/v2/v3 JSON 导入', () => {
     expect(await db.cosmetics.toArray()).toEqual(V3_REAL_BACKUP.cosmetics)
     expect(await db.sceneMemory.toArray()).toEqual(V3_REAL_BACKUP.sceneMemory)
     expect((await db.kv.get('loadout'))!.value).toEqual(V3_REAL_BACKUP.kv[3].value)
+    db.close()
+  })
+
+  it('v3 保留损坏的自定义 KV 原值，但首页恢复时把核心物件钳回舞台', async () => {
+    const db = freshDb()
+    const backup = structuredClone(V3_REAL_BACKUP) as unknown as {
+      kv: Array<{ key: string; value: unknown }>
+    }
+    const corruptedHomes = {
+      mother: { x: -50_000, y: 50_000 },
+      xiaopi: { x: 50_000, y: -50_000 },
+      hatchery: { x: 50_000, y: -50_000 },
+      rescue: { x: -50_000, y: 50_000 },
+    }
+    backup.kv.push({ key: 'scene-element-homes:scene-2', value: corruptedHomes })
+
+    await importAll(db, JSON.stringify(backup), IMPORT_CLOCK)
+
+    expect((await db.kv.get('scene-element-homes:scene-2'))?.value).toEqual(corruptedHomes)
+    expect((await createFarmUsecases(db).loadViewModel(IMPORT_CLOCK.now)).sceneElementHomes).toEqual({
+      mother: { x: 18, y: 604 },
+      xiaopi: { x: 924, y: 300 },
+      hatchery: { x: 878, y: 180 },
+      rescue: { x: 12, y: 672 },
+    })
     db.close()
   })
 })

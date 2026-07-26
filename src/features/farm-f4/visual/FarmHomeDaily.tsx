@@ -6,6 +6,7 @@ import {
   incubationHatcheryVisualState,
 } from '../../../domain/hatcheryVisual'
 import type { HatcheryVisualState } from '../../../domain/farmScenes'
+import { SCENE_ELEMENT_LAYOUTS } from '../../../domain/farmLayout'
 import type { FarmHomeEvent, FarmHomeViewModel } from '../../../application/viewmodel'
 import { f4AssetUrl } from '../assetUrl'
 import { approvedBgmTrack } from '../audio/bgmTracks'
@@ -25,11 +26,6 @@ interface FarmHomeDailyProps {
   vm: FarmHomeViewModel
   dispatch: (event: FarmHomeEvent) => Promise<void>
 }
-
-const HATCHERY_HOME = { x: 12, y: 544 } as const
-const HATCHERY_SIZE = { width: 304, height: 286 } as const
-const RESCUE_HOME = { x: 1033, y: 252 } as const
-const RESCUE_SIZE = { width: 142, height: 154 } as const
 
 export function compactHatchRemaining(remainingMs: number): string {
   if (remainingMs <= 0) return '即将破壳'
@@ -556,9 +552,9 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
           key={`${vm.viewedSceneId}:hatchery`}
           className={`hatchery-wrap-f4 ${vm.overlay === 'hatchery_pop' ? 'is-open' : ''}`}
           ariaLabel="可拖动的鸡蛋孵化区"
+          elementId="hatchery"
           home={vm.sceneElementHomes.hatchery ?? null}
-          defaultHome={HATCHERY_HOME}
-          size={HATCHERY_SIZE}
+          defaultHome={SCENE_ELEMENT_LAYOUTS.hatchery.defaultHome}
           onPlaced={home => dispatch({ type: 'SCENE_ELEMENT_PLACED', elementId: 'hatchery', home })}
         >
           <button data-stage-drag-handle className="hatchery-button-f4" type="button" aria-expanded={vm.overlay === 'hatchery_pop'} onClick={() => dispatch({ type: 'TOGGLE_HATCHERY_POP' })}>
@@ -595,9 +591,9 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
           key={`${vm.viewedSceneId}:rescue`}
           className={`rescue-wrap-f4 ${vm.overlay === 'rescue_pop' ? 'is-open' : ''}`}
           ariaLabel="可拖动的等待救援小鸡框"
+          elementId="rescue"
           home={vm.sceneElementHomes.rescue ?? null}
-          defaultHome={RESCUE_HOME}
-          size={RESCUE_SIZE}
+          defaultHome={SCENE_ELEMENT_LAYOUTS.rescue.defaultHome}
           onPlaced={home => dispatch({ type: 'SCENE_ELEMENT_PLACED', elementId: 'rescue', home })}
         >
           <button data-stage-drag-handle className="rescue-entry-f4" type="button" aria-expanded={vm.overlay === 'rescue_pop'} onClick={() => dispatch({ type: 'TOGGLE_RESCUE_POP' })}>

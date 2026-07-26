@@ -232,11 +232,15 @@ describe('首页三状态与蛋经济全链路', () => {
     expect(await uc.placeSceneElement('mother', { x: Number.NaN, y: 1 })).toBe(false)
     expect((await uc.loadViewModel()).sceneElementHomes).toEqual(sceneOneHomes)
 
+    expect(await uc.placeSceneElement('mother', { x: -50_000, y: 50_000 }, undefined, 'scene-1')).toBe(true)
+    const clampedSceneOneHomes = { ...sceneOneHomes, mother: { x: 18, y: 604 } }
+    expect((await uc.loadViewModel()).sceneElementHomes).toEqual(clampedSceneOneHomes)
+
     const farm = await getFarmStateV3(db, { now: Date.now(), today: '2026-07-22' })
     await setFarmStateV3(db, { ...farm, activeSceneId: 'scene-2', acknowledgedSceneChapter: 2 })
     expect(await uc.placeSceneElement('mother', { x: 610, y: 530 }, undefined, 'scene-2')).toBe(true)
     expect((await uc.loadViewModel(undefined, 'scene-2')).sceneElementHomes).toEqual({ mother: { x: 610, y: 530 } })
-    expect((await uc.loadViewModel(undefined, 'scene-1')).sceneElementHomes).toEqual(sceneOneHomes)
+    expect((await uc.loadViewModel(undefined, 'scene-1')).sceneElementHomes).toEqual(clampedSceneOneHomes)
     db.close()
   })
 

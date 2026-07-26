@@ -69,6 +69,7 @@ import {
 } from '../../domain/farmCustomization'
 import type { CharacterLoadout } from '../../domain/farmCatalog'
 import {
+  clampSceneElementHome,
   normalizeSceneElementHomes,
   sceneElementHomesKey,
   type MovableFarmElementId,
@@ -602,14 +603,15 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
     now = sources.now(),
     sceneId?: string,
   ): Promise<boolean> {
-    if (!Number.isFinite(home.x) || !Number.isFinite(home.y)) return false
+    const clampedHome = clampSceneElementHome(elementId, home)
+    if (!clampedHome) return false
     return d.transaction('rw', d.kv, async () => {
       const farm = await getFarm(now)
       const scene = enteredScene(farm, sceneId)
       if (!scene) return false
       const key = sceneElementHomesKey(scene.id)
       const current = normalizeSceneElementHomes(await getKV<unknown>(d, key, {}))
-      await setKV(d, key, { ...current, [elementId]: { x: home.x, y: home.y } })
+      await setKV(d, key, { ...current, [elementId]: clampedHome })
       return true
     })
   }

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { FarmChickVM, FarmHomeEvent, FarmHomeViewModel } from '../../../application/viewmodel'
 import type { StagePoint } from '../../../domain/types'
+import { clampSceneElementHome, SCENE_ELEMENT_LAYOUTS } from '../../../domain/farmLayout'
 import { f4AssetUrl } from '../assetUrl'
 import { STAGE_H, STAGE_W, toStagePoint } from '../stage/stagePoint'
 import { chickAssetId, chickCanvasSize, specialChickHome } from './chickVisual'
@@ -34,8 +35,8 @@ const CHICK_HOMES: StagePoint[] = [
 ]
 
 const ACTOR_SIZE: Record<ActorKind, { width: number; height: number }> = {
-  mother: { width: 220, height: 220 },
-  farmer: { width: 252, height: 274 },
+  mother: SCENE_ELEMENT_LAYOUTS.mother.size,
+  farmer: SCENE_ELEMENT_LAYOUTS.xiaopi.size,
   chick: { width: 116, height: 116 },
 }
 
@@ -232,11 +233,14 @@ function FarmActor({
     const point = stageCoordinates(event.clientX, event.clientY)
     const actor = actorRef.current
     if (!point || !actor) return
-    const size = spec.size
-    const next = {
-      x: Math.min(STAGE_W - size.width - 18, Math.max(18, point.x - drag.offset.x)),
-      y: Math.min(STAGE_H - size.height - 10, Math.max(300, point.y - drag.offset.y)),
-    }
+    const raw = { x: point.x - drag.offset.x, y: point.y - drag.offset.y }
+    const next = spec.kind === 'chick'
+      ? {
+          x: Math.min(STAGE_W - spec.size.width - 18, Math.max(18, raw.x)),
+          y: Math.min(STAGE_H - spec.size.height - 10, Math.max(300, raw.y)),
+        }
+      : clampSceneElementHome(spec.kind === 'mother' ? 'mother' : 'xiaopi', raw)
+    if (!next) return
     if (Math.hypot(point.x - drag.start.x, point.y - drag.start.y) > 8) drag.moved = true
     positionRef.current = next
     if (!positionIsBlocked(next)) drag.lastValid = { ...next }
@@ -377,7 +381,7 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
         kind: 'mother',
         label: vm.henName ? `母鸡妈妈：${vm.henName}` : '母鸡妈妈',
         image: f4AssetUrl(vm.viewedScene.characterVisuals.motherAssetId),
-        home: vm.sceneElementHomes.mother ?? { x: 615, y: 530 },
+        home: vm.sceneElementHomes.mother ?? SCENE_ELEMENT_LAYOUTS.mother.defaultHome,
         size: ACTOR_SIZE.mother,
         talk: { line: '咕咕，慢慢散步吧～', translation: "Let's take a walk!" },
       },
@@ -386,7 +390,7 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
         kind: 'farmer',
         label: '农场主小皮',
         image: f4AssetUrl(vm.viewedScene.characterVisuals.xiaopiAssetId),
-        home: vm.sceneElementHomes.xiaopi ?? { x: 835, y: 495 },
+        home: vm.sceneElementHomes.xiaopi ?? SCENE_ELEMENT_LAYOUTS.xiaopi.defaultHome,
         size: ACTOR_SIZE.farmer,
         talk: { line: '今天也一起加油！', translation: "Let's do our best!" },
       },

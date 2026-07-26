@@ -7,14 +7,18 @@ import {
   type ReactNode,
 } from 'react'
 import type { StagePoint } from '../../../domain/types'
-import { STAGE_H, STAGE_W, toStagePoint } from '../stage/stagePoint'
+import {
+  clampSceneElementHome,
+  type MovableFarmElementId,
+} from '../../../domain/farmLayout'
+import { STAGE_W, toStagePoint } from '../stage/stagePoint'
 
 interface StageDraggableProps {
   className: string
   ariaLabel: string
+  elementId: MovableFarmElementId
   home: StagePoint | null
   defaultHome: StagePoint
-  size: { width: number; height: number }
   onPlaced: (home: StagePoint) => void
   children: ReactNode
 }
@@ -31,9 +35,9 @@ interface ActiveDrag {
 export function StageDraggable({
   className,
   ariaLabel,
+  elementId,
   home,
   defaultHome,
-  size,
   onPlaced,
   children,
 }: StageDraggableProps) {
@@ -83,10 +87,11 @@ export function StageDraggable({
     if (!drag || drag.pointerId !== event.pointerId) return
     const point = stageCoordinates(event.clientX, event.clientY)
     if (!point) return
-    const next = {
-      x: Math.min(STAGE_W - size.width - 12, Math.max(12, point.x - drag.offset.x)),
-      y: Math.min(STAGE_H - size.height - 8, Math.max(180, point.y - drag.offset.y)),
-    }
+    const next = clampSceneElementHome(elementId, {
+      x: point.x - drag.offset.x,
+      y: point.y - drag.offset.y,
+    })
+    if (!next) return
     if (Math.hypot(point.x - drag.start.x, point.y - drag.start.y) > 8) drag.moved = true
     positionRef.current = next
     setPosition(next)
