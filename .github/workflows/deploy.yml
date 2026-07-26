@@ -25,6 +25,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # 门禁先跑:任务门禁文档或全屏视觉层违规时快速失败,不浪费测试与构建时间。
+      # npm run build 内部会再跑一次同样的检查,保证本地构建与 CI 行为一致。
+      - name: 门禁检查(全屏视觉层 + 任务视觉引用)
+        run: npm run check
       - run: npm test
       - run: npm run build
         env:

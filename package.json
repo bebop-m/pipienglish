@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/check-fullbleed-layers.mjs && tsc && vite build",
+    "build": "npm run check && tsc && vite build",
+    "check": "node scripts/check-fullbleed-layers.mjs && node scripts/check-visual-references.mjs",
     "check:fullbleed": "node scripts/check-fullbleed-layers.mjs",
     "check:visual-references": "node scripts/check-visual-references.mjs",
     "typecheck": "tsc --noEmit",
