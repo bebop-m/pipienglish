@@ -24,6 +24,17 @@ type CoreFarmHomeViewModel = Omit<
   'overlay' | 'chat' | 'favoriteReplacement' | 'arrivingChick' | 'hatchTransition'
 >
 
+type HatchRevealIdentity = Pick<HatchTransitionVM, 'chickId' | 'sceneId'>
+
+export function chicksVisibleDuringHatchReveal(
+  chicks: FarmHomeViewModel['chicksVisible'],
+  viewedSceneId: string,
+  reveal: HatchRevealIdentity | null,
+): FarmHomeViewModel['chicksVisible'] {
+  if (!reveal || reveal.sceneId !== viewedSceneId) return chicks
+  return chicks.filter(chick => chick.chickId !== reveal.chickId)
+}
+
 export interface FarmHomeBridge {
   vm: FarmHomeViewModel | null
   dispatch: (event: FarmHomeEvent) => Promise<void>
@@ -44,12 +55,21 @@ export function useFarmHome(): FarmHomeBridge {
   const guardRun = useRef<Promise<void> | null>(null)
   const arrivalTimer = useRef<number | undefined>(undefined)
   const hatchTransitionTimer = useRef<number | undefined>(undefined)
+  const hatchRevealRef = useRef<HatchRevealIdentity | null>(null)
   const chatRequest = useRef(0)
   const coreRef = useRef<CoreFarmHomeViewModel | null>(null)
 
   const commitCore = useCallback((next: CoreFarmHomeViewModel) => {
-    coreRef.current = next
-    setCore(next)
+    const committed = {
+      ...next,
+      chicksVisible: chicksVisibleDuringHatchReveal(
+        next.chicksVisible,
+        next.viewedSceneId,
+        hatchRevealRef.current,
+      ),
+    }
+    coreRef.current = committed
+    setCore(committed)
   }, [])
 
   const refresh = useCallback(async () => {
@@ -72,27 +92,23 @@ export function useFarmHome(): FarmHomeBridge {
         return
       }
 
-      const stillOwned = new Set(next.chicksAll.map(chick => chick.chickId))
-      commitCore({
-        ...next,
-        chicksVisible: before
-          ? before.chicksVisible.filter(chick => stillOwned.has(chick.chickId))
-          : next.chicksVisible.filter(chick => chick.chickId !== arrival.chickId),
-      })
-      setArrivingChick(null)
-      window.clearTimeout(arrivalTimer.current)
-      window.clearTimeout(hatchTransitionTimer.current)
       const transition = {
         chickId: arrival.chickId,
         sceneId: arrival.sceneId,
         rarity: arrival.rarity,
         variantId: arrival.variantId,
       } as const
+      hatchRevealRef.current = transition
+      commitCore(next)
+      setArrivingChick(null)
+      window.clearTimeout(arrivalTimer.current)
+      window.clearTimeout(hatchTransitionTimer.current)
       setHatchTransition({ ...transition, phase: 'two_shells' })
       hatchTransitionTimer.current = window.setTimeout(() => {
         setHatchTransition({ ...transition, phase: 'outcome' })
         hatchTransitionTimer.current = window.setTimeout(async () => {
           setHatchTransition(null)
+          hatchRevealRef.current = null
           if (coreRef.current?.viewedSceneId !== arrival.sceneId) {
             await refresh()
             return
