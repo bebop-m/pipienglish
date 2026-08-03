@@ -69,8 +69,8 @@ import {
 } from '../../domain/farmCustomization'
 import type { CharacterLoadout } from '../../domain/farmCatalog'
 import {
-  clampSceneElementHome,
   normalizeSceneElementHomes,
+  resolveSceneElementHome,
   sceneElementHomesKey,
   type MovableFarmElementId,
 } from '../../domain/farmLayout'
@@ -603,7 +603,7 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
     now = sources.now(),
     sceneId?: string,
   ): Promise<boolean> {
-    const clampedHome = clampSceneElementHome(elementId, home)
+    const clampedHome = resolveSceneElementHome(elementId, home)
     if (!clampedHome) return false
     return d.transaction('rw', d.kv, async () => {
       const farm = await getFarm(now)

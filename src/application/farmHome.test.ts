@@ -1,8 +1,9 @@
 // 首页用例全链路:完成学习 → 发蛋 → 分配 → 24h 孵化 → 农场 +1(fake-indexeddb)
 
 import { describe, expect, it } from 'vitest'
-import { getFarmStateV3, PipiDB, setFarmStateV3 } from './db'
+import { getFarmStateV3, PipiDB, setFarmStateV3, setKV } from './db'
 import { createFarmUsecases } from './usecases/farmHome'
+import { sceneElementHomesKey } from '../domain/farmLayout'
 import { HATCH_MS } from '../domain/types'
 import { persistedChickWithDefaults } from './farmPersistence'
 import { FARM_SCENE_DEFINITIONS, FUTURE_FARM_SCENE_DRAFTS } from '../domain/farmScenes'
@@ -241,6 +242,18 @@ describe('首页三状态与蛋经济全链路', () => {
     expect(await uc.placeSceneElement('mother', { x: 610, y: 530 }, undefined, 'scene-2')).toBe(true)
     expect((await uc.loadViewModel(undefined, 'scene-2')).sceneElementHomes).toEqual({ mother: { x: 610, y: 530 } })
     expect((await uc.loadViewModel(undefined, 'scene-1')).sceneElementHomes).toEqual(clampedSceneOneHomes)
+    db.close()
+  })
+
+  it('落点压在每日任务卡片上时推回卡片外,不把入口藏到卡片背后', async () => {
+    const db = freshDb()
+    const uc = createFarmUsecases(db)
+
+    expect(await uc.placeSceneElement('rescue', { x: 60, y: 190 }, undefined, 'scene-1')).toBe(true)
+    expect((await uc.loadViewModel()).sceneElementHomes.rescue).toEqual({ x: 60, y: 436 })
+
+    await setKV(db, sceneElementHomesKey('scene-1'), { hatchery: { x: 12, y: 200 } })
+    expect((await uc.loadViewModel()).sceneElementHomes.hatchery).toEqual({ x: 12, y: 436 })
     db.close()
   })
 

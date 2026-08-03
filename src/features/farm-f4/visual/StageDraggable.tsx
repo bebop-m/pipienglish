@@ -9,6 +9,7 @@ import {
 import type { StagePoint } from '../../../domain/types'
 import {
   clampSceneElementHome,
+  resolveSceneElementHome,
   type MovableFarmElementId,
 } from '../../../domain/farmLayout'
 import { STAGE_W, toStagePoint } from '../stage/stagePoint'
@@ -110,8 +111,12 @@ export function StageDraggable({
       return
     }
     if (!drag.moved) return
+    // 松手才归位：拖到每日任务卡片上会被推回卡片外，避免物件永久藏到卡片背后点不到。
+    const placed = resolveSceneElementHome(elementId, positionRef.current) ?? drag.origin
+    positionRef.current = placed
+    setPosition(placed)
     ignoreClickUntilRef.current = Date.now() + 500
-    onPlaced(positionRef.current)
+    onPlaced(placed)
   }
 
   const suppressDraggedClick = (event: React.MouseEvent<HTMLElement>) => {

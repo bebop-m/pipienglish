@@ -1,9 +1,22 @@
 import { describe, expect, it } from 'vitest'
 import {
   clampSceneElementHome,
+  MOVABLE_FARM_ELEMENT_IDS,
   normalizeSceneElementHomes,
+  resolveSceneElementHome,
   SCENE_ELEMENT_LAYOUTS,
 } from './farmLayout'
+
+/** 与 farmLayout 内 DAILY_BOARD_KEEPOUT 同值：任务卡片保留区，物件落进去就再也点不到。 */
+const KEEPOUT = { left: 24, top: 88, right: 418, bottom: 436 }
+
+function coversDailyBoard(elementId: keyof typeof SCENE_ELEMENT_LAYOUTS, home: { x: number; y: number }): boolean {
+  const { size } = SCENE_ELEMENT_LAYOUTS[elementId]
+  return home.x < KEEPOUT.right
+    && home.x + size.width > KEEPOUT.left
+    && home.y < KEEPOUT.bottom
+    && home.y + size.height > KEEPOUT.top
+}
 
 describe('farm scene element layout persistence', () => {
   it('keeps valid legacy coordinates and ignores malformed entries', () => {
@@ -38,5 +51,35 @@ describe('farm scene element layout persistence', () => {
       )).toEqual(layout.defaultHome)
     }
     expect(clampSceneElementHome('hatchery', { x: Number.POSITIVE_INFINITY, y: 1 })).toBeNull()
+  })
+})
+
+describe('daily board keep-out', () => {
+  it('keeps every default home outside the daily board', () => {
+    for (const elementId of MOVABLE_FARM_ELEMENT_IDS) {
+      const { defaultHome } = SCENE_ELEMENT_LAYOUTS[elementId]
+      expect([elementId, coversDailyBoard(elementId, defaultHome)]).toEqual([elementId, false])
+      expect(resolveSceneElementHome(elementId, defaultHome)).toEqual(defaultHome)
+    }
+  })
+
+  it('pushes any element dropped on the daily board back out of it', () => {
+    for (const elementId of MOVABLE_FARM_ELEMENT_IDS) {
+      for (const drop of [{ x: 30, y: 180 }, { x: 300, y: 300 }, { x: 400, y: 100 }, { x: 12, y: 430 }]) {
+        const home = resolveSceneElementHome(elementId, drop)!
+        expect([elementId, drop, coversDailyBoard(elementId, home)]).toEqual([elementId, drop, false])
+        expect(home).toEqual(clampSceneElementHome(elementId, home))
+      }
+    }
+  })
+
+  it('repairs persisted homes that already sit behind the daily board', () => {
+    expect(normalizeSceneElementHomes({ rescue: { x: 60, y: 190 } })).toEqual({ rescue: { x: 60, y: 436 } })
+    expect(normalizeSceneElementHomes({ hatchery: { x: 12, y: 200 } })).toEqual({ hatchery: { x: 12, y: 436 } })
+    expect(normalizeSceneElementHomes({ rescue: { x: 400, y: 100 } })).toEqual({ rescue: { x: 418, y: 180 } })
+  })
+
+  it('leaves drag-time clamping free to follow the finger across the board', () => {
+    expect(clampSceneElementHome('rescue', { x: 60, y: 190 })).toEqual({ x: 60, y: 190 })
   })
 })

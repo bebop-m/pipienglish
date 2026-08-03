@@ -11,7 +11,23 @@ interface SceneElementLayout {
   insets: { left: number; top: number; right: number; bottom: number }
 }
 
+interface StageRect {
+  left: number
+  top: number
+  right: number
+  bottom: number
+}
+
 const FARM_STAGE_SIZE = { width: 1194, height: 834 } as const
+
+/**
+ * 每日任务卡片盖在所有可拖动物件之上（`.task-board-f3` / `.complete-board-f4` 是 z-index 65，
+ * 孵化小屋 56、错题救援框 58、角色 20）。物件一旦落到卡片背后就再也点不到，
+ * 等于永久丢失入口，和坐标飞出屏幕是同一类硬锁，因此落点必须避开这块 UI 保留区。
+ * 数值取两张卡片实测外框的并集再留安全边，对应 `src/styles/f4/home.css` 的
+ * `.task-board-f3`（28,92,370×247）与 `.complete-board-f4`（31,91,382×338）。
+ */
+const DAILY_BOARD_KEEPOUT: StageRect = { left: 24, top: 88, right: 418, bottom: 436 }
 
 /**
  * 四类核心物件共享的 1194×834 舞台契约。默认位置、拖动边界和持久化恢复
@@ -40,16 +56,52 @@ export const SCENE_ELEMENT_LAYOUTS: Readonly<Record<MovableFarmElementId, SceneE
   },
 }
 
-export function clampSceneElementHome(
-  elementId: MovableFarmElementId,
-  home: StagePoint,
-): StagePoint | null {
-  if (!Number.isFinite(home.x) || !Number.isFinite(home.y)) return null
+function clampToSafeArea(elementId: MovableFarmElementId, home: StagePoint): StagePoint {
   const { size, insets } = SCENE_ELEMENT_LAYOUTS[elementId]
   return {
     x: Math.min(FARM_STAGE_SIZE.width - size.width - insets.right, Math.max(insets.left, home.x)),
     y: Math.min(FARM_STAGE_SIZE.height - size.height - insets.bottom, Math.max(insets.top, home.y)),
   }
+}
+
+function coversDailyBoard(elementId: MovableFarmElementId, home: StagePoint): boolean {
+  const { size } = SCENE_ELEMENT_LAYOUTS[elementId]
+  return home.x < DAILY_BOARD_KEEPOUT.right
+    && home.x + size.width > DAILY_BOARD_KEEPOUT.left
+    && home.y < DAILY_BOARD_KEEPOUT.bottom
+    && home.y + size.height > DAILY_BOARD_KEEPOUT.top
+}
+
+export function clampSceneElementHome(
+  elementId: MovableFarmElementId,
+  home: StagePoint,
+): StagePoint | null {
+  if (!Number.isFinite(home.x) || !Number.isFinite(home.y)) return null
+  return clampToSafeArea(elementId, home)
+}
+
+/**
+ * 拖动过程跟手只钳安全区；真正落点、持久化和备份恢复走这里，额外推出任务卡片保留区。
+ * 四个方向都出不去时回默认位置，保证任何一次写入都不会把物件永久藏到卡片背后。
+ */
+export function resolveSceneElementHome(
+  elementId: MovableFarmElementId,
+  home: StagePoint,
+): StagePoint | null {
+  const bounded = clampSceneElementHome(elementId, home)
+  if (!bounded || !coversDailyBoard(elementId, bounded)) return bounded
+  const { size, defaultHome } = SCENE_ELEMENT_LAYOUTS[elementId]
+  const distance = (point: StagePoint) => (point.x - bounded.x) ** 2 + (point.y - bounded.y) ** 2
+  const escapes = [
+    { x: DAILY_BOARD_KEEPOUT.left - size.width, y: bounded.y },
+    { x: DAILY_BOARD_KEEPOUT.right, y: bounded.y },
+    { x: bounded.x, y: DAILY_BOARD_KEEPOUT.top - size.height },
+    { x: bounded.x, y: DAILY_BOARD_KEEPOUT.bottom },
+  ]
+    .map(point => clampToSafeArea(elementId, point))
+    .filter(point => !coversDailyBoard(elementId, point))
+    .sort((a, b) => distance(a) - distance(b))
+  return escapes[0] ?? clampToSafeArea(elementId, defaultHome)
 }
 
 export function sceneElementHomesKey(sceneId: string): string {
@@ -64,7 +116,7 @@ export function normalizeSceneElementHomes(value: unknown): SceneElementHomes {
     if (!point || typeof point !== 'object' || Array.isArray(point)) return []
     const { x, y } = point as Record<string, unknown>
     if (typeof x !== 'number' || typeof y !== 'number') return []
-    const home = clampSceneElementHome(id, { x, y })
+    const home = resolveSceneElementHome(id, { x, y })
     return home ? [[id, home]] : []
   })) as SceneElementHomes
 }
