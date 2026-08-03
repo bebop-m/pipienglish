@@ -48,4 +48,4 @@ forbidden_actions:
 
 ## 发布授权
 
-- 待爸爸批准。推送 `main` 会触发 GitHub Pages 部署，未经明确批准不推送。
+- 2026-08-03，爸爸明确批准：提交并推送 `main`，允许本批次触发 GitHub Pages 部署。
