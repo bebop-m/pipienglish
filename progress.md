@@ -69,3 +69,10 @@ Original prompt: 批准按建议参数进行代码接入，暂不发布场景二
 - 不动 z-index、不动已批准视觉。改为在 `farmLayout.ts` 加卡片保留区：拖动过程只钳安全区、完全跟手，松手落点、KV 写入和备份恢复走新的 `resolveSceneElementHome` 推出保留区，推不出去回默认位置。
 - 保留区同时接进 `normalizeSceneElementHomes`，已经被吞掉的旧存档下一次加载自动救回，无需用户操作，也无数据库迁移。
 - 完整测试 47 文件 264/264 通过（基线 259，新增 5 个用例），L2 legacy backup fixtures、`tsc --noEmit`、全屏视觉层守卫均通过；真实浏览器实测被吞坐标刷新后归位且可点击，模拟拖到卡片正中松手会落到卡片正下方。
+
+## 2026-08-05 · 家长页 v1:备份通道 + 换机快进
+
+- iPad Pro 送修改用 mini,数据只在本地 IndexedDB 且生产构建无导出入口(逻辑在 `backup.ts`,UI 只在 DEV 门控的 DevShell)。爸爸裁决落地家长页 v1(F4-CHG-032):算术门控、导出/导入 JSON、连胜日历、改蛋数,并新增「快进到 Day N」。
+- 快进为整档重建:用真实 `buildPlan` + 真实 FSRS 按天重放「全对完成」历史,起步词在模拟 Day 1 播种;§5.1 积压暂停如实触发,N 天新词数少于 4N 属规则本身行为。蛋、小鸡数不可推导由爸爸填;笔迹/救援/装扮不伪造。已知取舍:快进后两机存档分叉,Pro 修回不再导回。
+- `srs.ts` 的 `newCard`/`rate` 增加可选 `now`(默认现值,向后兼容);家长页为朴素 UI,不用 F4 视觉语言,不碰小皮可见界面;`App.tsx` 放开 parent 路由。
+- `fastForward.test.ts` 新增 5 用例(时钟钉死);完整测试 48 文件 269/269(基线 264),`tsc --noEmit` 干净,L2 legacy fixtures 通过;真实浏览器端到端验证快进/改蛋/导出/日历,console 零错误。iOS Web Share 待 mini 真机导出时顺手验证,失败自动回退下载。

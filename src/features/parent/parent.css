@@ -1,0 +1,159 @@
+/* 家长页:面向爸爸的朴素工具界面,刻意不使用 F4 视觉语言(SPEC §8「朴素即可」) */
+
+.parent-screen,
+.parent-gate {
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 24px clamp(16px, 6vw, 64px) 48px;
+  background: #f6f2ea;
+  color: #3a3128;
+  font: 16px/1.6 -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  overflow-y: auto;
+}
+
+.parent-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.parent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.parent-header h1,
+.parent-gate h2,
+.parent-section h2 {
+  margin: 0;
+  font-weight: 700;
+}
+
+.parent-section {
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: #fffdf8;
+  border: 1px solid #e3d9c8;
+  border-radius: 12px;
+}
+
+.parent-section h2 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.parent-section-danger {
+  border-color: #d9a08f;
+  background: #fdf6f3;
+}
+
+.parent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.parent-btn {
+  padding: 10px 18px;
+  border: 1px solid #8a6d3b;
+  border-radius: 8px;
+  background: #8a6d3b;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.parent-btn:disabled,
+.parent-btn.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.parent-btn-plain {
+  background: #fff;
+  color: #8a6d3b;
+}
+
+.parent-btn-danger {
+  background: #b3452f;
+  border-color: #b3452f;
+}
+
+.parent-input {
+  box-sizing: border-box;
+  width: 120px;
+  padding: 8px 10px;
+  border: 1px solid #cbbfa8;
+  border-radius: 8px;
+  font-size: 16px;
+  background: #fff;
+}
+
+.parent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 10px 0 14px;
+}
+
+.parent-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.parent-grid .parent-input {
+  width: 100%;
+}
+
+.parent-calendar {
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.parent-calendar td {
+  width: 44px;
+  height: 36px;
+  border: 1px solid #e3d9c8;
+  text-align: center;
+  font-size: 14px;
+  color: #b0a590;
+}
+
+.parent-calendar td.is-done {
+  background: #dff0d5;
+  color: #3d7a2f;
+  font-weight: 700;
+}
+
+.parent-calendar-day {
+  display: block;
+  font-size: 10px;
+  line-height: 1;
+  padding-top: 2px;
+}
+
+.parent-notice {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #eef4fb;
+  border: 1px solid #b9d2ec;
+}
+
+.parent-warn {
+  color: #b3452f;
+}
+
+.parent-hint {
+  color: #7a6f5f;
+  font-size: 14px;
+  margin: 4px 0 8px;
+}
