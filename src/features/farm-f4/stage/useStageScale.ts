@@ -24,10 +24,16 @@ export function useStageScale(containerRef: RefObject<HTMLElement | null>): Stag
     measure()
     const ro = new ResizeObserver(measure)
     ro.observe(el)
+    // iOS 对 position:fixed 容器在旋转与 Safari 工具栏伸缩时存在 ResizeObserver
+    // 不触发/迟触发的时序问题,补 resize 与 visualViewport 监听兜底;measure 幂等,多触发无害
     window.addEventListener('orientationchange', measure)
+    window.addEventListener('resize', measure)
+    window.visualViewport?.addEventListener('resize', measure)
     return () => {
       ro.disconnect()
       window.removeEventListener('orientationchange', measure)
+      window.removeEventListener('resize', measure)
+      window.visualViewport?.removeEventListener('resize', measure)
     }
   }, [containerRef])
 

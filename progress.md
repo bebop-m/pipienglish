@@ -76,3 +76,9 @@ Original prompt: 批准按建议参数进行代码接入，暂不发布场景二
 - 快进为整档重建:用真实 `buildPlan` + 真实 FSRS 按天重放「全对完成」历史,起步词在模拟 Day 1 播种;§5.1 积压暂停如实触发,N 天新词数少于 4N 属规则本身行为。蛋、小鸡数不可推导由爸爸填;笔迹/救援/装扮不伪造。已知取舍:快进后两机存档分叉,Pro 修回不再导回。
 - `srs.ts` 的 `newCard`/`rate` 增加可选 `now`(默认现值,向后兼容);家长页为朴素 UI,不用 F4 视觉语言,不碰小皮可见界面;`App.tsx` 放开 parent 路由。
 - `fastForward.test.ts` 新增 5 用例(时钟钉死);完整测试 48 文件 269/269(基线 264),`tsc --noEmit` 干净,L2 legacy fixtures 通过;真实浏览器端到端验证快进/改蛋/导出/日历,console 零错误。iOS Web Share 待 mini 真机导出时顺手验证,失败自动回退下载。
+
+## 2026-08-05 · iOS 系列视口适配加固
+
+- 爸爸报告 mini 真机「显示尺寸不对,有些贴图看不到」(F4-CHG-033)。对快进 Day 23 日常态跑 8 视口矩阵(mini 6/7、mini 5 4:3、Air、Pro 13、Safari 工具栏压缩、竖屏、iPhone 横屏),桌面模拟全部正常,截图存 `visual-regression/ios-adaptation-2026-08/`。
+- 修两个 iOS 真机特有缺口:状态栏改 `black-translucent`(default 状态栏挤压 standalone 可用高度);`useStageScale` 补 `window.resize` + `visualViewport.resize` 兜底(iOS 旋转/工具栏伸缩时 ResizeObserver 对 fixed 容器有时序缺口,旋转后可能停在错误缩放)。
+- 1194×834 坐标系、唯一缩放公式、0.72 阈值、竖屏与 iPhone 提示策略均未动。完整测试 48 文件 269/269,`tsc` 干净,改动后矩阵与改动前逐张一致。真机若仍丢贴图按 CURRENT_TASK「真机确诊待办」提供截图定位。
