@@ -38,7 +38,8 @@ visual_references:
     - public/assets/f4/scenes/scene-2/xiaopi.png
     - public/assets/f4/scenes/scene-2/mother.png
   style_reference:
-    - C:/Users/86181/.codex/visualizations/2026/08/11/019ff196-03e8-7661-92d6-b9aa81d1311c/s2-wardrobe-g1/scene-2-wardrobe-g1-review-board-v1.png
+    - public/assets/f4/scenes/scene-2/cosmetics/xiaopi-bonnet-overalls-satchel.png
+    - public/assets/f4/scenes/scene-2/cosmetics/mother-bonnet-neckerchief.png
   environment_reference:
     - public/assets/f4/scenes/scene-2/orchard-background.png
   composition_reference:
