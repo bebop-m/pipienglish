@@ -1,50 +1,73 @@
-# 当前任务门禁 · 2026-08-05 iOS 系列屏幕自适应加固
+# 当前任务门禁 · 2026-09-10 场景 2 完整衣柜上线
 
 ```yaml
-task_id: FIX-IOS-VIEWPORT-ADAPTATION-2026-08-05
-base_commit: 10d3beff48816c088b3709481da98dd11911926a
-created_at: 2026-08-05T18:00:00+08:00
+task_id: ART-S2-WARDROBE-SHOP-LAUNCH-2026-09-10
+base_commit: d94299048f02868baa5ff4a609db7360bb32409f
+created_at: 2026-09-10T00:00:00+08:00
 allowed_paths:
   - docs/00-start/CURRENT_TASK.md
-  - docs/03-workflow/changes/**
-  - progress.md
-  - index.html
-  - src/features/farm-f4/stage/useStageScale.ts
-  - visual-regression/ios-adaptation-2026-08/**
-validation_level: L1
+  - docs/04-assets/CORE_ART_PRODUCTION_BOARD.md
+  - public/assets/f4/asset-manifest.json
+  - public/assets/f4/scenes/scene-2/travel-sign.png
+  - public/assets/f4/scenes/scene-2/decorations/*.png
+  - public/assets/f4/scenes/scene-2/cosmetics/*.png
+  - scripts/qa-scene2-shop.mjs
+  - scripts/qa-scene2-wardrobe.mjs
+  - src/application/farmCustomization.test.ts
+  - src/domain/farmCosmetics.ts
+  - src/domain/farmCosmetics.test.ts
+  - src/domain/farmScenes.test.ts
+  - src/domain/farmScenes.ts
+  - src/features/farm-f4/visual/characterAppearance.ts
+  - src/features/farm-f4/visual/characterAppearance.test.ts
+  - src/features/farm-f4/visual/FarmActors.tsx
+  - src/features/farm-f4/visual/FarmCustomization.tsx
+  - src/features/farm-f4/visual/FarmCustomization.test.ts
+  - src/styles/f4/home.css
+  - visual-regression/scene-2-shop-production/*
+  - visual-regression/scene-2-wardrobe-production/*
+validation_level: L3
 required_docs:
   - docs/00-start/AI_START_HERE.md
-  - docs/02-visual/F4_IPAD_FIDELITY.md
-visual_references: not_applicable_non_visual_task
+  - docs/03-workflow/EXECUTION_BUDGET_POLICY.md
+  - docs/04-assets/CORE_ART_PRODUCTION_BOARD.md
+  - docs/05-architecture/F7_SCENE_STICKERS_WARDROBE_GATE_AND_TEST_PLAN.md
+visual_references:
+  asset_kind: character
+  identity_reference:
+    - public/assets/f4/scenes/scene-2/xiaopi.png
+    - public/assets/f4/scenes/scene-2/mother.png
+  style_reference:
+    - C:/Users/86181/.codex/visualizations/2026/08/11/019ff196-03e8-7661-92d6-b9aa81d1311c/s2-wardrobe-g1/scene-2-wardrobe-g1-review-board-v1.png
+  environment_reference:
+    - public/assets/f4/scenes/scene-2/orchard-background.png
+  composition_reference:
+    - visual-regression/scene-2-wardrobe-production/scene-2-complete-shop-and-wardrobe-equipped-1194x834.png
+  allowed_changes:
+    - 将爸爸批准的 W01 至 W06 试装造型重建为完整可组合外观矩阵并复制到场景 2 生产目录
+    - 上架小皮 4 件、母鸡 2 件共 80 蛋的收费衣柜商品
+    - 让首页角色与衣柜预览按已装备槽位解析正确组合外观
+    - 复用现有 cosmetics 所有权、扣蛋、装备、卸下和备份事务，不升级 IndexedDB schema
+    - 新增真实购买、组合穿戴、刷新恢复与 GitHub Pages 子路径截图验收
+  must_preserve:
+    - W01 至 W06 已批准造型、角色身份、场景 2 免费默认造型与现有道具商店
+    - 小皮发型/帽子造型互斥共用 headLook；outfit 与 accessory 可同时叠加；母鸡 headwear 与 neckwear 可同时生效
+    - 六件价格依次 15、15、20、10、10、10，总价 80 蛋
+    - 所有权永久、装备与卸下免费、重复购买不扣蛋、场景 1 仍显示自己的既有角色基准
 forbidden_actions:
-  - 改动 1194×834 固定舞台坐标系与唯一缩放公式(FIDELITY §3)
-  - 改动 MIN_COMFORT_SCALE 门槛与竖屏/iPhone 提示策略(2026-07-17 裁决:iPhone 与竖屏另行设计)
-  - 改动任何 F4 视觉资产、样式 token 或儿童可见文案
-  - 未经爸爸明确批准不得推送 main 或部署
+  - 让多个已装备槽位只显示最后一件或用 UI 状态冒充视觉组合
+  - 修改角色脸、身份、道具商店价格、数据库 schema 或学习流程
+  - 把 G1 棋盘格原图直接复制进生产目录
+  - 提交、推送、外部部署、删除或覆盖用户已有内容
 ```
 
-## 本批次来源
+## 目标
 
-爸爸报告(2026-08-05):mini 真机上「显示尺寸不对,有些贴图甚至看不到」,裁决把 iOS 系列屏幕自适应做通。
+爸爸于 2026-09-10 对 W01～W06 回复“没问题，上线吧”。本任务据此冻结六件造型并完成生产上线。由于当前场景 2 角色基准是压平整身图，直接叠加服装会露出原帽子、裙摆或围兜；本轮采用完整组合外观矩阵消费相同槽位语义，保证每种合法装备组合都有明确成品图，同时保留现有所有权和事务接口。后续若重建独立 body/outfit/headLook 层，可保持逻辑 ID 与存档不变地替换渲染实现。
 
-排查结论:桌面模拟 iPad mini 6/7 横屏(1133×744)、mini 5 4:3(1024×768)、Air(1180×820)、Pro 13(1366×1024)、Safari 工具栏压缩(1133×650)下固定舞台缩放、贴图可见性全部正常(截图矩阵见 `visual-regression/ios-adaptation-2026-08/`);竖屏与 iPhone 横屏按既定裁决显示引导卡。模拟无法复现真机现象,但存在两个可坐实的 iOS 真机特有缺口,本批次修复:
+## 开始任务前四问
 
-1. `apple-mobile-web-app-status-bar-style: default` → standalone 下顶部有不透明状态栏挤压可用高度且顶部出现色条;改 `black-translucent` 让舞台用满屏幕(safe-area 已由 `.f4-safe-area` 处理)。
-2. `useStageScale` 只依赖 ResizeObserver + orientationchange;iOS 对 `position:fixed` 容器在旋转/Safari 工具栏伸缩时存在测量时序问题,补 `window.resize` 与 `visualViewport.resize` 监听兜底,任何视口变化都即时重算缩放。
-
-## 分项
-
-| 顺序 | 分项 | 负责人 | 级别 | 主要路径 | 状态 |
-|---:|---|---|---|---|---|
-| 1 | 状态栏沉浸 | Claude | L1 | `index.html` | 待做 |
-| 2 | 视口变化重算兜底 | Claude | L1 | `useStageScale.ts` | 待做 |
-| 3 | iOS 视口截图矩阵存档 | Claude | L1 | `visual-regression/ios-adaptation-2026-08/**` | 待做 |
-| 4 | 门禁与变更记录 | Claude | L1 | `CURRENT_TASK.md`、`F4-CHG-033`、`progress.md` | 待做 |
-
-## 真机确诊待办
-
-若修复发布后 mini 真机仍有「贴图看不到」,需要爸爸提供一张真机截图与打开方式(主屏图标还是 Safari)再定位;候选原因:Safari 非 standalone 工具栏压缩、弱网下 36MB 预缓存中断导致离线丢图、部分单词无插图资产(F4_WORD_ILLUSTRATION_POLICY 属预期)。
-
-## 发布授权
-
-- 2026-08-05,爸爸明确批准:提交并推送 `main`,允许本批次触发 GitHub Pages 部署(原话「先合并推送这一版」)。
+1. **修改哪一层：**场景 2 衣柜生产图、商品定义、外观解析器、首页/衣柜渲染、测试和截图；不改数据库结构。
+2. **参考与许可路径：**以 W01～W06 批准试装和场景 2 原角色为唯一身份/造型输入；组合补图只把已批准槽位放在同一角色上，不新增设计。
+3. **规格契约：**全部生产图 `1254×1254 RGBA`；小皮保持 `252×274 pt` 角色框，母鸡保持 `220×220 pt`；矩阵覆盖小皮 12 种、母鸡 4 种合法组合。
+4. **验证：**逐图检查 alpha、透明四角、身份和组合完整性；六件逐项真实购买共扣 80 蛋；组合装备后首页与衣柜同步、刷新恢复；运行完整测试、类型检查、视觉门禁、GitHub Pages L3 构建与子路径冒烟测试。

@@ -27,6 +27,7 @@ export interface DecorationRenderContract {
 
 export interface DecorationCatalogItemDefinition {
   id: string
+  displayName: string
   sceneId: string
   assetId: string
   assetStatus: SceneAssetStatus
@@ -145,15 +146,18 @@ const PLACEMENT_BOUNDS_BY_KIND = {
 function decoration(
   sceneId: string,
   suffix: string,
+  displayName: string,
   kind: DecorationKind,
   layer: SceneLayer,
   releaseTier: 'core' | 'extension',
+  approvedAssetId?: string,
 ): DecorationCatalogItemDefinition {
   return {
     id: `${sceneId}-${suffix}`,
+    displayName,
     sceneId,
-    assetId: `internal-placeholder:${sceneId}-${suffix}`,
-    assetStatus: 'internal-placeholder',
+    assetId: approvedAssetId ?? `internal-placeholder:${sceneId}-${suffix}`,
+    assetStatus: approvedAssetId ? 'approved' : 'internal-placeholder',
     kind,
     eggCost: DECORATION_EGG_PRICES[kind],
     releaseTier,
@@ -168,15 +172,15 @@ function decoration(
 }
 
 const SCENE_1_DECORATIONS: readonly DecorationCatalogItemDefinition[] = [
-  decoration('scene-1', 'flower-sign', 'small', 'front', 'core'),
-  decoration('scene-1', 'picnic-crate', 'medium', 'actor', 'core'),
-  decoration('scene-1', 'welcome-landmark', 'landmark', 'back', 'core'),
-  decoration('scene-1', 'flower-pot', 'small', 'front', 'extension'),
-  decoration('scene-1', 'butterfly-post', 'small', 'front', 'extension'),
-  decoration('scene-1', 'berry-basket', 'small', 'front', 'extension'),
-  decoration('scene-1', 'garden-bench', 'medium', 'actor', 'extension'),
-  decoration('scene-1', 'watering-cart', 'medium', 'actor', 'extension'),
-  decoration('scene-1', 'old-oak-landmark', 'landmark', 'back', 'extension'),
+  decoration('scene-1', 'flower-sign', '花朵小木牌', 'small', 'front', 'core'),
+  decoration('scene-1', 'picnic-crate', '野餐木箱', 'medium', 'actor', 'core'),
+  decoration('scene-1', 'welcome-landmark', '欢迎地标', 'landmark', 'back', 'core'),
+  decoration('scene-1', 'flower-pot', '花盆', 'small', 'front', 'extension'),
+  decoration('scene-1', 'butterfly-post', '蝴蝶柱', 'small', 'front', 'extension'),
+  decoration('scene-1', 'berry-basket', '莓果篮', 'small', 'front', 'extension'),
+  decoration('scene-1', 'garden-bench', '花园长椅', 'medium', 'actor', 'extension'),
+  decoration('scene-1', 'watering-cart', '浇水车', 'medium', 'actor', 'extension'),
+  decoration('scene-1', 'old-oak-landmark', '老橡树地标', 'landmark', 'back', 'extension'),
 ]
 
 const SCENE_1_DEFINITION: FarmSceneDefinition = {
@@ -227,7 +231,7 @@ const SCENE_2_DEFINITION: FarmSceneDefinition = {
     backgroundAssetId: 'scenes/scene-2/orchard-background.png',
     thumbnailAssetId: 'scenes/scene-2/orchard-background.png',
     assetStatus: 'approved',
-    freeSignAssetId: 'internal-placeholder:scene-2-travel-sign',
+    freeSignAssetId: 'scenes/scene-2/travel-sign.png',
     visibleChickCap: 40,
     hatcheryVisualStates: hatcheryVisualStates('scene-2'),
     hatcheryRenderBox: HATCHERY_RENDER_BOX,
@@ -239,6 +243,13 @@ const SCENE_2_DEFINITION: FarmSceneDefinition = {
     },
     fixedVisuals: [
       {
+        id: 'scene-2-travel-sign',
+        assetId: 'scenes/scene-2/travel-sign.png',
+        assetStatus: 'approved',
+        alt: '用苹果、叶片和花朵图案装饰的旅行路牌',
+        renderBox: { x: 1006, y: 468, width: 170, height: 170 },
+      },
+      {
         id: 'scene-2-apple-juice-station',
         assetId: 'scenes/scene-2/apple-juice-station.png',
         assetStatus: 'approved',
@@ -247,16 +258,29 @@ const SCENE_2_DEFINITION: FarmSceneDefinition = {
       },
     ],
     decorationCatalog: [
-      decoration('scene-2', 'flower-basket', 'small', 'front', 'core'),
-      decoration('scene-2', 'field-bench', 'medium', 'actor', 'core'),
-      decoration('scene-2', 'windmill-landmark', 'landmark', 'back', 'core'),
+      decoration('scene-2', 'flower-basket', '苹果花篮', 'small', 'front', 'core', 'scenes/scene-2/decorations/flower-basket.png'),
+      decoration('scene-2', 'apple-crate', '苹果木箱', 'small', 'front', 'extension', 'scenes/scene-2/decorations/apple-crate.png'),
+      decoration('scene-2', 'cider-jugs', '果汁陶壶', 'small', 'front', 'extension', 'scenes/scene-2/decorations/cider-jugs.png'),
+      decoration('scene-2', 'orchard-lantern', '果园提灯', 'small', 'front', 'extension', 'scenes/scene-2/decorations/orchard-lantern.png'),
+      decoration('scene-2', 'field-bench', '田野长椅', 'medium', 'actor', 'core', 'scenes/scene-2/decorations/field-bench.png'),
+      decoration('scene-2', 'harvest-cart', '苹果收获车', 'medium', 'actor', 'extension', 'scenes/scene-2/decorations/harvest-cart.png'),
+      decoration('scene-2', 'sorting-table', '苹果分拣桌', 'medium', 'actor', 'extension', 'scenes/scene-2/decorations/sorting-table.png'),
+      decoration('scene-2', 'windmill-landmark', '苹果园风车', 'landmark', 'back', 'core', 'scenes/scene-2/decorations/windmill-landmark.png'),
+      decoration('scene-2', 'apple-tree-swing-landmark', '苹果树秋千', 'landmark', 'back', 'extension', 'scenes/scene-2/decorations/apple-tree-swing-landmark.png'),
     ],
     chickVariantIds: {
       normal: [DEFAULT_NORMAL_CHICK_VARIANT_ID],
       color: SCENE_2_COLOR_CHICK_VARIANT_IDS,
       special: SCENE_2_SPECIAL_CHICK_VARIANT_IDS,
     },
-    cosmeticItemIds: ['mother-headwear-scene-2-core'],
+    cosmeticItemIds: [
+      'xiaopi-hair-scene-2-extension',
+      'xiaopi-hat-look-scene-2-extension',
+      'xiaopi-outfit-scene-2-extension',
+      'xiaopi-accessory-scene-2-extension',
+      'mother-headwear-scene-2-core',
+      'mother-neckwear-scene-2-extension',
+    ],
 }
 
 /**

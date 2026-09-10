@@ -10,8 +10,7 @@ import type { SceneLayer } from '../../../domain/farmScenes'
 import type { StagePoint } from '../../../domain/types'
 import { f4AssetUrl } from '../assetUrl'
 import { STAGE_W, toStagePoint } from '../stage/stagePoint'
-import { APPROVED_STANDARD_CHARACTER_LAYERS } from './characterLayerContract'
-import { LayeredCharacter } from './LayeredCharacter'
+import { characterAppearanceAssetId } from './characterAppearance'
 
 interface CustomizationProps {
   vm: FarmHomeViewModel
@@ -156,19 +155,15 @@ export function FarmDecorations({ vm, layer, dispatch }: { vm: FarmHomeViewModel
 }
 
 function decorationLabel(item: DecorationCatalogItemVM): string {
-  return item.definition.kind === 'small' ? '小贴纸' : item.definition.kind === 'medium' ? '中型摆设' : '地标'
+  return item.definition.displayName
+}
+
+function decorationKindLabel(item: DecorationCatalogItemVM): string {
+  return item.definition.kind === 'small' ? '小装饰' : item.definition.kind === 'medium' ? '中型摆设' : '果园地标'
 }
 
 function wardrobeLabel(item: WardrobeItemVM): string {
-  const labels: Record<WardrobeItemVM['definition']['catalogKind'], string> = {
-    xiaopi_hair: '小皮发型',
-    xiaopi_hat_look: '小皮帽子造型',
-    xiaopi_outfit: '小皮服装',
-    xiaopi_accessory: '小皮饰品',
-    mother_headwear: '母鸡头饰',
-    mother_neckwear: '母鸡颈饰',
-  }
-  return labels[item.definition.catalogKind]
+  return item.definition.displayName
 }
 
 export function CustomizationEntrances({ vm, dispatch }: CustomizationProps) {
@@ -189,18 +184,21 @@ export function DecorationCatalogPanel({ vm, dispatch }: CustomizationProps) {
   if (vm.overlay !== 'sticker_catalog') return null
   return (
     <>
-      <button className="panel-backdrop-f4 is-visible" type="button" aria-label="关闭贴纸目录" onClick={() => dispatch({ type: 'CLOSE_DECORATION_CATALOG' })} />
-      <section className="customization-panel-f7" aria-label={`${vm.viewedScene.title}贴纸目录`}>
+      <button className="panel-backdrop-f4 is-visible" type="button" aria-label="关闭装饰商店" onClick={() => dispatch({ type: 'CLOSE_DECORATION_CATALOG' })} />
+      <section className="customization-panel-f7" aria-label={`${vm.viewedScene.title}装饰商店`}>
         <button className="panel-close-f4" type="button" aria-label="关闭" onClick={() => dispatch({ type: 'CLOSE_DECORATION_CATALOG' })}>×</button>
-        <p className="k-eyebrow">{vm.viewedScene.title}</p><h2>布置农场</h2>
+        <p className="k-eyebrow">{vm.viewedScene.title} · 用鸡蛋永久收藏</p><h2>装饰商店</h2>
         <div className="customization-grid-f7">
           {vm.decorationCatalog.map(item => {
             const bounds = item.definition.placementBounds
             const center = { x: (bounds.xMin + bounds.xMax) / 2, y: (bounds.yMin + bounds.yMax) / 2 }
             return (
               <article key={item.definition.id}>
+                <div className="customization-item-preview-f7">
+                  <img src={f4AssetUrl(item.definition.assetId)} alt={item.definition.displayName} />
+                </div>
                 <strong>{decorationLabel(item)}</strong>
-                <small>{item.definition.eggCost} 颗蛋 · {item.definition.layer}</small>
+                <small>{item.definition.eggCost} 颗蛋 · {decorationKindLabel(item)}</small>
                 {!item.owned
                   ? <button type="button" onClick={() => dispatch({ type: 'BUY_DECORATION', sceneId: vm.viewedSceneId, itemId: item.definition.id })}>购买</button>
                   : item.placement
@@ -217,6 +215,18 @@ export function DecorationCatalogPanel({ vm, dispatch }: CustomizationProps) {
 
 export function WardrobePanel({ vm, dispatch }: CustomizationProps) {
   if (vm.overlay !== 'wardrobe') return null
+  const xiaopiAppearance = characterAppearanceAssetId(
+    vm.viewedSceneId,
+    'xiaopi',
+    vm.loadout,
+    vm.viewedScene.characterVisuals.xiaopiAssetId,
+  )
+  const motherAppearance = characterAppearanceAssetId(
+    vm.viewedSceneId,
+    'mother',
+    vm.loadout,
+    vm.viewedScene.characterVisuals.motherAssetId,
+  )
   return (
     <>
       <button className="panel-backdrop-f4 is-visible" type="button" aria-label="关闭衣柜" onClick={() => dispatch({ type: 'CLOSE_WARDROBE' })} />
@@ -224,12 +234,15 @@ export function WardrobePanel({ vm, dispatch }: CustomizationProps) {
         <button className="panel-close-f4" type="button" aria-label="关闭" onClick={() => dispatch({ type: 'CLOSE_WARDROBE' })}>×</button>
         <p className="k-eyebrow">购买永久 · 换装免费</p><h2>角色衣柜</h2>
         <div className="wardrobe-preview-f7">
-          <LayeredCharacter group={{ target: 'xiaopi', surface: 'wardrobe', loadout: vm.loadout.xiaopi, home: { x: 0, y: 0 }, layers: APPROVED_STANDARD_CHARACTER_LAYERS.xiaopi }} />
-          <LayeredCharacter group={{ target: 'mother', surface: 'wardrobe', loadout: vm.loadout.mother, home: { x: 270, y: 25 }, layers: APPROVED_STANDARD_CHARACTER_LAYERS.mother }} />
+          <img className="wardrobe-character-preview-f7 is-xiaopi" src={f4AssetUrl(xiaopiAppearance)} alt="小皮当前造型" />
+          <img className="wardrobe-character-preview-f7 is-mother" src={f4AssetUrl(motherAppearance)} alt="母鸡当前造型" />
         </div>
         <div className="customization-grid-f7">
           {vm.wardrobeCatalog.map(item => (
             <article key={item.definition.id}>
+              <div className="customization-item-preview-f7">
+                <img src={f4AssetUrl(item.definition.previewAssetId)} alt={item.definition.displayName} />
+              </div>
               <strong>{wardrobeLabel(item)}</strong><small>{item.definition.eggCost} 颗蛋</small>
               {!item.owned
                 ? <button type="button" onClick={() => dispatch({ type: 'BUY_COSMETIC', itemId: item.definition.id })}>购买</button>

@@ -5,6 +5,7 @@ import { clampSceneElementHome, SCENE_ELEMENT_LAYOUTS } from '../../../domain/fa
 import { f4AssetUrl } from '../assetUrl'
 import { STAGE_H, STAGE_W, toStagePoint } from '../stage/stagePoint'
 import { chickAssetId, chickCanvasSize, specialChickHome } from './chickVisual'
+import { characterAppearanceAssetId } from './characterAppearance'
 
 type ActorKind = 'mother' | 'farmer' | 'chick'
 type Talk = { line: string; translation: string } | null
@@ -380,7 +381,12 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
         id: 'mother',
         kind: 'mother',
         label: vm.henName ? `母鸡妈妈：${vm.henName}` : '母鸡妈妈',
-        image: f4AssetUrl(vm.viewedScene.characterVisuals.motherAssetId),
+        image: f4AssetUrl(characterAppearanceAssetId(
+          vm.viewedSceneId,
+          'mother',
+          vm.loadout,
+          vm.viewedScene.characterVisuals.motherAssetId,
+        )),
         home: vm.sceneElementHomes.mother ?? SCENE_ELEMENT_LAYOUTS.mother.defaultHome,
         size: ACTOR_SIZE.mother,
         talk: { line: '咕咕，慢慢散步吧～', translation: "Let's take a walk!" },
@@ -389,14 +395,19 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
         id: 'farmer',
         kind: 'farmer',
         label: '农场主小皮',
-        image: f4AssetUrl(vm.viewedScene.characterVisuals.xiaopiAssetId),
+        image: f4AssetUrl(characterAppearanceAssetId(
+          vm.viewedSceneId,
+          'xiaopi',
+          vm.loadout,
+          vm.viewedScene.characterVisuals.xiaopiAssetId,
+        )),
         home: vm.sceneElementHomes.xiaopi ?? SCENE_ELEMENT_LAYOUTS.xiaopi.defaultHome,
         size: ACTOR_SIZE.farmer,
         talk: { line: '今天也一起加油！', translation: "Let's do our best!" },
       },
       ...chickSpecs,
     ]
-  }, [vm.henName, vm.sceneElementHomes, vm.viewedScene, visibleChicks])
+  }, [vm.henName, vm.loadout, vm.sceneElementHomes, vm.viewedScene, vm.viewedSceneId, visibleChicks])
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)')

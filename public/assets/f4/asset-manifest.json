@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "copiedOn": "2026-07-17",
-  "updatedOn": "2026-07-22",
-  "sourceRoot": "design-samples/assets",
-  "rule": "Byte-for-byte production copies; locked sources remain unchanged.",
+  "updatedOn": "2026-09-10",
+  "sourceRoot": "design-samples/assets plus approved external art sources",
+  "rule": "Each hash identifies production bytes; approved source art may receive documented G2 alpha/canvas calibration before copy.",
   "assets": [
     {
       "file": "farm-background-f3.png",
@@ -136,6 +136,102 @@
     {
       "file": "scenes/scene-2/apple-juice-station.png",
       "sha256": "0ECCF413FFDEFE01373BEC540C907CA71CC10EE0980FB077B3C5E23108A19E97"
+    },
+    {
+      "file": "scenes/scene-2/travel-sign.png",
+      "sha256": "917C3CBF0BA7DC2C747245655F9D784B9662BF20D40AA31027D8B5D0DBD867A2"
+    },
+    {
+      "file": "scenes/scene-2/decorations/flower-basket.png",
+      "sha256": "9BEB762E2FDC409855017562E16A56D816A9DD5F5A5A34280967EA26468CD8E6"
+    },
+    {
+      "file": "scenes/scene-2/decorations/apple-crate.png",
+      "sha256": "B61F1D618518369C21CB61D090083E495283740971B6D26E58FD5F60E6300591"
+    },
+    {
+      "file": "scenes/scene-2/decorations/cider-jugs.png",
+      "sha256": "ED8B22FAD289CA60E6CF316A4D3189ED4B9986FA455CE2F234C3728ECC5B79C3"
+    },
+    {
+      "file": "scenes/scene-2/decorations/orchard-lantern.png",
+      "sha256": "254EF527157118F73413FC133D6CBF6769000D2BF5D441A662A411C9886B196E"
+    },
+    {
+      "file": "scenes/scene-2/decorations/field-bench.png",
+      "sha256": "084A9245553F6C7FDC588F982E8D5F116BC7883BBAC1986459C37D94BA534729"
+    },
+    {
+      "file": "scenes/scene-2/decorations/harvest-cart.png",
+      "sha256": "CD52700450FBB75D44F54C259B125CBE7B953FA537273CD4290E6159930CC90D"
+    },
+    {
+      "file": "scenes/scene-2/decorations/sorting-table.png",
+      "sha256": "FE9EBF762E9DD4FEB0613E8AACA8843496E3A7AAE9ECBAC7ACFF1E806FCFA659"
+    },
+    {
+      "file": "scenes/scene-2/decorations/windmill-landmark.png",
+      "sha256": "9AF6E17603B4287CE81804C98FE1459F77CEB2C9B47077E46F2AC9D636DDA9B7"
+    },
+    {
+      "file": "scenes/scene-2/decorations/apple-tree-swing-landmark.png",
+      "sha256": "82749EF57FC21CA11F7669A4AE53BAF593E3D31BF8BC47E859A2517CA0A2CF7A"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/mother-bonnet-neckerchief.png",
+      "sha256": "082C20E783FA3BAD1FA1C586D36D37DCCBD3E57536B3649FB352CC5589E7A65A"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/mother-bonnet-none.png",
+      "sha256": "D50A32D075E9F4DA139C47280280B49E59DEB1D3FC9720FA0CCAE10009B3513B"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/mother-default-neckerchief.png",
+      "sha256": "8008E267C2BF7A8BAE0B315073E5586F94B86AA708FA22B639E34A1164B802F3"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-bonnet-default-none.png",
+      "sha256": "333F74354B65FCBDB8B454572C07EEDA0F72694B8731394982C813B09E9B2F91"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-bonnet-default-satchel.png",
+      "sha256": "4E22324EBF7DE0A2D7AE9561099D1F06F2952A0D35E1BEC512A56E335376DE3F"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-bonnet-overalls-none.png",
+      "sha256": "1AD054BEB4992818EFCF70B06EC82E7538921DE5C0439ED2780EC6560B3BBFAB"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-bonnet-overalls-satchel.png",
+      "sha256": "85F73FEC597C40A92B9DB714A124AB1F88BC528E9C9AD46FCA492E567FB66242"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-default-default-satchel.png",
+      "sha256": "BD5F95CA69F950DB1606C9435EEFBF5D904D2839C7CCA86E358F622BA7A759C5"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-default-overalls-none.png",
+      "sha256": "2885D23B0E39B376BEF256AF7D99A27B9DD501E7B9295C363434D9775A9F6B38"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-default-overalls-satchel.png",
+      "sha256": "D72F14A536FB665AC384E3A51AC7BE5A438CD7415E06FD685A1E6A1DDDC087D7"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-hair-default-none.png",
+      "sha256": "705F1FE61CA426D4D73AA52151A098475240A499DC8894194D1083871C2E69C4"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-hair-default-satchel.png",
+      "sha256": "67A29CF614E4CADBAE808CB79C2BBE3CED8D37479279928765D4C3564CCCC12B"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-hair-overalls-none.png",
+      "sha256": "2DEA15F9986AD80B0261DF769BE704EB1B29A0DD57DD38EAECCAE81F0C01AC0D"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-hair-overalls-satchel.png",
+      "sha256": "02C3B3878759753124DCF1CC3FE035EA8BDAA6CC22F9D982596DEA1B9238EEE6"
     }
   ]
 }

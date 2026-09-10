@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { INTERNAL_SCENE_1_COSMETIC_DRAFTS } from '../domain/farmCosmetics'
 import { FARM_SCENE_DEFINITIONS } from '../domain/farmScenes'
 import { exportAll, importAll } from './backup'
-import { getFarmStateV3, PipiDB, setFarmStateV3 } from './db'
+import { defaultMeta, getFarmStateV3, PipiDB, setFarmStateV3, setKV } from './db'
 import { defaultFarmStateV3 } from './farmPersistence'
 import { createFarmUsecases } from './usecases/farmHome'
 
@@ -42,6 +42,54 @@ describe('framework 7 release gating', () => {
     expect(vm.wardrobeCatalog).toHaveLength(6)
     expect(vm.decorationCatalog.reduce((sum, item) => sum + item.definition.eggCost, 0)).toBe(90)
     expect(vm.wardrobeCatalog.reduce((sum, item) => sum + item.definition.eggCost, 0)).toBe(80)
+    db.close()
+  })
+
+  it('lists and sells the complete approved scene 2 decoration and wardrobe catalogs in production', async () => {
+    const db = freshDb()
+    await setKV(db, 'meta', { ...defaultMeta(context.today), totalDays: 36 })
+    await setFarmStateV3(db, {
+      ...defaultFarmStateV3(),
+      henName: 'Coco',
+      eggStock: 200,
+      activeSceneId: 'scene-2',
+      acknowledgedSceneChapter: 2,
+    })
+    const uc = createFarmUsecases(db)
+    const vm = await uc.loadViewModel(now)
+
+    expect(vm.viewedSceneId).toBe('scene-2')
+    expect(vm.decorationCatalog).toHaveLength(9)
+    expect(vm.decorationCatalog.every(item => item.definition.assetStatus === 'approved')).toBe(true)
+    expect(vm.wardrobeCatalog).toHaveLength(6)
+    expect(vm.wardrobeCatalog.reduce((sum, item) => sum + item.definition.eggCost, 0)).toBe(80)
+    for (const item of vm.decorationCatalog) {
+      expect(await uc.buyDecoration('scene-2', item.definition.id, now)).toEqual({
+        status: 'purchased',
+        chargedEggs: item.definition.eggCost,
+      })
+    }
+    for (const item of vm.wardrobeCatalog) {
+      expect(await uc.buyCosmetic(item.definition.id, now)).toEqual({
+        status: 'purchased',
+        chargedEggs: item.definition.eggCost,
+      })
+      expect((await uc.equipCosmetic(item.definition.target, item.definition.slot, item.definition.id, now)).status)
+        .toBe('equipped')
+    }
+    expect((await getFarmStateV3(db, context)).eggStock).toBe(30)
+    expect(await db.decorations.where('sceneId').equals('scene-2').count()).toBe(9)
+    expect(await db.cosmetics.count()).toBe(6)
+    const equippedVm = await uc.loadViewModel(now)
+    expect(equippedVm.loadout.xiaopi).toMatchObject({
+      headLook: 'xiaopi-hat-look-scene-2-extension',
+      outfit: 'xiaopi-outfit-scene-2-extension',
+      accessory: 'xiaopi-accessory-scene-2-extension',
+    })
+    expect(equippedVm.loadout.mother).toEqual({
+      headwear: 'mother-headwear-scene-2-core',
+      neckwear: 'mother-neckwear-scene-2-extension',
+    })
     db.close()
   })
 })

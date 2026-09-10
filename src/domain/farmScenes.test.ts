@@ -37,9 +37,10 @@ describe('scene release package', () => {
       expect(scene.chickVariantIds.special).toEqual(['chick-special-approved-f'])
     }
     expect(FARM_SCENE_DEFINITIONS.map(scene => scene.id)).toEqual(['scene-1', 'scene-2'])
-    expect(FARM_SCENE_DEFINITIONS[1].fixedVisuals).toMatchObject([
-      { id: 'scene-2-apple-juice-station', assetStatus: 'approved' },
-    ])
+    expect(FARM_SCENE_DEFINITIONS[1].fixedVisuals).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'scene-2-travel-sign', assetStatus: 'approved' }),
+      expect.objectContaining({ id: 'scene-2-apple-juice-station', assetStatus: 'approved' }),
+    ]))
   })
 
   it('defines the complete scene 1 sticker economy without exposing draft art', () => {
@@ -71,5 +72,24 @@ describe('scene release package', () => {
       expect(item.render.groundAnchorPx.x).toBeGreaterThan(0)
       expect(item.render.groundAnchorPx.y).toBeGreaterThan(0)
     }
+  })
+
+  it('publishes the complete scene 2 decoration shop with approved production art', () => {
+    const scene = FARM_SCENE_DEFINITIONS[1]
+    const counts = scene.decorationCatalog.reduce<Record<string, number>>((result, item) => {
+      result[item.kind] = (result[item.kind] ?? 0) + 1
+      return result
+    }, {})
+
+    expect(counts).toEqual({ small: 4, medium: 3, landmark: 2 })
+    expect(scene.decorationCatalog).toHaveLength(9)
+    expect(scene.decorationCatalog.reduce((sum, item) => sum + item.eggCost, 0)).toBe(90)
+    expect(scene.decorationCatalog.filter(item => item.releaseTier === 'core')).toHaveLength(3)
+    expect(scene.decorationCatalog.filter(item => item.releaseTier === 'extension')).toHaveLength(6)
+    expect(scene.decorationCatalog.every(item => item.assetStatus === 'approved')).toBe(true)
+    expect(scene.decorationCatalog.every(item => item.assetId.startsWith('scenes/scene-2/decorations/'))).toBe(true)
+    expect(new Set(scene.decorationCatalog.map(item => item.displayName)).size).toBe(9)
+    expect(scene.freeSignAssetId).toBe('scenes/scene-2/travel-sign.png')
+    expect(scene.cosmeticItemIds).toHaveLength(6)
   })
 })
