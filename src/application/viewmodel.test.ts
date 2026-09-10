@@ -37,14 +37,25 @@ describe('F4 首页进度 ViewModel', () => {
     const afterNewWordQuiz = assembleViewModel(snapshot(4))
     expect(afterNewWordQuiz.learnedToday).toBe(3)
     expect(afterNewWordQuiz.newWordsLearnedToday).toBe(1)
-    expect(afterNewWordQuiz.eggsEarnedToday).toBe(2)
+    expect(afterNewWordQuiz.eggsEarnedToday).toBe(1)
   })
 
-  it('向暂停日任务板暴露真实暂停状态', () => {
-    const paused = snapshot(0)
-    paused.session.newWordsPaused = true
-    expect(assembleViewModel(paused).newWordsPaused).toBe(true)
-    expect(assembleViewModel(snapshot(0)).newWordsPaused).toBe(false)
+  it('守护卡:完成日暴露张数、今日用卡与今日发卡(F4-CHG-034)', () => {
+    const protectedDay = snapshot(4)
+    protectedDay.session.completed = true
+    protectedDay.meta = {
+      streak: 7, lastDoneDate: '2026-07-17', totalDays: 9, installDate: '2026-07-01',
+      freezeCards: 1, lastShieldUsedOn: '2026-07-17',
+    }
+    const vm = assembleViewModel(protectedDay)
+    expect(vm.freezeCards).toBe(1)
+    expect(vm.streakProtectedToday).toBe(true)
+    expect(vm.shieldEarnedToday).toBe(true)
+
+    const plain = assembleViewModel(snapshot(0))
+    expect(plain.freezeCards).toBe(0)
+    expect(plain.streakProtectedToday).toBe(false)
+    expect(plain.shieldEarnedToday).toBe(false)
   })
 
   it('孵化 VM 只暴露派生时间，不提前泄露隐藏外观', () => {

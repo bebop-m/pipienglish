@@ -46,7 +46,7 @@ describe('起步词播种', () => {
     await farm.clockGuard(now)
     const session = (await db.sessions.get(dayKeyOf(now)))!
     for (const id of session.newIds) expect(STARTER_WORD_IDS).not.toContain(id)
-    expect(session.newIds).toHaveLength(4) // 新词照常从未学词里取
+    expect(session.newIds).toHaveLength(2) // 新词照常从未学词里取
     db.close()
   })
 

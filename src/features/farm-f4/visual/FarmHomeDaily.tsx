@@ -310,6 +310,14 @@ function CompleteBoard({ vm, dispatch }: FarmHomeDailyProps) {
       <p className="complete-kicker-f4">今天的农场任务完成啦</p>
       <h1 id="complete-title-f4">连续 {vm.streak} 天！</h1>
       <p>今天认识了 {completedNewWords} 个新朋友，还复习了 {vm.reviewCountToday} 个老朋友。</p>
+      <p className="complete-shield-f4" aria-label={`连胜守护卡 ${vm.freezeCards} 张`}>
+        {vm.streakProtectedToday
+          ? `母鸡用一张守护卡帮你把连续 ${vm.streak} 天接上了 · `
+          : vm.shieldEarnedToday
+            ? '连续 7 天，得到一张守护卡 · '
+            : ''}
+        <span aria-hidden="true">🛡</span> 守护卡 ×{vm.freezeCards}
+      </p>
       <div className="complete-stats-f4" aria-label="今日学习战报">
         <span><strong>{completedNewWords}</strong> 新词</span>
         <span><strong>{vm.reviewCountToday}</strong> 复习</span>
@@ -460,13 +468,11 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
   const hatcheryAssetId = vm.viewedScene.hatcheryVisualStates[hatcheryVisualState]
   const hatcheryRenderBox = vm.viewedScene.hatcheryRenderBox
   const progress = vm.totalItemsToday > 0 ? Math.min(100, (vm.learnedToday / vm.totalItemsToday) * 100) : 0
-  const taskTitle = vm.newWordsPaused
-    ? '今天先复习老朋友'
-    : vm.learnedToday > 0 ? '继续今天的学习' : '开始今天的学习'
-  const taskSummary = vm.newWordsPaused
-    ? `复习 ${vm.reviewCountToday} 个`
+  const taskTitle = vm.learnedToday > 0 ? '继续今天的学习' : '开始今天的学习'
+  const taskSummary = vm.reviewCountToday > 0 && vm.dailyTarget > 0
+    ? `复习 ${vm.reviewCountToday} · 新词 ${vm.dailyTarget}`
     : vm.reviewCountToday > 0
-      ? `复习 ${vm.reviewCountToday} · 新词 ${vm.dailyTarget}`
+      ? `复习 ${vm.reviewCountToday} 个`
       : `新词 ${vm.dailyTarget} 个`
   const hatcheryCopy = activeHatchTransition
     ? activeHatchTransition.phase === 'two_shells'

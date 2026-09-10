@@ -6,12 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run check && tsc && vite build",
-    "check": "node scripts/check-fullbleed-layers.mjs && node scripts/check-visual-references.mjs",
+    "check": "node scripts/check-fullbleed-layers.mjs",
     "check:fullbleed": "node scripts/check-fullbleed-layers.mjs",
     "check:visual-references": "node scripts/check-visual-references.mjs",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "assets:optimize": "python scripts/optimize-f4-assets.py",
+    "assets:check": "python scripts/optimize-f4-assets.py --check"
   },
   "dependencies": {
     "dexie": "^4.0.11",

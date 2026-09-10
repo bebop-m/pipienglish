@@ -15,6 +15,12 @@ body,
   height: 100%;
 }
 
+/* 画布底色:iPad 桌面 PWA 的固定视口有时铺不到屏幕最底边(2026-09-10 真机:底部露出一条天蓝色横带),
+   露出的那一段只能由 html 的画布背景着色。农场页按场景写入 --f4-canvas(背景底边的草地色)。 */
+html {
+  background: var(--f4-canvas, #bfe5f7);
+}
+
 body {
   overflow: hidden;
   font-family: system-ui, sans-serif;

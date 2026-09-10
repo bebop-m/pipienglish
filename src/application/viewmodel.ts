@@ -7,6 +7,7 @@ import { estimatedMinutes, totalItems } from '../domain/dailyPlan'
 import { eggsEarnedFor } from '../domain/eggEconomy'
 import { hatchesAt, remainingHatchMs } from '../domain/hatchTiming'
 import { dayKeyOf } from '../domain/time'
+import { SHIELD_STREAK_INTERVAL } from '../domain/streak'
 import type { ChickRarity } from '../domain/hatchRarity'
 import { canStartMeal, RECIPE_EGG_COSTS, type CookingMeal, type RecipeId } from '../domain/meals'
 import type { FarmStateV3, PersistedChick } from './farmPersistence'
@@ -33,7 +34,7 @@ import {
   FARM_COSMETIC_DEFINITIONS,
   type CosmeticItemDefinition,
 } from '../domain/farmCosmetics'
-import { assetIsListable, loadoutItem } from '../domain/farmCustomization'
+import { assetIsListable, loadoutItem, resolveDecorationHome } from '../domain/farmCustomization'
 import {
   defaultCharacterLoadout,
   type DecorationRow,
@@ -99,6 +100,7 @@ export interface FarmSceneVM {
   subtitle: string
   backgroundAssetId: string
   thumbnailAssetId: string
+  canvasColor: string
   assetStatus: 'approved' | 'internal-placeholder'
   hatcheryVisualStates: HatcheryVisualStates
   hatcheryRenderBox: StageRenderBox
@@ -152,12 +154,14 @@ export interface FarmHomeViewModel {
   sceneCapabilities: FarmSceneCapabilitiesVM
   dayNumber: number
   streak: number
+  freezeCards: number // 连胜守护卡张数(F4-CHG-034)
+  streakProtectedToday: boolean // 今天完成时用守护卡接上了连胜,完成卡多一句话
+  shieldEarnedToday: boolean // 今天完成后连胜到 7 的倍数,刚发了一张卡
   henName: string | null
   learnedToday: number // 已完成的复习词 + 已完成见面/自测的新词,用于任务板“朋友”进度
   newWordsLearnedToday: number // 仅新词,用于顶栏“今日单词”
   dailyTarget: number
   reviewCountToday: number
-  newWordsPaused: boolean
   totalItemsToday: number
   estimatedMinutes: number
   eggStock: number
@@ -302,6 +306,7 @@ export function assembleViewModel(
     subtitle: scene.subtitle,
     backgroundAssetId: scene.backgroundAssetId,
     thumbnailAssetId: scene.thumbnailAssetId,
+    canvasColor: scene.canvasColor,
     assetStatus: scene.assetStatus,
     hatcheryVisualStates: scene.hatcheryVisualStates,
     hatcheryRenderBox: scene.hatcheryRenderBox,
@@ -332,7 +337,8 @@ export function assembleViewModel(
       return {
         definition: item,
         owned: Boolean(row),
-        placement: row?.x != null && row.y != null ? { x: row.x, y: row.y } : null,
+        // 旧存档里已经藏到任务卡背后的贴纸,读出来时就推回可点区域(不写库,下次拖动才落库)
+        placement: row?.x != null && row.y != null ? resolveDecorationHome(item, { x: row.x, y: row.y }) : null,
       }
     })
   const loadout = s.loadout ?? defaultCharacterLoadout()
@@ -343,8 +349,10 @@ export function assembleViewModel(
       .filter(scene => scene.chapter <= activeChapter)
       .flatMap(scene => scene.cosmeticItemIds),
   )
+  // 只列出正在查看的场景自己的装扮:回访场景 1 时不再显示场景 2 的衣柜(穿上也不会变),
+  // 所有权仍全局有效,回到场景 2 照样能穿
   const wardrobeCatalog = (s.cosmeticDefinitions ?? FARM_COSMETIC_DEFINITIONS)
-    .filter(item => enteredCosmeticIds.has(item.id))
+    .filter(item => enteredCosmeticIds.has(item.id) && viewedDefinition.cosmeticItemIds.includes(item.id))
     .filter(item => assetIsListable(item.assetStatus, s.includeInternalPlaceholders ?? false))
     .map(item => ({
       definition: item,
@@ -378,12 +386,17 @@ export function assembleViewModel(
     },
     dayNumber: meta.totalDays + (session.completed ? 0 : 1),
     streak: meta.streak,
+    freezeCards: meta.freezeCards ?? 0,
+    streakProtectedToday: session.completed && meta.lastShieldUsedOn === today,
+    shieldEarnedToday: session.completed
+      && meta.lastDoneDate === today
+      && meta.streak > 0
+      && meta.streak % SHIELD_STREAK_INTERVAL === 0,
     henName: farm.henName,
     learnedToday: reviewDone + newWordsLearnedToday,
     newWordsLearnedToday,
     dailyTarget: session.newIds.length,
     reviewCountToday: session.reviewIds.length,
-    newWordsPaused: session.newWordsPaused ?? false,
     totalItemsToday: session.reviewIds.length + session.newIds.length,
     estimatedMinutes: estimatedMinutes(session),
     eggStock: farm.eggStock,

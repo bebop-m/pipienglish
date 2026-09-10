@@ -32,6 +32,8 @@ export interface MetaState {
   lastDoneDate: string | null
   totalDays: number
   installDate: string
+  freezeCards?: number // 连胜守护卡张数(F4-CHG-034);旧记录缺省 0
+  lastShieldUsedOn?: string | null // 最近一次用守护卡接上连胜的日期,供完成卡文案;旧记录缺省 null
 }
 
 export interface Settings {
@@ -48,7 +50,7 @@ export interface DailySession {
   correct: number
   completed: boolean
   dueBacklog?: number // 构建当日队列时的到期总数(供 SPEC §5.1 连续积压判定;旧记录缺省按 0)
-  newWordsPaused?: boolean // 当日新词是否因积压暂停(文案归视觉层)
+  newWordsPaused?: boolean // 历史字段:F4-CHG-034 起不再暂停新词、不再写入;旧记录可能为 true,读取忽略
   gameEggs?: number // 今日写词游戏已领奖励蛋数(日上限 GAME_EGGS_DAILY_CAP;旧记录缺省 0)
 }
 

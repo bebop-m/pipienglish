@@ -143,10 +143,10 @@ const cards = wardrobe.locator('.customization-grid-f7 article')
 assert.equal(await cards.count(), 6)
 await page.waitForFunction(() => {
   const images = [...document.querySelectorAll('.customization-item-preview-f7 img')]
-  return images.length === 6 && images.every(image => image.complete && image.naturalWidth === 1254 && image.naturalHeight === 1254)
+  return images.length === 6 && images.every(image => image.complete && image.naturalWidth > 0 && image.naturalHeight === image.naturalWidth)
 })
 assert.equal(await wardrobe.locator('.customization-item-preview-f7 img').evaluateAll(images => (
-  images.every(image => image.complete && image.naturalWidth === 1254 && image.naturalHeight === 1254)
+  images.every(image => image.complete && image.naturalWidth > 0 && image.naturalHeight === image.naturalWidth)
 )), true)
 await page.screenshot({ path: path.join(outputDir, 'scene-2-wardrobe-shop-1194x834.png'), animations: 'disabled' })
 
@@ -179,10 +179,10 @@ assert.deepEqual(snapshot.loadout, {
 })
 await page.waitForFunction(() => {
   const images = [...document.querySelectorAll('.wardrobe-character-preview-f7')]
-  return images.length === 2 && images.every(image => image.complete && image.naturalWidth === 1254 && image.naturalHeight === 1254)
+  return images.length === 2 && images.every(image => image.complete && image.naturalWidth > 0 && image.naturalHeight === image.naturalWidth)
 })
 assert.equal(await wardrobe.locator('.wardrobe-character-preview-f7').evaluateAll(images => (
-  images.every(image => image.complete && image.naturalWidth === 1254 && image.naturalHeight === 1254)
+  images.every(image => image.complete && image.naturalWidth > 0 && image.naturalHeight === image.naturalWidth)
 )), true)
 await page.screenshot({ path: path.join(outputDir, 'scene-2-wardrobe-equipped-1194x834.png'), animations: 'disabled' })
 
@@ -197,13 +197,13 @@ await page.waitForFunction(() => {
   const xiaopi = document.querySelector('.actor-f3[data-kind="farmer"] .sprite-f3')
   return mother?.getAttribute('src')?.includes('mother-bonnet-neckerchief.png')
     && xiaopi?.getAttribute('src')?.includes('xiaopi-bonnet-overalls-satchel.png')
-    && mother.complete && mother.naturalWidth === 1254
-    && xiaopi.complete && xiaopi.naturalWidth === 1254
+    && mother.complete && mother.naturalWidth > 0
+    && xiaopi.complete && xiaopi.naturalWidth > 0
 })
 assert.match(await mother.getAttribute('src'), /mother-bonnet-neckerchief\.png$/)
 assert.match(await xiaopi.getAttribute('src'), /xiaopi-bonnet-overalls-satchel\.png$/)
-assert.equal(await mother.evaluate(image => image.complete && image.naturalWidth === 1254 && image.naturalHeight === 1254), true)
-assert.equal(await xiaopi.evaluate(image => image.complete && image.naturalWidth === 1254 && image.naturalHeight === 1254), true)
+assert.equal(await mother.evaluate(image => image.complete && image.naturalWidth > 0 && image.naturalHeight === image.naturalWidth), true)
+assert.equal(await xiaopi.evaluate(image => image.complete && image.naturalWidth > 0 && image.naturalHeight === image.naturalWidth), true)
 assert.equal((await state()).placedDecorations, 9)
 await page.screenshot({ path: path.join(outputDir, 'scene-2-complete-shop-and-wardrobe-equipped-1194x834.png'), animations: 'disabled' })
 

@@ -8,7 +8,7 @@ import {
 } from './farmLayout'
 
 /** 与 farmLayout 内 DAILY_BOARD_KEEPOUT 同值：任务卡片保留区，物件落进去就再也点不到。 */
-const KEEPOUT = { left: 24, top: 88, right: 418, bottom: 436 }
+const KEEPOUT = { left: 24, top: 88, right: 418, bottom: 460 }
 
 function coversDailyBoard(elementId: keyof typeof SCENE_ELEMENT_LAYOUTS, home: { x: number; y: number }): boolean {
   const { size } = SCENE_ELEMENT_LAYOUTS[elementId]
@@ -74,8 +74,8 @@ describe('daily board keep-out', () => {
   })
 
   it('repairs persisted homes that already sit behind the daily board', () => {
-    expect(normalizeSceneElementHomes({ rescue: { x: 60, y: 190 } })).toEqual({ rescue: { x: 60, y: 436 } })
-    expect(normalizeSceneElementHomes({ hatchery: { x: 12, y: 200 } })).toEqual({ hatchery: { x: 12, y: 436 } })
+    expect(normalizeSceneElementHomes({ rescue: { x: 60, y: 190 } })).toEqual({ rescue: { x: 60, y: 460 } })
+    expect(normalizeSceneElementHomes({ hatchery: { x: 12, y: 200 } })).toEqual({ hatchery: { x: 12, y: 460 } })
     expect(normalizeSceneElementHomes({ rescue: { x: 400, y: 100 } })).toEqual({ rescue: { x: 418, y: 180 } })
   })
 

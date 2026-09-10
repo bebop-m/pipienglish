@@ -1,74 +1,41 @@
-# 当前任务门禁 · 2026-09-10 场景 2 完整衣柜上线
+# 当前任务门禁 · 2026-09-11 学习节奏重定 + iPad A16 反馈修复 + 资产瘦身
 
 ```yaml
-task_id: ART-S2-WARDROBE-SHOP-LAUNCH-2026-09-10
-base_commit: d94299048f02868baa5ff4a609db7360bb32409f
-created_at: 2026-09-10T00:00:00+08:00
+task_id: RULES-IPAD-ASSETS-2026-09-11
+base_commit: 147ba31
+created_at: 2026-09-11T00:00:00+08:00
 allowed_paths:
-  - docs/00-start/CURRENT_TASK.md
-  - docs/04-assets/CORE_ART_PRODUCTION_BOARD.md
-  - public/assets/f4/asset-manifest.json
-  - public/assets/f4/scenes/scene-2/travel-sign.png
-  - public/assets/f4/scenes/scene-2/decorations/*.png
-  - public/assets/f4/scenes/scene-2/cosmetics/*.png
+  - docs/**
+  - progress.md
+  - package.json
+  - vite.config.ts
+  - .github/workflows/deploy.yml
+  - scripts/optimize-f4-assets.py
   - scripts/qa-scene2-shop.mjs
   - scripts/qa-scene2-wardrobe.mjs
-  - src/application/farmCustomization.test.ts
-  - src/domain/farmCosmetics.ts
-  - src/domain/farmCosmetics.test.ts
-  - src/domain/farmScenes.test.ts
-  - src/domain/farmScenes.ts
-  - src/features/farm-f4/visual/characterAppearance.ts
-  - src/features/farm-f4/visual/characterAppearance.test.ts
-  - src/features/farm-f4/visual/FarmActors.tsx
-  - src/features/farm-f4/visual/FarmCustomization.tsx
-  - src/features/farm-f4/visual/FarmCustomization.test.ts
-  - src/styles/f4/home.css
-  - visual-regression/scene-2-shop-production/*
-  - visual-regression/scene-2-wardrobe-production/*
+  - src/**
+  - public/assets/f4/**
+  - design-samples/assets/f4-production-masters/**
 validation_level: L3
 required_docs:
   - docs/00-start/AI_START_HERE.md
   - docs/03-workflow/EXECUTION_BUDGET_POLICY.md
-  - docs/04-assets/CORE_ART_PRODUCTION_BOARD.md
-  - docs/05-architecture/F7_SCENE_STICKERS_WARDROBE_GATE_AND_TEST_PLAN.md
-visual_references:
-  asset_kind: character
-  identity_reference:
-    - public/assets/f4/scenes/scene-2/xiaopi.png
-    - public/assets/f4/scenes/scene-2/mother.png
-  style_reference:
-    - public/assets/f4/scenes/scene-2/cosmetics/xiaopi-bonnet-overalls-satchel.png
-    - public/assets/f4/scenes/scene-2/cosmetics/mother-bonnet-neckerchief.png
-  environment_reference:
-    - public/assets/f4/scenes/scene-2/orchard-background.png
-  composition_reference:
-    - visual-regression/scene-2-wardrobe-production/scene-2-complete-shop-and-wardrobe-equipped-1194x834.png
-  allowed_changes:
-    - 将爸爸批准的 W01 至 W06 试装造型重建为完整可组合外观矩阵并复制到场景 2 生产目录
-    - 上架小皮 4 件、母鸡 2 件共 80 蛋的收费衣柜商品
-    - 让首页角色与衣柜预览按已装备槽位解析正确组合外观
-    - 复用现有 cosmetics 所有权、扣蛋、装备、卸下和备份事务，不升级 IndexedDB schema
-    - 新增真实购买、组合穿戴、刷新恢复与 GitHub Pages 子路径截图验收
-  must_preserve:
-    - W01 至 W06 已批准造型、角色身份、场景 2 免费默认造型与现有道具商店
-    - 小皮发型/帽子造型互斥共用 headLook；outfit 与 accessory 可同时叠加；母鸡 headwear 与 neckwear 可同时生效
-    - 六件价格依次 15、15、20、10、10、10，总价 80 蛋
-    - 所有权永久、装备与卸下免费、重复购买不扣蛋、场景 1 仍显示自己的既有角色基准
+  - docs/03-workflow/changes/F4-CHG-034-review-spelling-daily-rhythm-streak-shield.md
+  - docs/03-workflow/changes/F4-CHG-035-ipad-a16-fixes-and-asset-diet.md
+visual_references: not_applicable_non_visual_task
 forbidden_actions:
-  - 让多个已装备槽位只显示最后一件或用 UI 状态冒充视觉组合
-  - 修改角色脸、身份、道具商店价格、数据库 schema 或学习流程
-  - 把 G1 棋盘格原图直接复制进生产目录
-  - 提交、推送、外部部署、删除或覆盖用户已有内容
+  - 修改任何母版 PNG 的像素;母版只读,生产 WebP 由脚本派生
+  - 改变 1194×834 舞台坐标系、已批准视觉布局或角色身份
+  - 删除、覆盖或清理用户 worktree
 ```
 
 ## 目标
 
-爸爸于 2026-09-10 对 W01～W06 回复“没问题，上线吧”。本任务据此冻结六件造型并完成生产上线。由于当前场景 2 角色基准是压平整身图，直接叠加服装会露出原帽子、裙摆或围兜；本轮采用完整组合外观矩阵消费相同槽位语义，保证每种合法装备组合都有明确成品图，同时保留现有所有权和事务接口。后续若重建独立 body/outfit/headLook 层，可保持逻辑 ID 与存档不变地替换渲染实现。
+爸爸 2026-09-10 在小皮 iPad A16 的真机反馈后裁决:复习全部拼写、每日 2 新词 + 12 复习、连胜守护卡、必修 1 颗蛋(F4-CHG-034);并把审查清单里的 bug 与优化一并实施、自查后推送上线(F4-CHG-035)。
 
 ## 开始任务前四问
 
-1. **修改哪一层：**场景 2 衣柜生产图、商品定义、外观解析器、首页/衣柜渲染、测试和截图；不改数据库结构。
-2. **参考与许可路径：**以 W01～W06 批准试装和场景 2 原角色为唯一身份/造型输入；组合补图只把已批准槽位放在同一角色上，不新增设计。
-3. **规格契约：**全部生产图 `1254×1254 RGBA`；小皮保持 `252×274 pt` 角色框，母鸡保持 `220×220 pt`；矩阵覆盖小皮 12 种、母鸡 4 种合法组合。
-4. **验证：**逐图检查 alpha、透明四角、身份和组合完整性；六件逐项真实购买共扣 80 蛋；组合装备后首页与衣柜同步、刷新恢复；运行完整测试、类型检查、视觉门禁、GitHub Pages L3 构建与子路径冒烟测试。
+1. **修改哪一层:**领域规则(dailyPlan / lesson / streak / eggEconomy)、应用层(viewmodel / usecases / fastForward / migration)、首页与家长页 UI 文案与容器、BGM 播放器、样式(touch-callout、画布底色、家长页滚动)、构建与 CI 配置、生产素材派生。
+2. **参考与许可路径:**见 allowed_paths;母版 PNG 移入 `design-samples/assets/f4-production-masters/` 只读,不改像素。
+3. **规格契约:**assetId 沿用 `.png` 逻辑 ID,`assetUrl.ts` 统一映射 `.webp`;`MetaState.freezeCards` 旧记录缺省 0;`DailySession.newWordsPaused` 保留读兼容不再写入。
+4. **验证:**`npm test`、`npm run typecheck`、`npm run check`、`npm run assets:check`、`GITHUB_PAGES=true npm run build`、浏览器实测(装饰 keep-out、衣柜、完成卡守护卡、家长页滚动与诊断面板)。

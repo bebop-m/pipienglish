@@ -50,7 +50,6 @@ export function createLessonUsecases(d: PipiDB, deps: LessonDeps) {
         reviewCards: session.reviewIds.map((wordId, i) => ({
           wordId,
           stability: cards[i]?.card.stability ?? 0,
-          lastQuizType: cards[i]?.lastQuizType,
         })),
         newIds: session.newIds,
       },
@@ -145,7 +144,6 @@ export function createLessonUsecases(d: PipiDB, deps: LessonDeps) {
     return assembleLessonVM(progress, WORD_MAP, {
       newIds: session?.newIds ?? [],
       reviewIds: session?.reviewIds ?? [],
-      newWordsPaused: session?.newWordsPaused,
     })
   }
 

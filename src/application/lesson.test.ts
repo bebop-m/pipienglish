@@ -29,7 +29,7 @@ async function passCurrent(lesson: ReturnType<typeof createLessonUsecases>, p: L
 }
 
 describe('学习流用例(应用层)', () => {
-  it('首日全链路:4 新词 16 步 → doneCount=任务项 → 完成发蛋连胜;书写/答对自动播音', async () => {
+  it('首日全链路:2 新词 8 步 → doneCount=任务项 → 完成发蛋连胜;书写/答对自动播音', async () => {
     const db = freshDb()
     const { farm, lesson, speak } = setup(db)
     const t0 = Date.now()
@@ -37,29 +37,29 @@ describe('学习流用例(应用层)', () => {
     await farm.clockGuard(t0)
     await farm.nameHen('咕咕')
     let p = await lesson.loadToday(t0)
-    // 首日无复习:4 × (听看/描红/选择) + 4 收尾默写
-    expect(p.steps).toHaveLength(16)
+    // 首日无复习:2 × (听看/描红/选择) + 2 收尾默写(F4-CHG-034)
+    expect(p.steps).toHaveLength(8)
 
     while (!lessonFinished(p)) p = await passCurrent(lesson, p, t0)
 
     const session = (await db.sessions.get(dayKeyOf(t0)))!
     expect(session.completed).toBe(true) // COMPLETED → 注入的 completeDailyLesson
     expect(session.doneCount).toBe(totalItems(session)) // 口径 = 复习×1 + 新词×2
-    expect(session.answered).toBe(4) // 新词自测 ×4(收尾不计)
-    expect(session.correct).toBe(4)
+    expect(session.answered).toBe(2) // 新词自测 ×2(收尾不计)
+    expect(session.correct).toBe(2)
 
     const vm = await farm.loadViewModel(t0)
     expect(vm.state).toBe('daily_complete')
-    expect(vm.eggStock).toBe(2)
+    expect(vm.eggStock).toBe(1) // F4-CHG-034:必修 1 颗
     expect(vm.streak).toBe(1)
 
-    // 音频:描红×4 + 选择答对×4 + 收尾写对×4 = 12 次(听看卡进场自动播放归视觉层)
-    expect(speak).toHaveBeenCalledTimes(12)
-    expect(await db.seen.count()).toBe(12 + 4) // 12 起步词播种 + 今日 4 新词
+    // 音频:描红×2 + 选择答对×2 + 收尾写对×2 = 6 次(听看卡进场自动播放归视觉层)
+    expect(speak).toHaveBeenCalledTimes(6)
+    expect(await db.seen.count()).toBe(12 + 2) // 12 起步词播种 + 今日 2 新词
 
     const lessonVm = await lesson.loadViewModel(t0)
     expect(lessonVm.finished).toBe(true)
-    expect(lessonVm.summary).toMatchObject({ newWords: 4, reviews: 0, correctRate: 1 })
+    expect(lessonVm.summary).toMatchObject({ newWords: 2, reviews: 0, correctRate: 1 })
     db.close()
   })
 
@@ -130,7 +130,7 @@ describe('学习流用例(应用层)', () => {
     db.close()
   })
 
-  it('次日:昨日新词进复习队列,旧断点被清理,题型按 stability 分配', async () => {
+  it('次日:昨日新词进复习队列,旧断点被清理,每张复习都是默写', async () => {
     const db = freshDb()
     const { farm, lesson } = setup(db)
     const t0 = Date.now()
@@ -147,7 +147,7 @@ describe('学习流用例(应用层)', () => {
     expect(p2.date).toBe(dayKeyOf(t1))
     const reviewSteps = p2.steps.filter(s => s.phase === 'review')
     expect(reviewSteps.length).toBe(session2.reviewIds.length)
-    for (const s of reviewSteps) expect(['choice', 'listening']).toContain(s.type) // stability < 7 天,无默写
+    for (const s of reviewSteps) expect(s.type).toBe('dictation') // F4-CHG-034:昨天刚学的词今天也默写
 
     // 旧断点清理:只剩今天的 lesson: 键
     const lessonKeys = (await db.kv.toArray()).map(r => r.key).filter(k => k.startsWith('lesson:'))
@@ -186,7 +186,7 @@ describe('学习流用例(应用层)', () => {
     db.close()
   })
 
-  it('收尾默写 VM:同类型序号 第 x 题 / 共 4 题', async () => {
+  it('收尾默写 VM:同类型序号 第 x 题 / 共 2 题', async () => {
     const db = freshDb()
     const { farm, lesson } = setup(db)
     const t0 = Date.now()
@@ -195,7 +195,7 @@ describe('学习流用例(应用层)', () => {
     let p = await lesson.loadToday(t0)
     while (p.steps[p.cursor].type !== 'closing') p = await passCurrent(lesson, p, t0)
     const vm = await lesson.loadViewModel(t0)
-    expect(vm.current).toMatchObject({ type: 'closing', stepOrdinal: 1, stepOrdinalTotal: 4 })
+    expect(vm.current).toMatchObject({ type: 'closing', stepOrdinal: 1, stepOrdinalTotal: 2 })
     db.close()
   })
 })

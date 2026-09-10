@@ -3,12 +3,16 @@
 .parent-screen,
 .parent-gate {
   box-sizing: border-box;
-  min-height: 100vh;
-  padding: 24px clamp(16px, 6vw, 64px) 48px;
+  /* body 为固定舞台关掉了滚动,家长页必须自己是有界高度的滚动容器,
+     否则 iPad 横屏 820pt 一定溢出且无法上下滑(2026-09-10 真机反馈) */
+  height: 100%;
+  padding: max(24px, env(safe-area-inset-top, 0px)) clamp(16px, 6vw, 64px) calc(48px + env(safe-area-inset-bottom, 0px));
   background: #f6f2ea;
   color: #3a3128;
   font: 16px/1.6 -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .parent-gate {
@@ -156,4 +160,24 @@
   color: #7a6f5f;
   font-size: 14px;
   margin: 4px 0 8px;
+}
+
+.parent-diag {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f1ede4;
+  font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.parent-safe-probe {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
 }

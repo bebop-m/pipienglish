@@ -82,6 +82,7 @@ export function FarmHomeScreen({ onNavigate }: FarmHomeScreenProps = {}) {
   return (
     <FarmStageShell
       backgroundAssetUrl={bridge.vm ? f4AssetUrl(bridge.vm.viewedScene.backgroundAssetId) : undefined}
+      canvasColor={bridge.vm?.viewedScene.canvasColor}
       ariaLabel={bridge.vm ? `${bridge.vm.viewedScene.title} · 皮皮のEnglish` : undefined}
       surface="farm"
       dimmed={DIMMING_OVERLAYS.has(bridge.vm?.overlay ?? 'none')}

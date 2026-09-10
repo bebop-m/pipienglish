@@ -140,4 +140,24 @@ describe('farm background music player', () => {
     expect(created).toHaveLength(1) // 续播同一实例,不重建
     expect(created[0].playCount).toBe(2)
   })
+
+  it('pauses when the page is hidden and resumes only if still active (iPad home-button case)', () => {
+    let visibility: ((visible: boolean) => void) | null = null
+    const { player, created } = setup({ onVisibility: handler => { visibility = handler } })
+    expect(visibility).not.toBeNull()
+
+    player.setActive(true)
+    expect(created[0].playCount).toBe(1)
+
+    visibility!(false) // 退到桌面
+    expect(created[0].pauseCount).toBe(1)
+    visibility!(true) // 回到前台且开关仍开着 → 续播
+    expect(created[0].playCount).toBe(2)
+
+    player.setActive(false) // 关掉开关后回前台不得偷偷续播
+    const pausedBefore = created[0].pauseCount
+    visibility!(true)
+    expect(created[0].playCount).toBe(2)
+    expect(created[0].pauseCount).toBe(pausedBefore)
+  })
 })

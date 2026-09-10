@@ -155,7 +155,7 @@ snapshot = await state()
 assert.equal(snapshot.eggs, 110)
 assert.equal(snapshot.listedDecorations, 9)
 assert.equal(snapshot.placedDecorations, 9)
-assert.equal(await page.locator('.farm-decoration-f7 img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth === 1254 && image.naturalHeight === 1254)), true)
+assert.equal(await page.locator('.farm-decoration-f7 img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0 && image.naturalHeight === image.naturalWidth)), true)
 assert.equal(await page.locator('.scene-fixed-visual-f4[alt*="旅行路牌"]').count(), 1)
 await page.screenshot({ path: path.join(outputDir, 'scene-2-all-decorations-placed-1194x834.png'), animations: 'disabled' })
 

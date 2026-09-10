@@ -51,7 +51,6 @@ export interface LessonViewModel {
   totalSteps: number
   current: LessonStepVM | null // null = 已全部完成(finished)
   finished: boolean
-  newWordsPaused: boolean // 今日新词因积压暂停(文案归视觉层,S-3 待定稿)
   summary: LessonSummaryVM
 }
 
@@ -60,7 +59,7 @@ const NEW_TRIPLE_ORDINAL: Partial<Record<LessonStepType, number>> = { intro: 1, 
 export function assembleLessonVM(
   progress: LessonProgress,
   wordMap: ReadonlyMap<string, Word>,
-  session: { newIds: string[]; reviewIds: string[]; newWordsPaused?: boolean },
+  session: { newIds: string[]; reviewIds: string[] },
 ): LessonViewModel {
   const finished = lessonFinished(progress)
   const step = finished ? null : progress.steps[progress.cursor]
@@ -110,7 +109,6 @@ export function assembleLessonVM(
     doneSteps: Math.min(progress.cursor, progress.steps.length),
     totalSteps: progress.steps.length,
     finished,
-    newWordsPaused: session.newWordsPaused ?? false,
     current,
     summary: {
       newWords: session.newIds.length,

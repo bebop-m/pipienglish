@@ -9,8 +9,6 @@
 
 import type { Word } from './words/types'
 
-export const DICTATION_STABILITY_DAYS = 7 // stability ≥ 7 天 → 默写复习(SPEC §5.3)
-export const DICTATION_DAILY_CAP = 3 // 默写类复习每日上限,超出降级为选择题(控时阀门)
 export const WARMUP_COUNT = 3 // 开局热身:记忆强度最高的前 3 张(连对入状态)
 export const QUIZ_OPTIONS = 4 // 选择/听音:1 正确 + 3 干扰
 
@@ -38,8 +36,7 @@ export interface LessonStep {
 
 export interface ReviewCardInfo {
   wordId: string
-  stability: number
-  lastQuizType?: QuizKind // 上次低熟练复习的题型,用于选择/听音交替(SPEC §5.3)
+  stability: number // 只用于热身排序;F4-CHG-034 起题型不再按记忆强度分流
 }
 
 export interface LessonPlanInput {
@@ -106,19 +103,13 @@ function shuffle<T>(items: readonly T[], rng: () => number): T[] {
 
 // ---------- 计划构建 ----------
 
-/** 复习题型分配(SPEC §5.3):熟卡默写(每日 ≤3,超出降级选择);生卡选择/听音交替 */
+/**
+ * 复习题型分配(F4-CHG-034,爸爸 2026-09-10 裁决):每一张复习都是默写(H-5 卡:看中文、
+ * 听发音、写英文、客观判定),不再按记忆强度分流,也不设每日默写上限。
+ * 选择/听音辨义只保留给新词自测与救援流程。
+ */
 export function assignReviewTypes(cards: readonly ReviewCardInfo[]): Map<string, LessonStepType> {
-  const types = new Map<string, LessonStepType>()
-  let dictationUsed = 0
-  for (const card of cards) {
-    if (card.stability >= DICTATION_STABILITY_DAYS && dictationUsed < DICTATION_DAILY_CAP) {
-      types.set(card.wordId, 'dictation')
-      dictationUsed += 1
-    } else {
-      types.set(card.wordId, card.lastQuizType === 'choice' ? 'listening' : 'choice')
-    }
-  }
-  return types
+  return new Map(cards.map(card => [card.wordId, 'dictation' as const]))
 }
 
 /** 选择/听音的 4 个中文选项:干扰项优先同包同级,按释义去重,不足回退全库同级再全库 */

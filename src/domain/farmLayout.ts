@@ -11,7 +11,7 @@ interface SceneElementLayout {
   insets: { left: number; top: number; right: number; bottom: number }
 }
 
-interface StageRect {
+export interface StageRect {
   left: number
   top: number
   right: number
@@ -25,9 +25,16 @@ const FARM_STAGE_SIZE = { width: 1194, height: 834 } as const
  * 孵化小屋 56、错题救援框 58、角色 20）。物件一旦落到卡片背后就再也点不到，
  * 等于永久丢失入口，和坐标飞出屏幕是同一类硬锁，因此落点必须避开这块 UI 保留区。
  * 数值取两张卡片实测外框的并集再留安全边，对应 `src/styles/f4/home.css` 的
- * `.task-board-f3`（28,92,370×247）与 `.complete-board-f4`（31,91,382×338）。
+ * `.task-board-f3`（28,92,370×247）与 `.complete-board-f4`（31,91,382×约 360，
+ * F4-CHG-034 起多一行守护卡文案）。装饰物的落点保留区（farmCustomization）共用此矩形。
  */
-const DAILY_BOARD_KEEPOUT: StageRect = { left: 24, top: 88, right: 418, bottom: 436 }
+export const DAILY_BOARD_KEEPOUT: StageRect = { left: 24, top: 88, right: 418, bottom: 460 }
+
+/**
+ * 右下角「布置农场 / 打开衣柜」按钮组(`.customization-entrances-f7`,z-index 64)同样压在装饰层之上,
+ * 小装饰滑到右下角会被按钮盖住点不到;取按钮组实测外框(right 24 / bottom 22,约 200×40)再留安全边。
+ */
+export const CUSTOMIZATION_ENTRANCE_KEEPOUT: StageRect = { left: 956, top: 764, right: 1178, bottom: 820 }
 
 /**
  * 四类核心物件共享的 1194×834 舞台契约。默认位置、拖动边界和持久化恢复

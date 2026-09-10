@@ -21,7 +21,7 @@ import { isHatchDue } from '../../domain/hatchTiming'
 import { completeDay } from '../../domain/streak'
 import { buildPlan } from '../../domain/dailyPlan'
 import { weightedSample } from '../../domain/staleness'
-import { addDays, dayKeyOf } from '../../domain/time'
+import { dayKeyOf } from '../../domain/time'
 import { WORDS, WORD_MAP } from '../../domain/words'
 import { assembleViewModel, type ChickChatVM, type FarmSnapshot } from '../viewmodel'
 import { ensureStarterWords } from '../starterWords'
@@ -65,6 +65,7 @@ import {
   assetIsListable,
   equipLoadoutItem,
   pointWithinPlacementBounds,
+  resolveDecorationHome,
   unequipLoadoutItem,
 } from '../../domain/farmCustomization'
 import type { CharacterLoadout } from '../../domain/farmCatalog'
@@ -241,22 +242,15 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
   async function buildTodaySession(today: string, now: number): Promise<DailySession> {
     const due = await d.cards.where('due').belowOrEqual(now).sortBy('due')
     const known = new Set(await d.cards.toCollection().primaryKeys())
-    // 近两日积压记录,供 SPEC §5.1 连续积压判定(缺记录按 0/false)
-    const recentBacklogs = (await Promise.all([addDays(today, -1), addDays(today, -2)].map(k => d.sessions.get(k)))).map(
-      s => ({ backlog: s?.dueBacklog ?? 0, paused: s?.newWordsPaused ?? false }),
-    )
     const plan = buildPlan({
       dueByOverdue: due.map(c => c.wordId),
       unlearned: WORDS.filter(w => !known.has(w.id)).map(w => w.id),
-      backlogToday: due.length,
-      recentBacklogs,
     })
     return {
       date: today,
       reviewIds: plan.reviewIds,
       newIds: plan.newIds,
-      dueBacklog: due.length,
-      newWordsPaused: plan.newWordsPaused,
+      dueBacklog: due.length, // 只供家长页/诊断;儿童界面永不显示积压总数(SPEC §5.3)
       doneCount: 0,
       answered: 0,
       correct: 0,
@@ -509,7 +503,9 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
       if (!pointWithinPlacementBounds(home, item.placementBounds)) {
         return { status: 'outside-placement-bounds', chargedEggs: 0 }
       }
-      await d.decorations.put({ ...owned, x: home.x, y: home.y })
+      // 落库前推出 UI 保留区(任务卡/右下按钮组),与视觉层松手逻辑同一规则
+      const resolved = resolveDecorationHome(item, home)
+      await d.decorations.put({ ...owned, x: resolved.x, y: resolved.y })
       return { status: 'placed', chargedEggs: 0 }
     })
   }

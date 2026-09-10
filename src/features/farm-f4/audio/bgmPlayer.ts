@@ -29,6 +29,11 @@ export interface BgmDeps {
   onSpeechListener?: (listener: SpeechListener | null) => void
   /** 自动播放被拒后等待的一次性用户手势;返回取消函数 */
   awaitGesture?: (retry: () => void) => () => void
+  /**
+   * 页面可见性:iPad 上按 Home 退到桌面时农场页并未卸载,循环播放的 <audio> 会被 iOS 当成
+   * 后台媒体继续放(2026-09-10 真机反馈)。隐藏即暂停,回到前台且开关仍开着才续播。
+   */
+  onVisibility?: (handler: (visible: boolean) => void) => void
   setTimer?: (fn: () => void, ms: number) => number
   clearTimer?: (id: number) => void
 }
@@ -46,6 +51,7 @@ export function createBgmPlayer(deps: BgmDeps): BgmPlayer {
     trackUrl = filename => f4AssetUrl(`audio/${filename}`),
     onSpeechListener = setSpeechListener,
     awaitGesture,
+    onVisibility,
     setTimer = (fn, ms) => (typeof window === 'undefined' ? 0 : window.setTimeout(fn, ms)),
     clearTimer = id => { if (typeof window !== 'undefined') window.clearTimeout(id) },
   } = deps
@@ -73,6 +79,14 @@ export function createBgmPlayer(deps: BgmDeps): BgmPlayer {
     if (!audio || !active) return
     audio.play().catch(() => armGestureRetry())
   }
+
+  onVisibility?.(visible => {
+    if (!visible) {
+      audio?.pause()
+      return
+    }
+    if (active) tryPlay()
+  })
 
   function speechStarted(): void {
     ducked = true
@@ -128,6 +142,10 @@ export function setBgmActive(active: boolean): void {
     awaitGesture: retry => {
       window.addEventListener('pointerdown', retry, { once: true, capture: true })
       return () => window.removeEventListener('pointerdown', retry, { capture: true })
+    },
+    onVisibility: handler => {
+      document.addEventListener('visibilitychange', () => handler(document.visibilityState === 'visible'))
+      window.addEventListener('pagehide', () => handler(false))
     },
   })
   defaultPlayer.setActive(active)

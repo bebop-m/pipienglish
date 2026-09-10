@@ -9,8 +9,9 @@
 import type { PipiDB, CardRow, SeenRow } from './db'
 import { defaultMeta, DEFAULT_SETTINGS } from './db'
 import type { DailySession, MetaState, Settings } from '../domain/types'
-import { buildPlan, totalItems, type RecentBacklog } from '../domain/dailyPlan'
+import { buildPlan, totalItems } from '../domain/dailyPlan'
 import { newCard, rate } from '../domain/srs'
+import { shieldCardsForStreak } from '../domain/streak'
 import { addDays, dayKey } from '../domain/time'
 import { WORDS } from '../domain/words'
 import { STARTER_WORD_IDS } from './starterWords'
@@ -88,16 +89,7 @@ export async function fastForward(
     const now = simTimeOf(date)
     const due = [...cards.values()].filter(row => row.due <= now).sort((a, b) => a.due - b.due)
     const unlearned = WORDS.filter(word => !cards.has(word.id)).map(word => word.id)
-    const recentBacklogs: RecentBacklog[] = [sessions[sessions.length - 1], sessions[sessions.length - 2]].map(s => ({
-      backlog: s?.dueBacklog ?? 0,
-      paused: s?.newWordsPaused ?? false,
-    }))
-    const plan = buildPlan({
-      dueByOverdue: due.map(row => row.wordId),
-      unlearned,
-      backlogToday: due.length,
-      recentBacklogs,
-    })
+    const plan = buildPlan({ dueByOverdue: due.map(row => row.wordId), unlearned })
 
     // 与真实学习流一致:每词每日一评,全对 → Good;新词首评即建卡
     for (const wordId of plan.reviewIds) {
@@ -118,7 +110,6 @@ export async function fastForward(
       reviewIds: plan.reviewIds,
       newIds: plan.newIds,
       dueBacklog: due.length,
-      newWordsPaused: plan.newWordsPaused,
       doneCount: totalItems(plan),
       answered,
       correct: answered,
@@ -141,12 +132,15 @@ export async function fastForward(
     ))
   }
 
+  const streak = Math.min(input.streak, input.days)
   const meta: MetaState = {
     ...defaultMeta(today),
-    streak: Math.min(input.streak, input.days),
+    streak,
     lastDoneDate: dateOf(input.days),
     totalDays: input.days,
     installDate,
+    freezeCards: shieldCardsForStreak(streak), // 连续 7 天 1 张、最多 3 张(F4-CHG-034)
+    lastShieldUsedOn: null,
   }
 
   // —— 整档落库(与 importAll 同一清库-重建路径) ——

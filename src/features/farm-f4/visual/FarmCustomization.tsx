@@ -1,11 +1,15 @@
-import { useRef, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useRef, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import type {
   DecorationCatalogItemVM,
   FarmHomeEvent,
   FarmHomeViewModel,
   WardrobeItemVM,
 } from '../../../application/viewmodel'
-import { clampPointToPlacementBounds } from '../../../domain/farmCustomization'
+import {
+  clampPointToPlacementBounds,
+  initialDecorationHome,
+  resolveDecorationHome,
+} from '../../../domain/farmCustomization'
 import type { SceneLayer } from '../../../domain/farmScenes'
 import type { StagePoint } from '../../../domain/types'
 import { f4AssetUrl } from '../assetUrl'
@@ -72,6 +76,12 @@ function DraggableDecoration({
     element.style.setProperty('--f7-depth-key', `${home.y}`)
   }
 
+  // 落点由外部变化(刷新恢复、收起再摆)时同步;拖动中不打断跟手
+  useEffect(() => {
+    if (dragRef.current) return
+    applyHome({ x: item.placement!.x, y: item.placement!.y })
+  }, [item.placement?.x, item.placement?.y])
+
   const stageCoordinates = (clientX: number, clientY: number) => {
     const stage = elementRef.current?.closest<HTMLElement>('.f4-stage')
     if (!stage) return null
@@ -118,7 +128,10 @@ function DraggableDecoration({
       applyHome(drag.origin)
       return
     }
-    onPlaced(homeRef.current)
+    // 松手才推出保留区:拖到任务卡或右下按钮组背后会被推回可点区域,不会永久藏起来
+    const placed = resolveDecorationHome(item.definition, homeRef.current)
+    applyHome(placed)
+    onPlaced(placed)
   }
 
   return (
@@ -145,7 +158,7 @@ export function FarmDecorations({ vm, layer, dispatch }: { vm: FarmHomeViewModel
         .filter(item => item.definition.layer === layer && item.definition.assetStatus === 'approved')
         .map(item => (
           <DraggableDecoration
-            key={`${item.definition.id}:${item.placement!.x},${item.placement!.y}`}
+            key={item.definition.id}
             item={item}
             onPlaced={home => dispatch({ type: 'PLACE_DECORATION', sceneId: vm.viewedSceneId, itemId: item.definition.id, home })}
           />
@@ -190,8 +203,11 @@ export function DecorationCatalogPanel({ vm, dispatch }: CustomizationProps) {
         <p className="k-eyebrow">{vm.viewedScene.title} · 用鸡蛋永久收藏</p><h2>装饰商店</h2>
         <div className="customization-grid-f7">
           {vm.decorationCatalog.map(item => {
-            const bounds = item.definition.placementBounds
-            const center = { x: (bounds.xMin + bounds.xMax) / 2, y: (bounds.yMin + bounds.yMax) / 2 }
+            // 摆出来:避开已摆放贴纸与 UI 保留区,不再全部叠在范围中心
+            const placeAt = () => initialDecorationHome(
+              item.definition,
+              vm.placedDecorations.map(placed => ({ definition: placed.definition, home: placed.placement! })),
+            )
             return (
               <article key={item.definition.id}>
                 <div className="customization-item-preview-f7">
@@ -203,7 +219,7 @@ export function DecorationCatalogPanel({ vm, dispatch }: CustomizationProps) {
                   ? <button type="button" onClick={() => dispatch({ type: 'BUY_DECORATION', sceneId: vm.viewedSceneId, itemId: item.definition.id })}>购买</button>
                   : item.placement
                     ? <button type="button" onClick={() => dispatch({ type: 'STORE_DECORATION', sceneId: vm.viewedSceneId, itemId: item.definition.id })}>收起来</button>
-                    : <button type="button" onClick={() => dispatch({ type: 'PLACE_DECORATION', sceneId: vm.viewedSceneId, itemId: item.definition.id, home: center })}>摆出来</button>}
+                    : <button type="button" onClick={() => dispatch({ type: 'PLACE_DECORATION', sceneId: vm.viewedSceneId, itemId: item.definition.id, home: placeAt() })}>摆出来</button>}
               </article>
             )
           })}

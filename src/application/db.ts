@@ -62,7 +62,7 @@ export const DEFAULT_FARM_V3 = defaultFarmStateV3()
 export const DEFAULT_SETTINGS: Settings = { motionEnabled: true, musicEnabled: true }
 
 export function defaultMeta(today = dayKey()): MetaState {
-  return { streak: 0, lastDoneDate: null, totalDays: 0, installDate: today }
+  return { streak: 0, lastDoneDate: null, totalDays: 0, installDate: today, freezeCards: 0, lastShieldUsedOn: null }
 }
 
 /**

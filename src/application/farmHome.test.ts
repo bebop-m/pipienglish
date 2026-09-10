@@ -20,7 +20,7 @@ describe('首页三状态与蛋经济全链路', () => {
     await uc.clockGuard(t0)
     let vm = await uc.loadViewModel(t0)
     expect(vm.state).toBe('first_visit')
-    expect(vm.dailyTarget).toBe(4) // 全新词库,今日 4 个新词
+    expect(vm.dailyTarget).toBe(2) // 全新词库,今日 2 个新词(F4-CHG-034)
     expect(vm.reviewCountToday).toBe(0)
 
     await uc.nameHen('咕咕')
@@ -31,13 +31,13 @@ describe('首页三状态与蛋经济全链路', () => {
     await uc.completeDailyLesson(t0)
     vm = await uc.loadViewModel(t0)
     expect(vm.state).toBe('daily_complete')
-    expect(vm.eggStock).toBe(2)
+    expect(vm.eggStock).toBe(1)
     expect(vm.streak).toBe(1)
 
     // 同日重复完成幂等
     await uc.completeDailyLesson(t0)
     vm = await uc.loadViewModel(t0)
-    expect(vm.eggStock).toBe(2)
+    expect(vm.eggStock).toBe(1)
     expect(vm.streak).toBe(1)
     db.close()
   })
@@ -53,7 +53,7 @@ describe('首页三状态与蛋经济全链路', () => {
     expect(await uc.allocateEggToHatch(t0)).toBe(true)
 
     let vm = await uc.loadViewModel(t0)
-    expect(vm.eggStock).toBe(1)
+    expect(vm.eggStock).toBe(0)
     expect(vm.incubating).not.toBeNull()
     expect(vm.incubating!.hatchesAt).toBe(t0 + HATCH_MS)
     expect(vm.incubating!.remainingMs).toBe(HATCH_MS)
@@ -120,7 +120,7 @@ describe('首页三状态与蛋经济全链路', () => {
     await uc.clockGuard(dayOne)
     await uc.nameHen('咕咕')
     await uc.completeDailyLesson(dayOne)
-    expect((await uc.loadViewModel(dayOne)).eggStock).toBe(2)
+    expect((await uc.loadViewModel(dayOne)).eggStock).toBe(1)
     expect(await uc.allocateEggToHatch(dayOne)).toBe(true)
 
     await uc.clockGuard(dayOne + HATCH_MS - 1)
@@ -138,14 +138,14 @@ describe('首页三状态与蛋经济全链路', () => {
     vm = await uc.loadViewModel(dayTwo)
     expect(vm.state).toBe('daily_complete')
     expect(vm.streak).toBe(2)
-    expect(vm.eggStock).toBe(3)
+    expect(vm.eggStock).toBe(1)
 
     expect((await uc.startMeal('single_fried_egg', dayTwo)).ok).toBe(true)
     expect(await uc.mealAnimationDone(dayTwo)).toBe(true)
     expect((await uc.serveMeal(vm.chicksVisible[0].chickId, dayTwo)).ok).toBe(true)
     vm = await uc.loadViewModel(dayTwo)
     expect(vm.cookingMeal).toBeNull()
-    expect(vm.eggStock).toBe(2)
+    expect(vm.eggStock).toBe(0)
     expect(vm.chicksTotal).toBe(1)
     db.close()
   })
@@ -163,7 +163,7 @@ describe('首页三状态与蛋经济全链路', () => {
     // 模拟"正在煎(动画中)崩溃重启":库里仍是 raw
     let vm = await uc.loadViewModel(t0)
     expect(vm.cookingMeal?.phase).toBe('raw')
-    expect(vm.eggStock).toBe(1) // 2 颗必修蛋中 1 颗已下锅
+    expect(vm.eggStock).toBe(0) // 唯一一颗必修蛋已下锅(F4-CHG-034:必修 1 颗)
 
     const restored = createFarmUsecases(db)
     expect((await restored.startMeal('single_fried_egg', t0 + 1)).ok).toBe(false)
@@ -250,10 +250,10 @@ describe('首页三状态与蛋经济全链路', () => {
     const uc = createFarmUsecases(db)
 
     expect(await uc.placeSceneElement('rescue', { x: 60, y: 190 }, undefined, 'scene-1')).toBe(true)
-    expect((await uc.loadViewModel()).sceneElementHomes.rescue).toEqual({ x: 60, y: 436 })
+    expect((await uc.loadViewModel()).sceneElementHomes.rescue).toEqual({ x: 60, y: 460 })
 
     await setKV(db, sceneElementHomesKey('scene-1'), { hatchery: { x: 12, y: 200 } })
-    expect((await uc.loadViewModel()).sceneElementHomes.hatchery).toEqual({ x: 12, y: 436 })
+    expect((await uc.loadViewModel()).sceneElementHomes.hatchery).toEqual({ x: 12, y: 460 })
     db.close()
   })
 
@@ -400,7 +400,7 @@ describe('首页三状态与蛋经济全链路', () => {
     expect(await uc.allocateEggToHatch()).toBe(false)
 
     const persisted = await getFarmStateV3(db, { now: t0, today: '2026-07-17' })
-    expect(persisted.eggStock).toBe(1)
+    expect(persisted.eggStock).toBe(0)
     expect(persisted.incubating).toMatchObject({
       placedAt: t0,
       rarity: 'color',

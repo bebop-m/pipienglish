@@ -19,7 +19,9 @@
 .f4-bleed {
   position: absolute;
   inset: 0;
-  background: var(--f4-sky) url('/assets/f4/farm-background-f3.png') center / cover no-repeat;
+  /* 背景图统一由 FarmStageShell 按场景内联写入;CSS 里不再写死场景一的图,
+     否则身在场景二也会先多下载一张 2 MB 的晴空农场再切换 */
+  background: var(--f4-sky) center / cover no-repeat;
   pointer-events: none;
 }
 

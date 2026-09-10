@@ -94,13 +94,14 @@ describe('fastForward 快进模拟', () => {
       .map(word => word.id)
     expect(todaySession.newIds).toEqual(expectedNext)
     expect(todaySession.completed).toBe(false)
-    // 昨天学的 4 个新词(首评 Good,10 分钟后到期)今天已到期;队列按最过期优先取 6,
+    // 昨天学的 2 个新词(首评 Good,10 分钟后到期)今天已到期;队列按最过期优先取 ≤12,
     // 它们进不进今天的队列取决于积压,但到期事实必须成立(顺延属正常行为)
     const yesterdayNew = (await db.sessions.get(addDays(TODAY, -1)))!.newIds
     for (const wordId of yesterdayNew) {
       expect((await db.cards.get(wordId))!.due).toBeLessThanOrEqual(NOW)
     }
-    expect(todaySession.reviewIds.length).toBe(REVIEW_CAP) // 到期数 ≥ 昨日新词 4 + 更早批次,队列取满
+    expect(todaySession.reviewIds.length).toBeGreaterThanOrEqual(yesterdayNew.length) // 昨日新词必在今日队列
+    expect(todaySession.reviewIds.length).toBeLessThanOrEqual(REVIEW_CAP)
     for (const wordId of todaySession.reviewIds) {
       expect((await db.cards.get(wordId))!.due).toBeLessThanOrEqual(NOW)
     }

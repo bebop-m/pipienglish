@@ -2,7 +2,7 @@
 // 算术门控 + 导出/导入 JSON + 连胜日历 + 改蛋数 + 快进到 Day N(2026-08-05 爸爸新增)。
 // 面向爸爸的朴素 UI,不做 F4 视觉主张,不使用 F4 资产。
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { db, getFarmStateV3, getKV, setFarmStateV3, setKV } from '../../application/db'
 import { exportAll, importAll } from '../../application/backup'
 import { fastForward, validateFastForwardInput } from '../../application/fastForward'
@@ -10,6 +10,7 @@ import type { FarmStateV3 } from '../../application/farmPersistence'
 import { defaultMeta } from '../../application/db'
 import type { DailySession, MetaState } from '../../domain/types'
 import { addDays, dayKey } from '../../domain/time'
+import { SHIELD_CARD_CAP } from '../../domain/streak'
 import './parent.css'
 
 const LAST_EXPORT_KEY = 'parentLastExportAt'
@@ -102,6 +103,44 @@ async function loadData(): Promise<LoadedData> {
     getKV<number | null>(db, LAST_EXPORT_KEY, null),
   ])
   return { meta, farm, sessions, lastExportAt }
+}
+
+/** 设备诊断:真机视口/安全区读数,定位「底部横带」「舞台缩放不对」这类只在 iPad 上出现的问题 */
+function DeviceDiagnostics() {
+  const probeRef = useRef<HTMLDivElement>(null)
+  const [report, setReport] = useState('')
+
+  useEffect(() => {
+    const measure = () => {
+      const nav = navigator as Navigator & { standalone?: boolean }
+      const probe = probeRef.current ? getComputedStyle(probeRef.current) : null
+      const lines = [
+        `视口 innerWidth×innerHeight: ${window.innerWidth}×${window.innerHeight}`,
+        `屏幕 screen: ${window.screen.width}×${window.screen.height} · dpr ${window.devicePixelRatio}`,
+        `visualViewport: ${window.visualViewport ? `${Math.round(window.visualViewport.width)}×${Math.round(window.visualViewport.height)}` : '不支持'}`,
+        `documentElement.clientHeight: ${document.documentElement.clientHeight} · outerHeight: ${window.outerHeight}`,
+        `安全区 top/right/bottom/left: ${probe ? [probe.paddingTop, probe.paddingRight, probe.paddingBottom, probe.paddingLeft].join(' / ') : '—'}`,
+        `standalone: navigator.standalone=${String(nav.standalone)} · display-mode=${window.matchMedia('(display-mode: standalone)').matches}`,
+        `方向: ${window.matchMedia('(orientation: landscape)').matches ? 'landscape' : 'portrait'}`,
+        `UA: ${navigator.userAgent}`,
+      ]
+      setReport(lines.join('\n'))
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    window.visualViewport?.addEventListener('resize', measure)
+    return () => {
+      window.removeEventListener('resize', measure)
+      window.visualViewport?.removeEventListener('resize', measure)
+    }
+  }, [])
+
+  return (
+    <>
+      <div ref={probeRef} className="parent-safe-probe" aria-hidden="true" />
+      <pre className="parent-diag">{report}</pre>
+    </>
+  )
 }
 
 /** 最近 8 周完成日历:一行一周,✓ = 当天必修完成 */
@@ -202,6 +241,19 @@ export function ParentScreen({ onExit }: { onExit: () => void }) {
     await refresh()
   }
 
+  /** 病假/旅行手动补一张守护卡(SPEC §3.3 的「病假旅行自动补」改为家长手动) */
+  const addShield = async () => {
+    const meta = await getKV<MetaState>(db, 'meta', defaultMeta(dayKey()))
+    const current = meta.freezeCards ?? 0
+    if (current >= SHIELD_CARD_CAP) {
+      setNotice(`守护卡已经是上限 ${SHIELD_CARD_CAP} 张`)
+      return
+    }
+    await setKV(db, 'meta', { ...meta, freezeCards: current + 1 })
+    setNotice(`已补 1 张守护卡,现在 ${current + 1} 张`)
+    await refresh()
+  }
+
   const doFastForward = async () => {
     const input = {
       days: Number(ff.days),
@@ -244,10 +296,23 @@ export function ParentScreen({ onExit }: { onExit: () => void }) {
       <section className="parent-section">
         <h2>学习统计</h2>
         <p>
-          连胜 <b>{data.meta.streak}</b> 天 · 累计 <b>{data.meta.totalDays}</b> 天
+          连续 <b>{data.meta.streak}</b> 天 · 累计 <b>{data.meta.totalDays}</b> 天
+          · 守护卡 <b>{data.meta.freezeCards ?? 0}</b> / {SHIELD_CARD_CAP} 张
           · 上次完成 {data.meta.lastDoneDate ?? '—'} · 安装于 {data.meta.installDate}
         </p>
+        <p className="parent-hint">
+          每连续 7 天自动得 1 张守护卡,漏学时自动用掉接上连续天数;病假或旅行可以在这里手动补一张。
+        </p>
+        <div className="parent-actions">
+          <button className="parent-btn parent-btn-plain" type="button" disabled={busy} onClick={() => void addShield()}>补 1 张守护卡</button>
+        </div>
         <StreakCalendar sessions={data.sessions} today={today} />
+      </section>
+
+      <section className="parent-section">
+        <h2>设备诊断</h2>
+        <p className="parent-hint">遇到「底部有横带」「画面缩放不对」时,把这一块截图发给开发。</p>
+        <DeviceDiagnostics />
       </section>
 
       <section className="parent-section">

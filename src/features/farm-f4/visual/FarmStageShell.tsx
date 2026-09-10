@@ -1,4 +1,4 @@
-import { useRef, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react'
 import { useStageScale } from '../stage/useStageScale'
 import '../../../styles/f4/stage.css'
 
@@ -6,6 +6,8 @@ interface FarmStageShellProps {
   children?: ReactNode
   ariaLabel?: string
   backgroundAssetUrl?: string
+  /** 场景背景底边的平均色,写到 html 画布底色:iPad 桌面 PWA 固定视口铺不到屏幕底边时,露出的横带与草地同色 */
+  canvasColor?: string
   /** 'farm' 启用农场采光渐变;全屏视觉处理一律画在 .f4-bleed 上,不能进舞台 */
   surface?: 'farm'
   /** 有面板打开时压暗整个视口(含 letterbox),而不是只压暗舞台 */
@@ -22,11 +24,21 @@ export function FarmStageShell({
   children,
   ariaLabel = '皮皮のEnglish 小鸡农场',
   backgroundAssetUrl,
+  canvasColor,
   surface,
   dimmed = false,
 }: FarmStageShellProps) {
   const safeAreaRef = useRef<HTMLDivElement>(null)
   const stage = useStageScale(safeAreaRef)
+
+  useEffect(() => {
+    const root = document.documentElement
+    if (!canvasColor) return
+    root.style.setProperty('--f4-canvas', canvasColor)
+    return () => {
+      root.style.removeProperty('--f4-canvas')
+    }
+  }, [canvasColor])
   const stageStyle: StageCustomProperties = {
     '--f4-stage-left': `${stage.left}px`,
     '--f4-stage-top': `${stage.top}px`,

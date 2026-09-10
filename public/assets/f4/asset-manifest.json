@@ -1,237 +1,462 @@
 {
-  "schemaVersion": 1,
-  "copiedOn": "2026-07-17",
-  "updatedOn": "2026-09-10",
-  "sourceRoot": "design-samples/assets plus approved external art sources",
-  "rule": "Each hash identifies production bytes; approved source art may receive documented G2 alpha/canvas calibration before copy.",
+  "schemaVersion": 2,
+  "updatedOn": "2026-09-11",
+  "sourceRoot": "design-samples/assets/f4-production-masters (只读母版,与本目录同构)",
+  "rule": "Each production file is a WebP derived from its master PNG by scripts/optimize-f4-assets.py; masterSha256 identifies the approved bytes, sha256 identifies the served bytes. Runtime asset ids keep the .png name and assetUrl.ts maps them to .webp.",
+  "quality": 82,
   "assets": [
     {
-      "file": "farm-background-f3.png",
-      "sha256": "0E0D54F93BEB79972209AE9AAA7EBED6F4EC9FD9F91A122EEEC0028C7DF546A8"
+      "file": "chick-f3.webp",
+      "assetId": "chick-f3.png",
+      "pixels": "400x400",
+      "sha256": "C81E1682A4DD3B955D9A48E5C5C472F5D1BF833BCBFEE2A379982190361FDA4E",
+      "masterFile": "chick-f3.png",
+      "masterSha256": "B06B82D8BA17A6AAF381E897309E67064C0D09D2E692D34EF1A344C2B97AAAB5"
     },
     {
-      "file": "mother-f3.png",
-      "sha256": "CFE836C951BBD726486BDE65972F61A0739D667024EF767FFA020DF095CB90BF"
+      "file": "chicks/chick-color-approved-b.webp",
+      "assetId": "chicks/chick-color-approved-b.png",
+      "pixels": "400x400",
+      "sha256": "F7F31B9C7320DFAD54CDEAFD6BB4B050805C9BF5A144A42FCC8F4FB9C4E8D434",
+      "masterFile": "chicks/chick-color-approved-b.png",
+      "masterSha256": "2A55EE50686DB7866DB6893A09768A8839F78B256F364DBC5720A17FF1C38694"
     },
     {
-      "file": "xiaopi-f3.png",
-      "sha256": "30C61F790B2E9A829CC9B26661EE77B4942512D60DB502D2880137A2B6E64637"
+      "file": "chicks/chick-special-approved-f.webp",
+      "assetId": "chicks/chick-special-approved-f.png",
+      "pixels": "400x400",
+      "sha256": "BFDAA3C73D06F4DF98F6AA639CABBD3423DA2FCF3852B149223CD0F859038E42",
+      "masterFile": "chicks/chick-special-approved-f.png",
+      "masterSha256": "FA9A9E247417B8557C50FBAC0B010D6C71BFBAF9BACEA137A582DE888C29BC1D"
     },
     {
-      "file": "chick-f3.png",
-      "sha256": "B06B82D8BA17A6AAF381E897309E67064C0D09D2E692D34EF1A344C2B97AAAB5"
+      "file": "egg-f4-v2.webp",
+      "assetId": "egg-f4-v2.png",
+      "pixels": "300x300",
+      "sha256": "7B5FA8B32C26D9964BC2E68E52DFB57DDB9F387C934AA8C2C190A6F06A79EF88",
+      "masterFile": "egg-f4-v2.png",
+      "masterSha256": "FBAA203DC4888EA7EBDF504448D402DC3707AD16504398240E081F2AA7BA4C38"
     },
     {
-      "file": "hatchery-empty-f4.png",
-      "sha256": "F2C4666F31A1B63AABF57202CDE8FB867B8472112B801A7E0485488639F2AB74"
+      "file": "farm-background-f3.webp",
+      "assetId": "farm-background-f3.png",
+      "pixels": "1501x1048",
+      "sha256": "C291A74021F79431C91A0FD72783488AA4B8A7159E3E1597D296A0F0BEDD6CC4",
+      "masterFile": "farm-background-f3.png",
+      "masterSha256": "0E0D54F93BEB79972209AE9AAA7EBED6F4EC9FD9F91A122EEEC0028C7DF546A8"
     },
     {
-      "file": "egg-f4-v2.png",
-      "sha256": "FBAA203DC4888EA7EBDF504448D402DC3707AD16504398240E081F2AA7BA4C38"
+      "file": "fried-egg-f4.webp",
+      "assetId": "fried-egg-f4.png",
+      "pixels": "300x300",
+      "sha256": "3382E71B5A40AAF35A9E8CC25383346B3B9FAB755CA7A065F0A179E71E245735",
+      "masterFile": "fried-egg-f4.png",
+      "masterSha256": "AE569374FFA4B11488B6734D3ECE126388CF46D7C59D152FEF950812CE378601"
     },
     {
-      "file": "kitchen-f4.png",
-      "sha256": "567D1D386CA5418BFA20B90F9E8CDC13CA3D3C6767EEA32FF352E3DC7D36482F"
+      "file": "hatchery-empty-f4.webp",
+      "assetId": "hatchery-empty-f4.png",
+      "pixels": "512x512",
+      "sha256": "B2E6935DCF63C3FBEEEADF43953C5CDEDC4970F389A31637F83CFED0185FC4A7",
+      "masterFile": "hatchery-empty-f4.png",
+      "masterSha256": "F2C4666F31A1B63AABF57202CDE8FB867B8472112B801A7E0485488639F2AB74"
     },
     {
-      "file": "fried-egg-f4.png",
-      "sha256": "AE569374FFA4B11488B6734D3ECE126388CF46D7C59D152FEF950812CE378601"
+      "file": "kitchen-f4.webp",
+      "assetId": "kitchen-f4.png",
+      "pixels": "700x700",
+      "sha256": "D7A456CF44F1DE4DE81D8A468D1C5697B8BF9D2B27497794734836C87A24DF5E",
+      "masterFile": "kitchen-f4.png",
+      "masterSha256": "567D1D386CA5418BFA20B90F9E8CDC13CA3D3C6767EEA32FF352E3DC7D36482F"
     },
     {
-      "file": "rescue-basket-f4.png",
-      "sha256": "B7189C6EA1A4924CE41B088750DE8E607BD9FAEF438F4E265054AACE8D2CC915"
+      "file": "mother-f3.webp",
+      "assetId": "mother-f3.png",
+      "pixels": "640x640",
+      "sha256": "620C54285C71B2C43845ABB06FD11372402D5FCB5E4EC41118655BBE3E717E43",
+      "masterFile": "mother-f3.png",
+      "masterSha256": "CFE836C951BBD726486BDE65972F61A0739D667024EF767FFA020DF095CB90BF"
     },
     {
-      "file": "mother-thumbsup-f4-v1.png",
-      "sha256": "EBCFBB1898BEF2D31D5E0B2C8F2A2CFE1F35803DCD6DE0AE633B56CC6DF004C3"
+      "file": "mother-thumbsup-f4-v1.webp",
+      "assetId": "mother-thumbsup-f4-v1.png",
+      "pixels": "640x640",
+      "sha256": "8BBAA197BADD9BB6641E61825961413AFED66F8F02BBC751C711798BD4211E0B",
+      "masterFile": "mother-thumbsup-f4-v1.png",
+      "masterSha256": "EBCFBB1898BEF2D31D5E0B2C8F2A2CFE1F35803DCD6DE0AE633B56CC6DF004C3"
+    },
+    {
+      "file": "rescue-basket-f4.webp",
+      "assetId": "rescue-basket-f4.png",
+      "pixels": "400x400",
+      "sha256": "471DF8DC9828D961D2E69D6587568C5D2A4A3EEFAD97DA801CB64E4DB8C8B4B5",
+      "masterFile": "rescue-basket-f4.png",
+      "masterSha256": "B7189C6EA1A4924CE41B088750DE8E607BD9FAEF438F4E265054AACE8D2CC915"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/01-empty.webp",
+      "assetId": "scenes/scene-1/hatchery/01-empty.png",
+      "pixels": "512x512",
+      "sha256": "58E8923D435A301764AEE7559DEADF5924451567C672D602E9C237031D5EF5BC",
+      "masterFile": "scenes/scene-1/hatchery/01-empty.png",
+      "masterSha256": "AF69A76D265DCBBAC0D04F115901B0EC889A33FFCFA09E8C0232C023BBC61669"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/02-whole.webp",
+      "assetId": "scenes/scene-1/hatchery/02-whole.png",
+      "pixels": "512x512",
+      "sha256": "8BDC0D0BA8E6113B9476FEAA8569D9DA1D39B1579A253E83D723CB497FB3B21E",
+      "masterFile": "scenes/scene-1/hatchery/02-whole.png",
+      "masterSha256": "194BAA1FD2844AA78B8611CBB6628B67EE4E0E4B7176BDFD9F1D04B450A6CAD0"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/03-hairline-crack.webp",
+      "assetId": "scenes/scene-1/hatchery/03-hairline-crack.png",
+      "pixels": "512x512",
+      "sha256": "D4BA5C90E6E9B3D9F5B50C658F3FBDEC312211A2D2FECCD6FBAC88369272C40E",
+      "masterFile": "scenes/scene-1/hatchery/03-hairline-crack.png",
+      "masterSha256": "39379BB315978A845A06D0C0D2F987ED80F3D21D1422C8F3D97422091F62304C"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/04-large-crack.webp",
+      "assetId": "scenes/scene-1/hatchery/04-large-crack.png",
+      "pixels": "512x512",
+      "sha256": "044B6EF9C0A28791A30B9791E809C21A31F27DF8104D80D48550321BBA61A739",
+      "masterFile": "scenes/scene-1/hatchery/04-large-crack.png",
+      "masterSha256": "321A0E3673D19705939032D4B648D42DDFB9D455B38C21A6705369BF5FB3A839"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/05-two-shells.webp",
+      "assetId": "scenes/scene-1/hatchery/05-two-shells.png",
+      "pixels": "512x512",
+      "sha256": "3243E074174005AF4A6BE499EAAAC234F7B184CE8FE85D1D94A2927DF2397A8E",
+      "masterFile": "scenes/scene-1/hatchery/05-two-shells.png",
+      "masterSha256": "B57932C7E63C51FA343A7058C6669494E5801A97097198F8BA83B24A4AA99B53"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/06-normal-hatch.webp",
+      "assetId": "scenes/scene-1/hatchery/06-normal-hatch.png",
+      "pixels": "512x512",
+      "sha256": "3DDC76442612C54149570DF7B3137D55461C95C3F90AC96325581458554B7594",
+      "masterFile": "scenes/scene-1/hatchery/06-normal-hatch.png",
+      "masterSha256": "24A3798D8F6C2B95AE9FB4C4248E80CB4071206949A3E44BD917AC29C454E89D"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/07-color-hatch.webp",
+      "assetId": "scenes/scene-1/hatchery/07-color-hatch.png",
+      "pixels": "512x512",
+      "sha256": "DFF5F2251EA6AA1E44D05569BE52BFC78A46CEBA7B5B97CB3C2FBA1E675F1936",
+      "masterFile": "scenes/scene-1/hatchery/07-color-hatch.png",
+      "masterSha256": "4C2C797EAEDC44F84947C47B80424F5778017BE56FEF51D44F93EB4F415CF89E"
+    },
+    {
+      "file": "scenes/scene-1/hatchery/08-special-hatch.webp",
+      "assetId": "scenes/scene-1/hatchery/08-special-hatch.png",
+      "pixels": "512x512",
+      "sha256": "0A6AEA05328A737473AEB9008AC738FDF0E1ED111577DCBEB5E9CBA33D3CA3EC",
+      "masterFile": "scenes/scene-1/hatchery/08-special-hatch.png",
+      "masterSha256": "DD7B562C314329CA00715F9AF5BE6233ACBAD645ECBAC640DB3402A32EF0C409"
+    },
+    {
+      "file": "scenes/scene-2/apple-juice-station.webp",
+      "assetId": "scenes/scene-2/apple-juice-station.png",
+      "pixels": "800x559",
+      "sha256": "0855977787FC849B1F6D1CFC0ED903EAD3E04AE7F8F99F25F9EFBED3BA68D059",
+      "masterFile": "scenes/scene-2/apple-juice-station.png",
+      "masterSha256": "0ECCF413FFDEFE01373BEC540C907CA71CC10EE0980FB077B3C5E23108A19E97"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/mother-bonnet-neckerchief.webp",
+      "assetId": "scenes/scene-2/cosmetics/mother-bonnet-neckerchief.png",
+      "pixels": "640x640",
+      "sha256": "DD64575479DA24B89F5AAF8B3B09BCF9FFEC9766A6248D28461EDCE7255B8E27",
+      "masterFile": "scenes/scene-2/cosmetics/mother-bonnet-neckerchief.png",
+      "masterSha256": "082C20E783FA3BAD1FA1C586D36D37DCCBD3E57536B3649FB352CC5589E7A65A"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/mother-bonnet-none.webp",
+      "assetId": "scenes/scene-2/cosmetics/mother-bonnet-none.png",
+      "pixels": "640x640",
+      "sha256": "E1DE18F2AA9409859BF620C3A0E2A39BB0544FF33248F2B6553AA15204CC1339",
+      "masterFile": "scenes/scene-2/cosmetics/mother-bonnet-none.png",
+      "masterSha256": "D50A32D075E9F4DA139C47280280B49E59DEB1D3FC9720FA0CCAE10009B3513B"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/mother-default-neckerchief.webp",
+      "assetId": "scenes/scene-2/cosmetics/mother-default-neckerchief.png",
+      "pixels": "640x640",
+      "sha256": "02EAB12AABDC9083B309FAB9B399864AB0A5DCE1DE8646ADD7F26F7C546DBD51",
+      "masterFile": "scenes/scene-2/cosmetics/mother-default-neckerchief.png",
+      "masterSha256": "8008E267C2BF7A8BAE0B315073E5586F94B86AA708FA22B639E34A1164B802F3"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-bonnet-default-none.webp",
+      "assetId": "scenes/scene-2/cosmetics/xiaopi-bonnet-default-none.png",
+      "pixels": "640x640",
+      "sha256": "BED9FAA1AB633873B2E379DB7BD6B48568B0EF22EAD10D90BD0FAF350D23084D",
+      "masterFile": "scenes/scene-2/cosmetics/xiaopi-bonnet-default-none.png",
+      "masterSha256": "333F74354B65FCBDB8B454572C07EEDA0F72694B8731394982C813B09E9B2F91"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-bonnet-default-satchel.webp",
+      "assetId": "scenes/scene-2/cosmetics/xiaopi-bonnet-default-satchel.png",
+      "pixels": "640x640",
+      "sha256": "8B41AF0EA6EC1FEFB837963087A61F6C16D6E2953553EFC9CBF1790FBBD5A981",
+      "masterFile": "scenes/scene-2/cosmetics/xiaopi-bonnet-default-satchel.png",
+      "masterSha256": "4E22324EBF7DE0A2D7AE9561099D1F06F2952A0D35E1BEC512A56E335376DE3F"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-bonnet-overalls-none.webp",
+      "assetId": "scenes/scene-2/cosmetics/xiaopi-bonnet-overalls-none.png",
+      "pixels": "640x640",
+      "sha256": "A388AE3B6B08CDFD948B7D03EED0859989CCB5DE7C75853999E9B01A1E82F894",
+      "masterFile": "scenes/scene-2/cosmetics/xiaopi-bonnet-overalls-none.png",
+      "masterSha256": "1AD054BEB4992818EFCF70B06EC82E7538921DE5C0439ED2780EC6560B3BBFAB"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-bonnet-overalls-satchel.webp",
+      "assetId": "scenes/scene-2/cosmetics/xiaopi-bonnet-overalls-satchel.png",
+      "pixels": "640x640",
+      "sha256": "4A5F3A31B2E9EEC5EBEB7A477E3EB4B4E3F9C6C845C56D76E4BC6144256D2010",
+      "masterFile": "scenes/scene-2/cosmetics/xiaopi-bonnet-overalls-satchel.png",
+      "masterSha256": "85F73FEC597C40A92B9DB714A124AB1F88BC528E9C9AD46FCA492E567FB66242"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-default-default-satchel.webp",
+      "assetId": "scenes/scene-2/cosmetics/xiaopi-default-default-satchel.png",
+      "pixels": "640x640",
+      "sha256": "5CA5BE63F950047FFB8C5531F39C1A6C8A13F47E018C114A15E02C1057AE531A",
+      "masterFile": "scenes/scene-2/cosmetics/xiaopi-default-default-satchel.png",
+      "masterSha256": "BD5F95CA69F950DB1606C9435EEFBF5D904D2839C7CCA86E358F622BA7A759C5"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-default-overalls-none.webp",
+      "assetId": "scenes/scene-2/cosmetics/xiaopi-default-overalls-none.png",
+      "pixels": "640x640",
+      "sha256": "1A2CA40F282E0497550FD9887AB6422A9777D89C81679B46A364DCB7A4540753",
+      "masterFile": "scenes/scene-2/cosmetics/xiaopi-default-overalls-none.png",
+      "masterSha256": "2885D23B0E39B376BEF256AF7D99A27B9DD501E7B9295C363434D9775A9F6B38"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-default-overalls-satchel.webp",
+      "assetId": "scenes/scene-2/cosmetics/xiaopi-default-overalls-satchel.png",
+      "pixels": "640x640",
+      "sha256": "027BAA6B5BCD24AD93A5D1AC304803A7A87E0AF7AD988F021E9C436B4E11C1A0",
+      "masterFile": "scenes/scene-2/cosmetics/xiaopi-default-overalls-satchel.png",
+      "masterSha256": "D72F14A536FB665AC384E3A51AC7BE5A438CD7415E06FD685A1E6A1DDDC087D7"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-hair-default-none.webp",
+      "assetId": "scenes/scene-2/cosmetics/xiaopi-hair-default-none.png",
+      "pixels": "640x640",
+      "sha256": "B04202185B29441193139374D8F079A672EB424E36476C17D0C86790EB6C4650",
+      "masterFile": "scenes/scene-2/cosmetics/xiaopi-hair-default-none.png",
+      "masterSha256": "705F1FE61CA426D4D73AA52151A098475240A499DC8894194D1083871C2E69C4"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-hair-default-satchel.webp",
+      "assetId": "scenes/scene-2/cosmetics/xiaopi-hair-default-satchel.png",
+      "pixels": "640x640",
+      "sha256": "9536034B1FD679BA86CAA48ED53D4E3C177DA131ED3F35A9B7CD1B927BDE7D3A",
+      "masterFile": "scenes/scene-2/cosmetics/xiaopi-hair-default-satchel.png",
+      "masterSha256": "67A29CF614E4CADBAE808CB79C2BBE3CED8D37479279928765D4C3564CCCC12B"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-hair-overalls-none.webp",
+      "assetId": "scenes/scene-2/cosmetics/xiaopi-hair-overalls-none.png",
+      "pixels": "640x640",
+      "sha256": "6EDFA8AB323CA6DAA6ACD87D3ACC32503B97FB4B5FE7F9690259EA206B7AD052",
+      "masterFile": "scenes/scene-2/cosmetics/xiaopi-hair-overalls-none.png",
+      "masterSha256": "2DEA15F9986AD80B0261DF769BE704EB1B29A0DD57DD38EAECCAE81F0C01AC0D"
+    },
+    {
+      "file": "scenes/scene-2/cosmetics/xiaopi-hair-overalls-satchel.webp",
+      "assetId": "scenes/scene-2/cosmetics/xiaopi-hair-overalls-satchel.png",
+      "pixels": "640x640",
+      "sha256": "DA7090B336981A09A436A62E70A7B983A2A04DC29559DF2BFB1BBB5C9CC458FE",
+      "masterFile": "scenes/scene-2/cosmetics/xiaopi-hair-overalls-satchel.png",
+      "masterSha256": "02C3B3878759753124DCF1CC3FE035EA8BDAA6CC22F9D982596DEA1B9238EEE6"
+    },
+    {
+      "file": "scenes/scene-2/decorations/apple-crate.webp",
+      "assetId": "scenes/scene-2/decorations/apple-crate.png",
+      "pixels": "680x680",
+      "sha256": "033C3608720BDED01B689A1A8300D783C065B91C163D7851F8BE80ADD7FD3C96",
+      "masterFile": "scenes/scene-2/decorations/apple-crate.png",
+      "masterSha256": "B61F1D618518369C21CB61D090083E495283740971B6D26E58FD5F60E6300591"
+    },
+    {
+      "file": "scenes/scene-2/decorations/apple-tree-swing-landmark.webp",
+      "assetId": "scenes/scene-2/decorations/apple-tree-swing-landmark.png",
+      "pixels": "680x680",
+      "sha256": "F1415E3B5D71D216A4924088EF241066ACAE773B7F222AC1F30AFED3F30F00C6",
+      "masterFile": "scenes/scene-2/decorations/apple-tree-swing-landmark.png",
+      "masterSha256": "82749EF57FC21CA11F7669A4AE53BAF593E3D31BF8BC47E859A2517CA0A2CF7A"
+    },
+    {
+      "file": "scenes/scene-2/decorations/cider-jugs.webp",
+      "assetId": "scenes/scene-2/decorations/cider-jugs.png",
+      "pixels": "680x680",
+      "sha256": "B8426E6AD6D6315C0E9D92899BC708CF771C41A6DEA36FF949C7147389CA8BA9",
+      "masterFile": "scenes/scene-2/decorations/cider-jugs.png",
+      "masterSha256": "ED8B22FAD289CA60E6CF316A4D3189ED4B9986FA455CE2F234C3728ECC5B79C3"
+    },
+    {
+      "file": "scenes/scene-2/decorations/field-bench.webp",
+      "assetId": "scenes/scene-2/decorations/field-bench.png",
+      "pixels": "680x680",
+      "sha256": "69E8104E035977091487CDE33997BFEDB1F4E457D657E9339B0E706C65466DB9",
+      "masterFile": "scenes/scene-2/decorations/field-bench.png",
+      "masterSha256": "084A9245553F6C7FDC588F982E8D5F116BC7883BBAC1986459C37D94BA534729"
+    },
+    {
+      "file": "scenes/scene-2/decorations/flower-basket.webp",
+      "assetId": "scenes/scene-2/decorations/flower-basket.png",
+      "pixels": "680x680",
+      "sha256": "5AC2BD15621A11D19CC64E2AE12B7D14D8013A99CFACE8C933FF2D82AEB2B070",
+      "masterFile": "scenes/scene-2/decorations/flower-basket.png",
+      "masterSha256": "9BEB762E2FDC409855017562E16A56D816A9DD5F5A5A34280967EA26468CD8E6"
+    },
+    {
+      "file": "scenes/scene-2/decorations/harvest-cart.webp",
+      "assetId": "scenes/scene-2/decorations/harvest-cart.png",
+      "pixels": "680x680",
+      "sha256": "02D58E6F29C57F1B1FE2D7BEDB0649E28004C3C9BC2D702F7BBC7A90499C4560",
+      "masterFile": "scenes/scene-2/decorations/harvest-cart.png",
+      "masterSha256": "CD52700450FBB75D44F54C259B125CBE7B953FA537273CD4290E6159930CC90D"
+    },
+    {
+      "file": "scenes/scene-2/decorations/orchard-lantern.webp",
+      "assetId": "scenes/scene-2/decorations/orchard-lantern.png",
+      "pixels": "680x680",
+      "sha256": "10AD7F0A00F20769A96D7BE21649E82B3CFDB72E32A303A902E1589D766F52AF",
+      "masterFile": "scenes/scene-2/decorations/orchard-lantern.png",
+      "masterSha256": "254EF527157118F73413FC133D6CBF6769000D2BF5D441A662A411C9886B196E"
+    },
+    {
+      "file": "scenes/scene-2/decorations/sorting-table.webp",
+      "assetId": "scenes/scene-2/decorations/sorting-table.png",
+      "pixels": "680x680",
+      "sha256": "F00894FFEC8FF5F978C4134C53C1A43D1013184B2B7F19297955153739762060",
+      "masterFile": "scenes/scene-2/decorations/sorting-table.png",
+      "masterSha256": "FE9EBF762E9DD4FEB0613E8AACA8843496E3A7AAE9ECBAC7ACFF1E806FCFA659"
+    },
+    {
+      "file": "scenes/scene-2/decorations/windmill-landmark.webp",
+      "assetId": "scenes/scene-2/decorations/windmill-landmark.png",
+      "pixels": "680x680",
+      "sha256": "6ACE35366247E70ACED455731C2DD1B91EE8087815E2630D268F7C01E0242999",
+      "masterFile": "scenes/scene-2/decorations/windmill-landmark.png",
+      "masterSha256": "9AF6E17603B4287CE81804C98FE1459F77CEB2C9B47077E46F2AC9D636DDA9B7"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/01-empty.webp",
+      "assetId": "scenes/scene-2/hatchery/01-empty.png",
+      "pixels": "512x512",
+      "sha256": "AA7AECD287B3F9AC6B3F8AF2E47C518D36F249AEC4CC7DB6FA5A637EBF6043A8",
+      "masterFile": "scenes/scene-2/hatchery/01-empty.png",
+      "masterSha256": "DFFC26CBF999F9EB83A20BB7014D7F054DCB4F5132AC0E07502238411D8C8437"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/02-whole.webp",
+      "assetId": "scenes/scene-2/hatchery/02-whole.png",
+      "pixels": "512x512",
+      "sha256": "A896EDBD64C56902DF3FFF288809A8AAF9CEFF753C8492A4F9B9F2810925C877",
+      "masterFile": "scenes/scene-2/hatchery/02-whole.png",
+      "masterSha256": "09FC4CD1DD08CB1C2CC21D0A4B6DF203D02EF204A9E310B3716BA4B1870A6547"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/03-hairline-crack.webp",
+      "assetId": "scenes/scene-2/hatchery/03-hairline-crack.png",
+      "pixels": "512x512",
+      "sha256": "B193B6FE57F1FC13AECBB16B38BC96B8B948DE8BD48EB0DEA5ABF80BCDB84EBE",
+      "masterFile": "scenes/scene-2/hatchery/03-hairline-crack.png",
+      "masterSha256": "860164C69BFC258E6870372A97EA9085315B9BF6E3DC6B5E6775D364BAB10C56"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/04-large-crack.webp",
+      "assetId": "scenes/scene-2/hatchery/04-large-crack.png",
+      "pixels": "512x512",
+      "sha256": "C13C991FD80098F056C08F2393DDE7E11269353F6242DAB5A3833BE0F2CCCD99",
+      "masterFile": "scenes/scene-2/hatchery/04-large-crack.png",
+      "masterSha256": "0C9B34F39C4564D59D37A82525BCCF1BAE9F8DCB084E70E4DDC1716B5D5E3CC4"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/05-two-shells.webp",
+      "assetId": "scenes/scene-2/hatchery/05-two-shells.png",
+      "pixels": "512x512",
+      "sha256": "FADC84DAD252E2E569EF0F21A092031055CB3F20851285A5A0481799E270A6AD",
+      "masterFile": "scenes/scene-2/hatchery/05-two-shells.png",
+      "masterSha256": "1317E2376936418FBCE72B656BB198961E075FC347AFC33D47C721B356628F8F"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/06-normal-hatch.webp",
+      "assetId": "scenes/scene-2/hatchery/06-normal-hatch.png",
+      "pixels": "512x512",
+      "sha256": "4B1B3A5D7EF959AAB6D9CA29FD5C06A23D8FC40328345249476CE42C0247850D",
+      "masterFile": "scenes/scene-2/hatchery/06-normal-hatch.png",
+      "masterSha256": "52FADF132EA8F5EA3C7C4FA78F8916AC3AB97BF1B71751E4AE210266DC940287"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/07-color-hatch.webp",
+      "assetId": "scenes/scene-2/hatchery/07-color-hatch.png",
+      "pixels": "512x512",
+      "sha256": "9B18388A94404EC8A6BC1C4C3A979459F10B6D00BB43308A33488DFDA5BE44B9",
+      "masterFile": "scenes/scene-2/hatchery/07-color-hatch.png",
+      "masterSha256": "66003AC86F7EF97DC587A13EC56FD77734EC9B09CD052CEDBC13F8DDFDC4BE14"
+    },
+    {
+      "file": "scenes/scene-2/hatchery/08-special-hatch.webp",
+      "assetId": "scenes/scene-2/hatchery/08-special-hatch.png",
+      "pixels": "512x512",
+      "sha256": "03F6A58766E5A3FBFECD133D2E3CD5BD136A653BD0838C4B8AD8C926F0C4D296",
+      "masterFile": "scenes/scene-2/hatchery/08-special-hatch.png",
+      "masterSha256": "20B2A064442EB3B641FFC078EEA7F99A769306CF32EFED4361B021BB14239C5A"
+    },
+    {
+      "file": "scenes/scene-2/mother.webp",
+      "assetId": "scenes/scene-2/mother.png",
+      "pixels": "640x640",
+      "sha256": "2A1EE1DFC851794514187B061AE1224157EE42EE66D7CCBF780B99753DA91BBE",
+      "masterFile": "scenes/scene-2/mother.png",
+      "masterSha256": "DD99BD5EC643D2D8652FF7DD530ECF86C61D34A302407433349CA772B06977AE"
+    },
+    {
+      "file": "scenes/scene-2/orchard-background.webp",
+      "assetId": "scenes/scene-2/orchard-background.png",
+      "pixels": "2388x1668",
+      "sha256": "15D3C9A18E19DD5E121525F914DABEEE1916FA8DAEE0DA94BE93758BA943E881",
+      "masterFile": "scenes/scene-2/orchard-background.png",
+      "masterSha256": "BE8068D7DA86BA450171A6B526EFA556A2A24CF00EB64C2139C306E8E43BC3A3"
+    },
+    {
+      "file": "scenes/scene-2/travel-sign.webp",
+      "assetId": "scenes/scene-2/travel-sign.png",
+      "pixels": "400x400",
+      "sha256": "70F27DFED5FCDF7CE97CEB84DBCBBD3D04B14533FADC3CED93B2B169C4DBE5D9",
+      "masterFile": "scenes/scene-2/travel-sign.png",
+      "masterSha256": "917C3CBF0BA7DC2C747245655F9D784B9662BF20D40AA31027D8B5D0DBD867A2"
+    },
+    {
+      "file": "scenes/scene-2/xiaopi.webp",
+      "assetId": "scenes/scene-2/xiaopi.png",
+      "pixels": "640x640",
+      "sha256": "8DC596DF029AA220DE4440960575D823492874902A824E84E15361F504AF5EF0",
+      "masterFile": "scenes/scene-2/xiaopi.png",
+      "masterSha256": "D63131CDD4770BC5A4645F40EB21544555DFFAC281852B3D5385F9319DF246CE"
+    },
+    {
+      "file": "xiaopi-f3.webp",
+      "assetId": "xiaopi-f3.png",
+      "pixels": "640x640",
+      "sha256": "AC2D7E001FBC7A05D61F43167A423D7F7D0DE9F80CC658F2FD35CE10CEE35EC4",
+      "masterFile": "xiaopi-f3.png",
+      "masterSha256": "30C61F790B2E9A829CC9B26661EE77B4942512D60DB502D2880137A2B6E64637"
     },
     {
       "file": "audio/bgm-english-garden.mp3",
+      "assetId": "audio/bgm-english-garden.mp3",
       "sha256": "11A8B67D5B70FC5AA2243AC4F6EF728FC895E3DDF6741EF1F61DB69E8D4E8479"
-    },
-    {
-      "file": "scenes/scene-1/hatchery/01-empty.png",
-      "sha256": "AF69A76D265DCBBAC0D04F115901B0EC889A33FFCFA09E8C0232C023BBC61669"
-    },
-    {
-      "file": "scenes/scene-1/hatchery/02-whole.png",
-      "sha256": "194BAA1FD2844AA78B8611CBB6628B67EE4E0E4B7176BDFD9F1D04B450A6CAD0"
-    },
-    {
-      "file": "scenes/scene-1/hatchery/03-hairline-crack.png",
-      "sha256": "39379BB315978A845A06D0C0D2F987ED80F3D21D1422C8F3D97422091F62304C"
-    },
-    {
-      "file": "scenes/scene-1/hatchery/04-large-crack.png",
-      "sha256": "321A0E3673D19705939032D4B648D42DDFB9D455B38C21A6705369BF5FB3A839"
-    },
-    {
-      "file": "scenes/scene-1/hatchery/05-two-shells.png",
-      "sha256": "B57932C7E63C51FA343A7058C6669494E5801A97097198F8BA83B24A4AA99B53"
-    },
-    {
-      "file": "scenes/scene-1/hatchery/06-normal-hatch.png",
-      "sha256": "24A3798D8F6C2B95AE9FB4C4248E80CB4071206949A3E44BD917AC29C454E89D"
-    },
-    {
-      "file": "scenes/scene-1/hatchery/07-color-hatch.png",
-      "sha256": "4C2C797EAEDC44F84947C47B80424F5778017BE56FEF51D44F93EB4F415CF89E"
-    },
-    {
-      "file": "scenes/scene-1/hatchery/08-special-hatch.png",
-      "sha256": "DD7B562C314329CA00715F9AF5BE6233ACBAD645ECBAC640DB3402A32EF0C409"
-    },
-    {
-      "file": "scenes/scene-2/hatchery/01-empty.png",
-      "sha256": "DFFC26CBF999F9EB83A20BB7014D7F054DCB4F5132AC0E07502238411D8C8437"
-    },
-    {
-      "file": "scenes/scene-2/hatchery/02-whole.png",
-      "sha256": "09FC4CD1DD08CB1C2CC21D0A4B6DF203D02EF204A9E310B3716BA4B1870A6547"
-    },
-    {
-      "file": "scenes/scene-2/hatchery/03-hairline-crack.png",
-      "sha256": "860164C69BFC258E6870372A97EA9085315B9BF6E3DC6B5E6775D364BAB10C56"
-    },
-    {
-      "file": "scenes/scene-2/hatchery/04-large-crack.png",
-      "sha256": "0C9B34F39C4564D59D37A82525BCCF1BAE9F8DCB084E70E4DDC1716B5D5E3CC4"
-    },
-    {
-      "file": "scenes/scene-2/hatchery/05-two-shells.png",
-      "sha256": "1317E2376936418FBCE72B656BB198961E075FC347AFC33D47C721B356628F8F"
-    },
-    {
-      "file": "scenes/scene-2/hatchery/06-normal-hatch.png",
-      "sha256": "52FADF132EA8F5EA3C7C4FA78F8916AC3AB97BF1B71751E4AE210266DC940287"
-    },
-    {
-      "file": "scenes/scene-2/hatchery/07-color-hatch.png",
-      "sha256": "66003AC86F7EF97DC587A13EC56FD77734EC9B09CD052CEDBC13F8DDFDC4BE14"
-    },
-    {
-      "file": "scenes/scene-2/hatchery/08-special-hatch.png",
-      "sha256": "20B2A064442EB3B641FFC078EEA7F99A769306CF32EFED4361B021BB14239C5A"
-    },
-    {
-      "file": "chicks/chick-color-approved-b.png",
-      "sha256": "2A55EE50686DB7866DB6893A09768A8839F78B256F364DBC5720A17FF1C38694"
-    },
-    {
-      "file": "chicks/chick-special-approved-f.png",
-      "sha256": "FA9A9E247417B8557C50FBAC0B010D6C71BFBAF9BACEA137A582DE888C29BC1D"
-    },
-    {
-      "file": "scenes/scene-2/orchard-background.png",
-      "sha256": "BE8068D7DA86BA450171A6B526EFA556A2A24CF00EB64C2139C306E8E43BC3A3"
-    },
-    {
-      "file": "scenes/scene-2/xiaopi.png",
-      "sha256": "D63131CDD4770BC5A4645F40EB21544555DFFAC281852B3D5385F9319DF246CE"
-    },
-    {
-      "file": "scenes/scene-2/mother.png",
-      "sha256": "DD99BD5EC643D2D8652FF7DD530ECF86C61D34A302407433349CA772B06977AE"
-    },
-    {
-      "file": "scenes/scene-2/apple-juice-station.png",
-      "sha256": "0ECCF413FFDEFE01373BEC540C907CA71CC10EE0980FB077B3C5E23108A19E97"
-    },
-    {
-      "file": "scenes/scene-2/travel-sign.png",
-      "sha256": "917C3CBF0BA7DC2C747245655F9D784B9662BF20D40AA31027D8B5D0DBD867A2"
-    },
-    {
-      "file": "scenes/scene-2/decorations/flower-basket.png",
-      "sha256": "9BEB762E2FDC409855017562E16A56D816A9DD5F5A5A34280967EA26468CD8E6"
-    },
-    {
-      "file": "scenes/scene-2/decorations/apple-crate.png",
-      "sha256": "B61F1D618518369C21CB61D090083E495283740971B6D26E58FD5F60E6300591"
-    },
-    {
-      "file": "scenes/scene-2/decorations/cider-jugs.png",
-      "sha256": "ED8B22FAD289CA60E6CF316A4D3189ED4B9986FA455CE2F234C3728ECC5B79C3"
-    },
-    {
-      "file": "scenes/scene-2/decorations/orchard-lantern.png",
-      "sha256": "254EF527157118F73413FC133D6CBF6769000D2BF5D441A662A411C9886B196E"
-    },
-    {
-      "file": "scenes/scene-2/decorations/field-bench.png",
-      "sha256": "084A9245553F6C7FDC588F982E8D5F116BC7883BBAC1986459C37D94BA534729"
-    },
-    {
-      "file": "scenes/scene-2/decorations/harvest-cart.png",
-      "sha256": "CD52700450FBB75D44F54C259B125CBE7B953FA537273CD4290E6159930CC90D"
-    },
-    {
-      "file": "scenes/scene-2/decorations/sorting-table.png",
-      "sha256": "FE9EBF762E9DD4FEB0613E8AACA8843496E3A7AAE9ECBAC7ACFF1E806FCFA659"
-    },
-    {
-      "file": "scenes/scene-2/decorations/windmill-landmark.png",
-      "sha256": "9AF6E17603B4287CE81804C98FE1459F77CEB2C9B47077E46F2AC9D636DDA9B7"
-    },
-    {
-      "file": "scenes/scene-2/decorations/apple-tree-swing-landmark.png",
-      "sha256": "82749EF57FC21CA11F7669A4AE53BAF593E3D31BF8BC47E859A2517CA0A2CF7A"
-    },
-    {
-      "file": "scenes/scene-2/cosmetics/mother-bonnet-neckerchief.png",
-      "sha256": "082C20E783FA3BAD1FA1C586D36D37DCCBD3E57536B3649FB352CC5589E7A65A"
-    },
-    {
-      "file": "scenes/scene-2/cosmetics/mother-bonnet-none.png",
-      "sha256": "D50A32D075E9F4DA139C47280280B49E59DEB1D3FC9720FA0CCAE10009B3513B"
-    },
-    {
-      "file": "scenes/scene-2/cosmetics/mother-default-neckerchief.png",
-      "sha256": "8008E267C2BF7A8BAE0B315073E5586F94B86AA708FA22B639E34A1164B802F3"
-    },
-    {
-      "file": "scenes/scene-2/cosmetics/xiaopi-bonnet-default-none.png",
-      "sha256": "333F74354B65FCBDB8B454572C07EEDA0F72694B8731394982C813B09E9B2F91"
-    },
-    {
-      "file": "scenes/scene-2/cosmetics/xiaopi-bonnet-default-satchel.png",
-      "sha256": "4E22324EBF7DE0A2D7AE9561099D1F06F2952A0D35E1BEC512A56E335376DE3F"
-    },
-    {
-      "file": "scenes/scene-2/cosmetics/xiaopi-bonnet-overalls-none.png",
-      "sha256": "1AD054BEB4992818EFCF70B06EC82E7538921DE5C0439ED2780EC6560B3BBFAB"
-    },
-    {
-      "file": "scenes/scene-2/cosmetics/xiaopi-bonnet-overalls-satchel.png",
-      "sha256": "85F73FEC597C40A92B9DB714A124AB1F88BC528E9C9AD46FCA492E567FB66242"
-    },
-    {
-      "file": "scenes/scene-2/cosmetics/xiaopi-default-default-satchel.png",
-      "sha256": "BD5F95CA69F950DB1606C9435EEFBF5D904D2839C7CCA86E358F622BA7A759C5"
-    },
-    {
-      "file": "scenes/scene-2/cosmetics/xiaopi-default-overalls-none.png",
-      "sha256": "2885D23B0E39B376BEF256AF7D99A27B9DD501E7B9295C363434D9775A9F6B38"
-    },
-    {
-      "file": "scenes/scene-2/cosmetics/xiaopi-default-overalls-satchel.png",
-      "sha256": "D72F14A536FB665AC384E3A51AC7BE5A438CD7415E06FD685A1E6A1DDDC087D7"
-    },
-    {
-      "file": "scenes/scene-2/cosmetics/xiaopi-hair-default-none.png",
-      "sha256": "705F1FE61CA426D4D73AA52151A098475240A499DC8894194D1083871C2E69C4"
-    },
-    {
-      "file": "scenes/scene-2/cosmetics/xiaopi-hair-default-satchel.png",
-      "sha256": "67A29CF614E4CADBAE808CB79C2BBE3CED8D37479279928765D4C3564CCCC12B"
-    },
-    {
-      "file": "scenes/scene-2/cosmetics/xiaopi-hair-overalls-none.png",
-      "sha256": "2DEA15F9986AD80B0261DF769BE704EB1B29A0DD57DD38EAECCAE81F0C01AC0D"
-    },
-    {
-      "file": "scenes/scene-2/cosmetics/xiaopi-hair-overalls-satchel.png",
-      "sha256": "02C3B3878759753124DCF1CC3FE035EA8BDAA6CC22F9D982596DEA1B9238EEE6"
     }
   ]
 }

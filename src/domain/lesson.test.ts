@@ -20,7 +20,7 @@ const planInput = {
   date: '2026-07-17',
   reviewCards: [
     { wordId: 'apple', stability: 12 },
-    { wordId: 'banana', stability: 2, lastQuizType: 'choice' as const },
+    { wordId: 'banana', stability: 2 },
     { wordId: 'orange', stability: 9 },
     { wordId: 'grape', stability: 1 },
     { wordId: 'peach', stability: 20 },
@@ -38,20 +38,12 @@ function passStep(p: LessonProgress): { progress: LessonProgress; effects: Lesso
   return applyLessonEvent(p, { type: 'ANSWER', correct: true })
 }
 
-describe('复习题型分配(SPEC §5.2/§5.3)', () => {
-  it('stability≥7 → 默写,每日上限 3,超出降级选择题', () => {
+describe('复习题型分配(F4-CHG-034:复习全部默写)', () => {
+  it('每一张复习都是默写,与记忆强度和数量无关', () => {
     const types = assignReviewTypes(planInput.reviewCards)
-    // 最过期优先顺序里前 3 个熟卡拿到默写:apple(12)、orange(9)、peach(20)
-    expect(types.get('apple')).toBe('dictation')
-    expect(types.get('orange')).toBe('dictation')
-    expect(types.get('peach')).toBe('dictation')
-    expect(types.get('pear')).toBe('choice') // 第 4 张熟卡降级
-  })
-
-  it('生卡选择/听音交替:上次 choice → 这次 listening;无记录 → choice', () => {
-    const types = assignReviewTypes(planInput.reviewCards)
-    expect(types.get('banana')).toBe('listening')
-    expect(types.get('grape')).toBe('choice')
+    for (const card of planInput.reviewCards) expect(types.get(card.wordId)).toBe('dictation')
+    const twelve = Array.from({ length: 12 }, (_, i) => ({ wordId: `w${i}`, stability: i }))
+    expect([...assignReviewTypes(twelve).values()].every(type => type === 'dictation')).toBe(true)
   })
 })
 

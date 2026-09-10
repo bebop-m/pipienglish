@@ -29,14 +29,14 @@ const session = (over: Partial<DailySession> = {}): DailySession => ({
 })
 
 describe('每日与写词鸡蛋收入', () => {
-  it('必修固定发 2 颗，且 completed 使重复提交幂等', () => {
-    expect(eggsEarnedFor(8)).toBe(2)
-    expect(eggsEarnedFor(33)).toBe(2)
+  it('必修固定发 1 颗(F4-CHG-034)，且 completed 使重复提交幂等', () => {
+    expect(eggsEarnedFor(8)).toBe(1)
+    expect(eggsEarnedFor(33)).toBe(1)
 
     const first = completeDailyLessonWithEggs(session(), farm({ eggStock: 4 }))
-    expect(first.awarded).toBe(2)
+    expect(first.awarded).toBe(1)
     expect(first.session.completed).toBe(true)
-    expect(first.farm.eggStock).toBe(6)
+    expect(first.farm.eggStock).toBe(5)
 
     const duplicate = completeDailyLessonWithEggs(first.session, first.farm)
     expect(duplicate).toEqual({ session: first.session, farm: first.farm, awarded: 0 })

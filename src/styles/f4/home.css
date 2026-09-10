@@ -33,6 +33,14 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* iPad 上按住素材图半秒会弹出图片预览/分享菜单,把拖动打断(2026-09-10 真机反馈);
+   农场里的图片一律不可长按、不可原生拖拽 */
+.f4-home img {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
 .sticker-topbar {
   position: absolute;
   z-index: 80;
@@ -361,6 +369,15 @@
 }
 
 .complete-stats-f4 strong { color: #b96040; font-size: 19px; }
+
+/* 连胜守护卡(F4-CHG-034):一行小字,位于战报与写词木牌之间;visual_owner_review: pending-codex */
+.complete-board-f4 > p.complete-shield-f4 {
+  margin: -6px 0 12px;
+  color: #8c6a4f;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.4;
+}
 
 .handwriting-sign-f4 {
   position: relative;

@@ -28,12 +28,16 @@ git merge-base --is-ancestor <base_commit> HEAD
 - 代码/数据任务默认不打开视觉 PNG。只有图片本身是输入、哈希/尺寸需核验或视觉验收被明确要求时才读取。
 - 美术或视觉生成任务必须按 `docs/02-visual/F4_VISUAL_SYSTEM.md` §9.1 实际打开目标对应的最小身份/画风锚图；文字说明、环境背景、场景总览或截图不得替代角色身份锚图。
 
-## 3. 本地检查点与发布边界
+## 3. 提交与发布边界（2026-09-11 与爸爸 2026-07-25 裁决对齐）
 
-- 检查点只允许在本地 `codex/wip-*` 分支或隔离 worktree 上创建。
-- WIP 不进入 `main`，不 push、不部署，也不作为已批准生产资产来源。
-- 只有完成 L3、通过所需人工/产品批准并走正常审查后，才可由获授权流程合并或发布。
+- 单人项目，改动直接在 `main` 上提交并推送；不建分支、不开 PR。Codex 工具自带的 `codex/wip-*` 分支只是其工作流产物，不是发布要求。
+- 提交与推送仍需爸爸开口；提交正文写清裁决理由，重要产品决策另建 F4-CHG 并同步 `progress.md`。
+- 推送即部署（GitHub Pages 工作流）。部署门槛只有测试、类型检查、全屏视觉层守卫与 Pages 构建；任务文档的视觉引用门禁不再参与部署。
 - 本政策不授权删除、prune、移动、清理、reset 或覆盖任何 worktree 与用户改动。
+
+## 3a. hotfix 通道
+
+bug 修复与小优化不走完整任务门禁：不重写 `CURRENT_TASK.md` 的 YAML，不做 `merge-base` 与 allowed_paths 校验，只要求 L1（必要时 L2/L3）+ `progress.md` 一行记录 + commit 正文说明。美术/资产生产与产品规则变更仍走完整门禁与 F4-CHG。
 
 ## 4. 验证等级
 
@@ -54,7 +58,9 @@ git diff --check
 npm run check:visual-references
 ```
 
-该门禁验证角色身份锚图、参考职责、变体允许范围和引用文件存在性；失败时不得调用图片生成或编辑工具。
+该门禁验证角色身份锚图、参考职责、变体允许范围和引用文件存在性；失败时不得调用图片生成或编辑工具。它只在美术任务开始前手动运行，不绑在 `npm run build` 或 CI 上（2026-09-10 曾因任务文档引用仓库外文件让生产部署失败一次）。
+
+生产素材自 F4-CHG-035 起为 `scripts/optimize-f4-assets.py` 从 `design-samples/assets/f4-production-masters/` 派生的 WebP；新增或替换素材时把母版 PNG 放进母版目录、登记尺寸规则后运行 `npm run assets:optimize`，交付前跑 `npm run assets:check`。
 
 修改后必须用 `git diff` 审查实际补丁。纯文档任务仍须检查 diff 和空白错误；若总控明确在同一 HEAD 上统一执行全仓命令，子任务可引用该次结果，不重复运行。
 

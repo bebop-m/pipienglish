@@ -108,7 +108,7 @@ describe('写词游戏用例', () => {
   it('奖励:每轮鸡蛋 +1 进库存,每日上限 10,超出返回 capped 且不加蛋', async () => {
     const db = freshDb()
     const now = Date.now()
-    await completedToday(db, now) // 完成必修 → eggStock 2
+    await completedToday(db, now) // 完成必修 → eggStock 1
     const uc = createHandwritingUsecases(db)
 
     for (let i = 1; i <= 10; i++) {
@@ -116,11 +116,11 @@ describe('写词游戏用例', () => {
       expect(await uc.gameEggsToday(now)).toBe(i)
     }
     let state = await getFarmStateV3(db, { now, today: dayKeyOf(now) })
-    expect(state.eggStock).toBe(2 + 10)
+    expect(state.eggStock).toBe(1 + 10)
 
     expect(await uc.awardRound(now)).toBe('capped') // 第 11 轮:照常可玩,不发蛋
     state = await getFarmStateV3(db, { now, today: dayKeyOf(now) })
-    expect(state.eggStock).toBe(12)
+    expect(state.eggStock).toBe(11)
     expect(await uc.gameEggsToday(now)).toBe(10)
     db.close()
   })
@@ -139,12 +139,12 @@ describe('写词游戏用例', () => {
     db.close()
   })
 
-  it('必修完成固定 2 颗蛋', async () => {
+  it('必修完成固定 1 颗蛋(F4-CHG-034)', async () => {
     const db = freshDb()
     const now = Date.now()
     await completedToday(db, now)
     const state = await getFarmStateV3(db, { now, today: dayKeyOf(now) })
-    expect(state.eggStock).toBe(2)
+    expect(state.eggStock).toBe(1)
     db.close()
   })
 })

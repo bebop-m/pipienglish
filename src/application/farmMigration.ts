@@ -138,6 +138,8 @@ function normalizeMeta(value: unknown, today: string): MetaState {
     lastDoneDate: typeof item.lastDoneDate === 'string' ? item.lastDoneDate : null,
     totalDays: nonNegativeInteger(item.totalDays, 0, 'meta.totalDays'),
     installDate: typeof item.installDate === 'string' ? item.installDate : today,
+    freezeCards: nonNegativeInteger(item.freezeCards, 0, 'meta.freezeCards'),
+    lastShieldUsedOn: typeof item.lastShieldUsedOn === 'string' ? item.lastShieldUsedOn : null,
   }
 }
 

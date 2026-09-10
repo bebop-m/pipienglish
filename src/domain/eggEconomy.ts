@@ -6,12 +6,12 @@ import { HATCH_MS, HATCHERY_SLOTS } from './types'
 
 export { hatchesAt, isHatchDue, remainingHatchMs } from './hatchTiming'
 
-/** 完成当日必修固定获得 2 颗；题量不改变奖励。 */
-export function eggsEarnedFor(_totalItems: number): 2 {
-  return 2
+/** 完成当日必修固定获得 1 颗(F4-CHG-034:2 → 1,想多拿蛋就多玩写词游戏);题量不改变奖励。 */
+export function eggsEarnedFor(_totalItems: number): 1 {
+  return DAILY_LESSON_EGGS
 }
 
-export const DAILY_LESSON_EGGS = 2 as const
+export const DAILY_LESSON_EGGS = 1 as const
 
 /** 写词游戏前 10 轮有奖励；第 11 轮起仍可无限加练。 */
 export const GAME_EGGS_DAILY_CAP = 10
@@ -23,7 +23,7 @@ export interface EggBalance {
 export interface EggRewardResult<TFarm extends EggBalance = FarmState> {
   session: DailySession
   farm: TFarm
-  awarded: 0 | 1 | 2
+  awarded: 0 | 1
 }
 
 /**

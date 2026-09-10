@@ -81,6 +81,8 @@ export interface FarmSceneDefinition {
   unlockAtTotalDays: number
   backgroundAssetId: string
   thumbnailAssetId: string
+  /** 背景最底边的平均色:iPad 桌面 PWA 的固定视口铺不到屏幕底边时,画布底色用它兜底,不再露出天蓝色横带 */
+  canvasColor: string
   assetStatus: SceneAssetStatus
   freeSignAssetId: string
   visibleChickCap: 40
@@ -191,6 +193,7 @@ const SCENE_1_DEFINITION: FarmSceneDefinition = {
     unlockAtTotalDays: 0,
     backgroundAssetId: 'farm-background-f3.png',
     thumbnailAssetId: 'farm-background-f3.png',
+    canvasColor: '#a0a949',
     assetStatus: 'approved',
     freeSignAssetId: 'internal-placeholder:scene-1-travel-sign',
     visibleChickCap: 40,
@@ -230,6 +233,7 @@ const SCENE_2_DEFINITION: FarmSceneDefinition = {
     unlockAtTotalDays: 36,
     backgroundAssetId: 'scenes/scene-2/orchard-background.png',
     thumbnailAssetId: 'scenes/scene-2/orchard-background.png',
+    canvasColor: '#a1a63e',
     assetStatus: 'approved',
     freeSignAssetId: 'scenes/scene-2/travel-sign.png',
     visibleChickCap: 40,
