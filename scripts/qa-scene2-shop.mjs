@@ -131,6 +131,10 @@ await page.getByRole('region', { name: '苹果园装饰商店' }).waitFor()
 const cards = page.locator('.customization-grid-f7 article')
 assert.equal(await cards.count(), 9)
 for (const name of itemNames) await page.getByRole('strong').filter({ hasText: name }).waitFor()
+await page.waitForFunction(() => {
+  const images = [...document.querySelectorAll('.customization-item-preview-f7 img')]
+  return images.length === 9 && images.every(image => image.complete && image.naturalWidth > 0)
+})
 assert.equal(await page.locator('.customization-item-preview-f7 img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)), true)
 await page.screenshot({ path: path.join(outputDir, 'scene-2-decoration-shop-1194x834.png'), animations: 'disabled' })
 

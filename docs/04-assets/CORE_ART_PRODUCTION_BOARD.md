@@ -375,8 +375,8 @@ G1 生成前已实际打开 4 张参考图并按上述唯一职责复核。三�
 
 #### G3 实景与 G4 生产接入
 
-- 商店实景：`visual-regression/scene-2-shop-production/scene-2-decoration-shop-1194x834.png`，SHA-256 `4A292EA944D886A38C2EC3C9A96C12DE302190AA1FF12EED72DD5B1794D07468`；9 张缩略图全部解码成功。
-- 整场实景：`visual-regression/scene-2-shop-production/scene-2-all-decorations-placed-1194x834.png`，SHA-256 `4A65F79677643B1710D9BDEB0C9A2CD1D6F000B65E2A26B478871725E3616F21`；真实 VM 报告 9 件列出、9 件已摆放，免费路牌固定显示。
+- 商店实景：`visual-regression/scene-2-shop-production/scene-2-decoration-shop-1194x834.png`，SHA-256 `619A37334804CE3E3C0D9CD9EE11B80D3716617F724D99AEB0FC08CB78D98587`；9 张缩略图全部解码成功。
+- 整场实景：`visual-regression/scene-2-shop-production/scene-2-all-decorations-placed-1194x834.png`，SHA-256 `1BDE7A1BFD9DC0BFC3AA101431EAEC012E10A95993B276E33385285E73B2D1E1`；真实 VM 报告 9 件列出、9 件已摆放，免费路牌固定显示。
 - 购买验收从 200 蛋逐件购买 9 件，准确扣除 90 蛋并剩余 110；small/medium/landmark 仍分别定价 5/10/20 蛋，购买后可摆出、收纳和拖动，事务结构与 IndexedDB schema 未改。
 - G4 生产路径为 `public/assets/f4/scenes/scene-2/travel-sign.png` 与 `public/assets/f4/scenes/scene-2/decorations/*.png`；10 个生产 SHA-256 已写入 `public/assets/f4/asset-manifest.json`。6 个原暂用扩展 ID 随本次批准冻结为稳定逻辑 ID。
 - 2026-09-09 L3 结果：48 个测试文件 / 271 项测试通过，TypeScript、全屏视觉层、视觉引用门禁通过；GitHub Pages 构建成功，PWA precache 含全部 10 张新图，子路径成品包冒烟测试再次通过。
@@ -413,8 +413,8 @@ G1 生成前已实际打开 4 张参考图并按上述唯一职责复核。三�
 
 #### G3 实景与 G4 生产接入
 
-- 衣柜商店实景：`visual-regression/scene-2-wardrobe-production/scene-2-wardrobe-shop-1194x834.png`，SHA-256 `776F36799C999CD239F66E989300B083F56055E36D17F845BA268591E4A08A5D`；六张商品缩略图均完整解码。
-- 组合穿戴实景：`visual-regression/scene-2-wardrobe-production/scene-2-wardrobe-equipped-1194x834.png`，SHA-256 `14F0820C00FFD490E305886CD911E966E8F369B531170C1EEF22C2A6E236AFF1`。最终整场截图：`scene-2-complete-shop-and-wardrobe-equipped-1194x834.png`，SHA-256 `31852F62B1D0E315712A1F2E1A085B60253EE16EC6A168A6648960D1A08CDA97`，同时包含 9 件收费道具、免费路牌、苹果汁驿站和换装后的两个角色。
+- 衣柜商店实景：`visual-regression/scene-2-wardrobe-production/scene-2-wardrobe-shop-1194x834.png`，SHA-256 `3FE1E83CE1158AC0F48FDD2514C455CBB22AD9DF52FEBC4BF3BB6A6A26373C99`；六张商品缩略图均完整解码。
+- 组合穿戴实景：`visual-regression/scene-2-wardrobe-production/scene-2-wardrobe-equipped-1194x834.png`，SHA-256 `4C546BABFEA9741F13A7ECAF8BBD4B685DBE0781AEB03CBA4CD8008FA00759C9`。最终整场截图：`scene-2-complete-shop-and-wardrobe-equipped-1194x834.png`，SHA-256 `7F5CAAB86599426E836F027620632FB9F4B7292A39D1AAC56869081BA0E5D3F4`，同时包含 9 件收费道具、免费路牌、苹果汁驿站和换装后的两个角色。
 - 真实购买从 200 蛋逐件购买六件，准确扣 80、剩余 120；小皮 `headLook` 同槽替换正确，最终同时装备 W02/W03/W04，母鸡同时装备 W05/W06；刷新后五个槽位和余额完整恢复。所有权、重复购买防重、免费换装及 v3 备份事务继续复用现有实现，IndexedDB schema 未升级。
 - G4 生产路径为 `public/assets/f4/scenes/scene-2/cosmetics/*.png`，14 个 SHA-256 均登记于 `asset-manifest.json`。2026-09-10 L3 结果：49 个测试文件 / 288 项测试通过，TypeScript、全屏视觉层、视觉引用门禁和 GitHub Pages 构建通过；PWA precache 含全部 14 张新图，真实 `/pipienglish/` 子路径购买、装备、刷新冒烟测试通过。
 

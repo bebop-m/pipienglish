@@ -141,6 +141,10 @@ const wardrobe = page.getByRole('region', { name: '角色衣柜' })
 await wardrobe.waitFor()
 const cards = wardrobe.locator('.customization-grid-f7 article')
 assert.equal(await cards.count(), 6)
+await page.waitForFunction(() => {
+  const images = [...document.querySelectorAll('.customization-item-preview-f7 img')]
+  return images.length === 6 && images.every(image => image.complete && image.naturalWidth === 1254 && image.naturalHeight === 1254)
+})
 assert.equal(await wardrobe.locator('.customization-item-preview-f7 img').evaluateAll(images => (
   images.every(image => image.complete && image.naturalWidth === 1254 && image.naturalHeight === 1254)
 )), true)
@@ -173,6 +177,10 @@ assert.deepEqual(snapshot.loadout, {
     neckwear: 'mother-neckwear-scene-2-extension',
   },
 })
+await page.waitForFunction(() => {
+  const images = [...document.querySelectorAll('.wardrobe-character-preview-f7')]
+  return images.length === 2 && images.every(image => image.complete && image.naturalWidth === 1254 && image.naturalHeight === 1254)
+})
 assert.equal(await wardrobe.locator('.wardrobe-character-preview-f7').evaluateAll(images => (
   images.every(image => image.complete && image.naturalWidth === 1254 && image.naturalHeight === 1254)
 )), true)
@@ -184,7 +192,14 @@ await page.reload({ waitUntil: 'domcontentloaded' })
 await waitForFarm()
 const mother = page.locator('.actor-f3[data-kind="mother"] .sprite-f3')
 const xiaopi = page.locator('.actor-f3[data-kind="farmer"] .sprite-f3')
-await page.waitForFunction(() => document.querySelector('.actor-f3[data-kind="farmer"] .sprite-f3')?.getAttribute('src')?.includes('xiaopi-bonnet-overalls-satchel.png'))
+await page.waitForFunction(() => {
+  const mother = document.querySelector('.actor-f3[data-kind="mother"] .sprite-f3')
+  const xiaopi = document.querySelector('.actor-f3[data-kind="farmer"] .sprite-f3')
+  return mother?.getAttribute('src')?.includes('mother-bonnet-neckerchief.png')
+    && xiaopi?.getAttribute('src')?.includes('xiaopi-bonnet-overalls-satchel.png')
+    && mother.complete && mother.naturalWidth === 1254
+    && xiaopi.complete && xiaopi.naturalWidth === 1254
+})
 assert.match(await mother.getAttribute('src'), /mother-bonnet-neckerchief\.png$/)
 assert.match(await xiaopi.getAttribute('src'), /xiaopi-bonnet-overalls-satchel\.png$/)
 assert.equal(await mother.evaluate(image => image.complete && image.naturalWidth === 1254 && image.naturalHeight === 1254), true)
