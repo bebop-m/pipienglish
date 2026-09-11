@@ -1,26 +1,23 @@
 import { describe, expect, it } from 'vitest'
 import {
+  blockedByKeepouts,
+  boardKindFor,
   boxAvoidsKeepouts,
   clampBoxToStage,
   clampSceneElementHome,
   CUSTOMIZATION_ENTRANCE_KEEPOUT,
-  DAILY_BOARD_KEEPOUT,
   fixedVisualLayout,
+  HOME_BOARD_RECTS,
   MOVABLE_FARM_ELEMENT_IDS,
   normalizeSceneElementHomes,
+  rectOf,
   resolveElementHome,
   resolveSceneElementHome,
+  SCENE_ELEMENT_KEEPOUTS,
   SCENE_ELEMENT_LAYOUTS,
   STAGE_DRAG_INSETS,
+  uiKeepoutsFor,
 } from './farmLayout'
-
-function coversDailyBoard(elementId: keyof typeof SCENE_ELEMENT_LAYOUTS, home: { x: number; y: number }): boolean {
-  const { size } = SCENE_ELEMENT_LAYOUTS[elementId]
-  return home.x < DAILY_BOARD_KEEPOUT.right
-    && home.x + size.width > DAILY_BOARD_KEEPOUT.left
-    && home.y < DAILY_BOARD_KEEPOUT.bottom
-    && home.y + size.height > DAILY_BOARD_KEEPOUT.top
-}
 
 describe('farm scene element layout persistence', () => {
   it('keeps valid legacy coordinates and ignores malformed entries', () => {
@@ -76,35 +73,54 @@ describe('farm scene element layout persistence', () => {
   })
 })
 
-describe('daily board keep-out', () => {
-  it('keeps every default home outside the keep-outs', () => {
+describe('UI keep-outs (soft rule: enough of the element must stay grabbable)', () => {
+  const blocked = (elementId: keyof typeof SCENE_ELEMENT_LAYOUTS, home: { x: number; y: number }, keepouts = SCENE_ELEMENT_KEEPOUTS) =>
+    blockedByKeepouts(rectOf(SCENE_ELEMENT_LAYOUTS[elementId].size, home), keepouts)
+
+  it('picks the board rect that is actually on screen', () => {
+    expect(boardKindFor({ henName: null, completed: false, viewingCurrentJourney: true })).toBe('name')
+    expect(boardKindFor({ henName: '咕咕', completed: false, viewingCurrentJourney: true })).toBe('task')
+    expect(boardKindFor({ henName: '咕咕', completed: true, viewingCurrentJourney: true })).toBe('complete')
+    expect(boardKindFor({ henName: '咕咕', completed: true, viewingCurrentJourney: false })).toBe('return')
+    expect(uiKeepoutsFor('task')).toEqual([HOME_BOARD_RECTS.task, CUSTOMIZATION_ENTRANCE_KEEPOUT])
+  })
+
+  it('keeps every default home grabbable', () => {
     for (const elementId of MOVABLE_FARM_ELEMENT_IDS) {
       const { defaultHome } = SCENE_ELEMENT_LAYOUTS[elementId]
-      expect([elementId, coversDailyBoard(elementId, defaultHome)]).toEqual([elementId, false])
+      expect([elementId, blocked(elementId, defaultHome)]).toEqual([elementId, false])
       expect(resolveSceneElementHome(elementId, defaultHome)).toEqual(defaultHome)
     }
   })
 
-  it('pushes any element dropped on the daily board back out of it', () => {
+  it('lets the rescue basket sit right under the task board (no air wall below the card)', () => {
+    const task = uiKeepoutsFor('task')
+    expect(resolveSceneElementHome('rescue', { x: 60, y: 360 }, task)).toEqual({ x: 60, y: 360 })
+    // 完成卡更高(底边 457):同一位置露出 37%,仍允许
+    expect(resolveSceneElementHome('rescue', { x: 60, y: 360 }, uiKeepoutsFor('complete'))).toEqual({ x: 60, y: 360 })
+    // 靠着按钮组也行:只盖住篮子下面三成
+    expect(resolveSceneElementHome('rescue', { x: 1040, y: 700 })).toEqual({ x: 1040, y: 676 })
+  })
+
+  it('moves any element dropped fully behind the board to the nearest grabbable spot, staying clamped', () => {
     for (const elementId of MOVABLE_FARM_ELEMENT_IDS) {
       for (const drop of [{ x: 30, y: 180 }, { x: 300, y: 300 }, { x: 400, y: 100 }, { x: 12, y: 430 }, { x: 0, y: 0 }]) {
         const home = resolveSceneElementHome(elementId, drop)!
-        expect([elementId, drop, coversDailyBoard(elementId, home)]).toEqual([elementId, drop, false])
+        expect([elementId, drop, blocked(elementId, home)]).toEqual([elementId, drop, false])
         expect(home).toEqual(clampSceneElementHome(elementId, home))
       }
     }
   })
 
-  it('pushes the rescue basket out from under the bottom-right buttons', () => {
-    const home = resolveSceneElementHome('rescue', { x: 1040, y: 700 })!
-    const { size } = SCENE_ELEMENT_LAYOUTS.rescue
-    expect(home.y + size.height <= CUSTOMIZATION_ENTRANCE_KEEPOUT.top || home.x + size.width <= CUSTOMIZATION_ENTRANCE_KEEPOUT.left).toBe(true)
-  })
-
-  it('repairs persisted homes that already sit behind the daily board', () => {
-    expect(normalizeSceneElementHomes({ rescue: { x: 60, y: 190 } })).toEqual({ rescue: { x: 60, y: 460 } })
-    expect(normalizeSceneElementHomes({ hatchery: { x: 12, y: 200 } })).toEqual({ hatchery: { x: 12, y: 460 } })
-    expect(normalizeSceneElementHomes({ rescue: { x: 400, y: 100 } })).toEqual({ rescue: { x: 418, y: 100 } })
+  it('repairs persisted homes that already sit behind the board, moving them as little as possible', () => {
+    const rescue = normalizeSceneElementHomes({ rescue: { x: 60, y: 190 } }).rescue!
+    expect(blocked('rescue', rescue)).toBe(false)
+    expect(rescue.x).toBe(60)
+    expect(rescue.y).toBeGreaterThan(190)
+    const hatchery = normalizeSceneElementHomes({ hatchery: { x: 12, y: 200 } }).hatchery!
+    expect(blocked('hatchery', hatchery)).toBe(false)
+    // 只被卡片盖住右边一小条:露出七成,原地不动
+    expect(normalizeSceneElementHomes({ rescue: { x: 400, y: 100 } })).toEqual({ rescue: { x: 400, y: 100 } })
   })
 
   it('leaves drag-time clamping free to follow the finger across the board', () => {

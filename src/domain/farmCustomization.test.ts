@@ -4,7 +4,7 @@ import { INTERNAL_SCENE_1_COSMETIC_DRAFTS } from './farmCosmetics'
 import {
   assetIsListable,
   clampPointToPlacementBounds,
-  decorationCoversKeepout,
+  decorationBlockedByKeepouts,
   decorationDisplayRect,
   equipLoadoutItem,
   initialDecorationHome,
@@ -12,7 +12,7 @@ import {
   resolveDecorationHome,
   unequipLoadoutItem,
 } from './farmCustomization'
-import { CUSTOMIZATION_ENTRANCE_KEEPOUT, DAILY_BOARD_KEEPOUT, type StageRect } from './farmLayout'
+import { uiKeepoutsFor } from './farmLayout'
 import { FARM_SCENE_DEFINITIONS } from './farmScenes'
 
 describe('farm customization domain rules', () => {
@@ -62,45 +62,45 @@ describe('farm customization domain rules', () => {
   })
 })
 
-describe('decoration keep-out and initial placement (2026-09-10 iPad feedback)', () => {
+describe('decoration keep-out and initial placement (2026-09-10 iPad feedback, softened 2026-09-11)', () => {
   const scene2 = FARM_SCENE_DEFINITIONS.find(scene => scene.id === 'scene-2')!
   const landmark = scene2.decorationCatalog.find(item => item.kind === 'landmark')!
   const medium = scene2.decorationCatalog.find(item => item.kind === 'medium')!
   const small = scene2.decorationCatalog.find(item => item.kind === 'small')!
-  const overlaps = (a: StageRect, b: StageRect) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top
+  const taskKeepouts = uiKeepoutsFor('task')
 
   it('keeps a legal, uncovered point unchanged', () => {
     expect(resolveDecorationHome(landmark, { x: 700, y: 600 })).toEqual({ x: 700, y: 600 })
-    expect(decorationCoversKeepout(landmark, { x: 700, y: 600 })).toBe(false)
+    expect(decorationBlockedByKeepouts(landmark, { x: 700, y: 600 })).toBe(false)
   })
 
-  it('pushes a landmark dropped behind the daily board back into a clickable spot', () => {
-    // 真机复现:风车拖到左上角,落点被钳到 (240,390) 后整张藏在完成卡片背后
+  it('moves a landmark dropped fully behind the daily board to a spot that is still grabbable', () => {
+    // 真机复现:风车拖到左上角,整张藏在完成卡片背后
     const home = resolveDecorationHome(landmark, { x: 200, y: 250 })
-    expect(decorationCoversKeepout(landmark, home)).toBe(false)
+    expect(decorationBlockedByKeepouts(landmark, home)).toBe(false)
     expect(pointWithinPlacementBounds(home, landmark.placementBounds)).toBe(true)
-    expect(overlaps(decorationDisplayRect(landmark, home), DAILY_BOARD_KEEPOUT)).toBe(false)
+    expect(home).not.toEqual({ x: 200, y: 250 })
   })
 
-  it('pushes a medium prop out from under the board and a small one away from the bottom-right buttons', () => {
-    const bench = resolveDecorationHome(medium, { x: 120, y: 500 })
-    expect(decorationCoversKeepout(medium, bench)).toBe(false)
-    expect(pointWithinPlacementBounds(bench, medium.placementBounds)).toBe(true)
-
-    const basket = resolveDecorationHome(small, { x: 1154, y: 810 })
-    expect(decorationCoversKeepout(small, basket)).toBe(false)
-    expect(pointWithinPlacementBounds(basket, small.placementBounds)).toBe(true)
-    expect(overlaps(decorationDisplayRect(small, basket), CUSTOMIZATION_ENTRANCE_KEEPOUT)).toBe(false)
+  it('lets stickers sit right below or beside the task board when only the task board is showing (no air wall)', () => {
+    // 小皮 2026-09-11:任务卡周围有空气墙。任务卡底边 343,小装饰锚点在 400 时框顶 339,只碰 4pt → 原地不动
+    expect(resolveDecorationHome(small, { x: 300, y: 400 }, taskKeepouts)).toEqual({ x: 300, y: 400 })
+    // 地标压住任务卡一半以上仍露出 44% → 允许
+    expect(resolveDecorationHome(landmark, { x: 200, y: 450 }, taskKeepouts)).toEqual({ x: 200, y: 450 })
+    // 靠在卡片右侧
+    expect(resolveDecorationHome(medium, { x: 480, y: 250 }, taskKeepouts)).toEqual({ x: 480, y: 250 })
   })
 
-  it('every keep-out escape stays inside placement bounds across the whole bounds grid', () => {
-    for (const item of [landmark, medium, small]) {
-      const { xMin, xMax, yMin, yMax } = item.placementBounds
-      for (let x = xMin; x <= xMax; x += 40) {
-        for (let y = yMin; y <= yMax; y += 40) {
-          const home = resolveDecorationHome(item, { x, y })
-          expect(pointWithinPlacementBounds(home, item.placementBounds)).toBe(true)
-          expect(decorationCoversKeepout(item, home)).toBe(false)
+  it('keeps every escape inside placement bounds and grabbable across the whole bounds grid', () => {
+    for (const keepouts of [undefined, taskKeepouts, uiKeepoutsFor('complete'), uiKeepoutsFor('name')]) {
+      for (const item of [landmark, medium, small]) {
+        const { xMin, xMax, yMin, yMax } = item.placementBounds
+        for (let x = xMin; x <= xMax; x += 40) {
+          for (let y = yMin; y <= yMax; y += 40) {
+            const home = resolveDecorationHome(item, { x, y }, keepouts)
+            expect(pointWithinPlacementBounds(home, item.placementBounds)).toBe(true)
+            expect(decorationBlockedByKeepouts(item, home, keepouts)).toBe(false)
+          }
         }
       }
     }
@@ -115,7 +115,7 @@ describe('decoration keep-out and initial placement (2026-09-10 iPad feedback)',
     expect(third).not.toEqual(second)
     for (const home of [first, second, third]) {
       expect(pointWithinPlacementBounds(home, small.placementBounds)).toBe(true)
-      expect(decorationCoversKeepout(small, home)).toBe(false)
+      expect(decorationBlockedByKeepouts(small, home)).toBe(false)
     }
     const a = decorationDisplayRect(small, first)
     const b = decorationDisplayRect(small, second)

@@ -10,6 +10,7 @@ import {
   initialDecorationHome,
   resolveDecorationHome,
 } from '../../../domain/farmCustomization'
+import type { StageRect } from '../../../domain/farmLayout'
 import type { SceneLayer } from '../../../domain/farmScenes'
 import type { StagePoint } from '../../../domain/types'
 import { f4AssetUrl } from '../assetUrl'
@@ -63,9 +64,11 @@ export function depthZIndex(groundY: number): number {
 /** 已摆放贴纸:与小鸡一致的指针拖拽,落点钳回 placementBounds 后经 PLACE_DECORATION 免费持久化 */
 function DraggableDecoration({
   item,
+  keepouts,
   onPlaced,
 }: {
   item: DecorationCatalogItemVM
+  keepouts: readonly StageRect[]
   onPlaced: (home: StagePoint) => void
 }) {
   const elementRef = useRef<HTMLButtonElement>(null)
@@ -136,7 +139,7 @@ function DraggableDecoration({
       return
     }
     // 松手才推出保留区:拖到任务卡或右下按钮组背后会被推回可点区域,不会永久藏起来
-    const placed = resolveDecorationHome(item.definition, homeRef.current)
+    const placed = resolveDecorationHome(item.definition, homeRef.current, keepouts)
     applyHome(placed)
     onPlaced(placed)
   }
@@ -167,6 +170,7 @@ export function FarmDecorations({ vm, layer, dispatch }: { vm: FarmHomeViewModel
           <DraggableDecoration
             key={item.definition.id}
             item={item}
+            keepouts={vm.uiKeepouts}
             onPlaced={home => dispatch({ type: 'PLACE_DECORATION', sceneId: vm.viewedSceneId, itemId: item.definition.id, home })}
           />
         ))}
@@ -214,6 +218,7 @@ export function DecorationCatalogPanel({ vm, dispatch }: CustomizationProps) {
             const placeAt = () => initialDecorationHome(
               item.definition,
               vm.placedDecorations.map(placed => ({ definition: placed.definition, home: placed.placement! })),
+              vm.uiKeepouts,
             )
             return (
               <article key={item.definition.id}>

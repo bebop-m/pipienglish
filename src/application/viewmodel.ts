@@ -35,13 +35,14 @@ import {
   type CosmeticItemDefinition,
 } from '../domain/farmCosmetics'
 import { assetIsListable, loadoutItem, resolveDecorationHome } from '../domain/farmCustomization'
+import { boardKindFor, uiKeepoutsFor } from '../domain/farmLayout'
 import {
   defaultCharacterLoadout,
   type DecorationRow,
   type OwnedCosmeticRow,
 } from './farmPersistence'
 import type { CharacterLoadout } from '../domain/farmCatalog'
-import type { SceneElementHomes } from '../domain/farmLayout'
+import type { SceneElementHomes, StageRect } from '../domain/farmLayout'
 
 export type FarmHomeState = 'first_visit' | 'daily_incomplete' | 'daily_complete'
 export type FarmOverlay =
@@ -184,6 +185,8 @@ export interface FarmHomeViewModel {
   ownedCosmeticIds: string[]
   loadout: CharacterLoadout
   sceneElementHomes: SceneElementHomes
+  /** 当前首页压在物件之上的 UI 矩形(左上角那张卡片 + 右下角按钮组),拖放落点据此避让 */
+  uiKeepouts: StageRect[]
   overlay: FarmOverlay // 由视觉桥(useFarmHome)本地维护,不持久化
   chat: ChickChatVM | null
   favoriteReplacement: FavoriteReplacementVM | null
@@ -325,6 +328,11 @@ export function assembleViewModel(
     .map(toSceneVM)
   const activeScene = toSceneVM(activeDefinition)
   const viewedScene = toSceneVM(viewedDefinition)
+  const uiKeepouts = uiKeepoutsFor(boardKindFor({
+    henName: farm.henName,
+    completed: session.completed,
+    viewingCurrentJourney: viewedDefinition.id === activeDefinition.id,
+  }))
   const decorationRows = s.decorationRows ?? []
   const decorationByItemId = new Map(
     decorationRows
@@ -339,7 +347,7 @@ export function assembleViewModel(
         definition: item,
         owned: Boolean(row),
         // 旧存档里已经藏到任务卡背后的贴纸,读出来时就推回可点区域(不写库,下次拖动才落库)
-        placement: row?.x != null && row.y != null ? resolveDecorationHome(item, { x: row.x, y: row.y }) : null,
+        placement: row?.x != null && row.y != null ? resolveDecorationHome(item, { x: row.x, y: row.y }, uiKeepouts) : null,
       }
     })
   const loadout = s.loadout ?? defaultCharacterLoadout()
@@ -435,6 +443,7 @@ export function assembleViewModel(
     ownedCosmeticIds,
     loadout,
     sceneElementHomes: s.sceneElementHomes ?? {},
+    uiKeepouts,
     motionEnabled: s.motionEnabled,
     musicEnabled: s.musicEnabled ?? true,
   }

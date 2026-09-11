@@ -13,6 +13,7 @@ import {
   SCENE_ELEMENT_LAYOUTS,
   type MovableFarmElementId,
   type SceneElementLayout,
+  type StageRect,
 } from '../../../domain/farmLayout'
 import { STAGE_W, toStagePoint } from '../stage/stagePoint'
 
@@ -22,6 +23,8 @@ interface StageDraggableProps {
   /** 四类核心物件用固定 id;场景固定装置传 fixedVisuals 的 id 并同时给 layout */
   elementId: string
   layout?: SceneElementLayout
+  /** 当前首页压在物件之上的 UI 矩形(vm.uiKeepouts);缺省用保守并集 */
+  keepouts?: readonly StageRect[]
   home: StagePoint | null
   defaultHome: StagePoint
   onPlaced: (home: StagePoint) => void
@@ -42,6 +45,7 @@ export function StageDraggable({
   ariaLabel,
   elementId,
   layout: explicitLayout,
+  keepouts,
   home,
   defaultHome,
   onPlaced,
@@ -118,7 +122,7 @@ export function StageDraggable({
     }
     if (!drag.moved) return
     // 松手才归位：拖到每日任务卡片或右下按钮组上会被推回,避免物件永久藏到 UI 背后点不到。
-    const placed = resolveElementHome(layout, positionRef.current) ?? drag.origin
+    const placed = resolveElementHome(layout, positionRef.current, keepouts) ?? drag.origin
     positionRef.current = placed
     setPosition(placed)
     ignoreClickUntilRef.current = Date.now() + 500

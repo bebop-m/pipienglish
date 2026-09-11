@@ -1,7 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { FarmChickVM, FarmHomeEvent, FarmHomeViewModel } from '../../../application/viewmodel'
 import type { StagePoint } from '../../../domain/types'
-import { boxAvoidsKeepouts, clampBoxToStage, clampSceneElementHome, SCENE_ELEMENT_LAYOUTS, STAGE_DRAG_INSETS } from '../../../domain/farmLayout'
+import {
+  boxAvoidsKeepouts,
+  clampBoxToStage,
+  clampSceneElementHome,
+  rectOf,
+  SCENE_ELEMENT_LAYOUTS,
+  settleOutsideKeepouts,
+  STAGE_DRAG_INSETS,
+  type StageRect,
+} from '../../../domain/farmLayout'
 import { f4AssetUrl } from '../assetUrl'
 import { STAGE_H, STAGE_W, toStagePoint } from '../stage/stagePoint'
 import { chickAssetId, chickCanvasSize, specialChickHome } from './chickVisual'
@@ -64,6 +73,7 @@ function actorZone(kind: ActorKind, home: StagePoint, size: ActorSpec['size']) {
 function FarmActor({
   spec,
   motionEnabled,
+  uiKeepouts,
   chat,
   ambientTalk,
   onChat,
@@ -73,6 +83,7 @@ function FarmActor({
 }: {
   spec: ActorSpec
   motionEnabled: boolean
+  uiKeepouts: readonly StageRect[]
   chat: Talk
   ambientTalk: Talk
   onChat: () => void
@@ -89,7 +100,6 @@ function FarmActor({
     offset: StagePoint
     start: StagePoint
     origin: StagePoint
-    lastValid: StagePoint
     moved: boolean
   } | null>(null)
   const ignoreClickUntilRef = useRef(0)
@@ -181,7 +191,7 @@ function FarmActor({
         let target: StagePoint | null = null
         for (let attempt = 0; attempt < 6 && !target; attempt += 1) {
           const candidate = { x: randomBetween(zone.minX, zone.maxX), y: randomBetween(zone.minY, zone.maxY) }
-          if (boxAvoidsKeepouts(spec.size, candidate)) target = candidate
+          if (boxAvoidsKeepouts(spec.size, candidate, uiKeepouts)) target = candidate
         }
         if (target) await moveTo(target)
         if (!disposed) schedule()
@@ -193,7 +203,7 @@ function FarmActor({
       window.clearTimeout(timerRef.current)
       syncPresentation()
     }
-  }, [dragging, motionEnabled, moveTo, spec.home, spec.kind, syncPresentation])
+  }, [dragging, motionEnabled, moveTo, spec.home, spec.kind, spec.size, syncPresentation, uiKeepouts])
 
   useEffect(() => () => animationRef.current?.cancel(), [])
 
@@ -205,31 +215,28 @@ function FarmActor({
     return toStagePoint(clientX, clientY, rect, rect.width / STAGE_W)
   }
 
-  const positionIsBlocked = (target: StagePoint) => {
-    const actor = actorRef.current
-    if (!actor) return false
-    const actorBox = {
-      left: target.x + spec.size.width * 0.17,
-      right: target.x + spec.size.width * 0.83,
-      top: target.y + spec.size.height * 0.12,
-      bottom: target.y + spec.size.height * 0.92,
+  /** 角色落点要避让的矩形:当前首页卡片 + 右下按钮组(vm.uiKeepouts)+ 鸡窝/救援框当前位置(它们在角色之上) */
+  const dropKeepouts = (): StageRect[] => {
+    const stage = actorRef.current?.closest('.farm-stage-f3')
+    const dynamic: StageRect[] = []
+    const hatchery = stage?.querySelector<HTMLElement>('.hatchery-wrap-f4')
+    if (hatchery) {
+      // 只按鸡窝图本身算(画布内 46,99 起 177×177),不把透明画布边当障碍
+      dynamic.push({ left: hatchery.offsetLeft + 46, top: hatchery.offsetTop + 99, right: hatchery.offsetLeft + 223, bottom: hatchery.offsetTop + 276 })
     }
-    const obstacles = [
-      { element: actor.closest('.farm-stage-f3')?.querySelector<HTMLElement>('.task-board-f3'), topInset: 0 },
-      { element: actor.closest('.farm-stage-f3')?.querySelector<HTMLElement>('.hatchery-wrap-f4'), topInset: 45 },
-      { element: actor.closest('.farm-stage-f3')?.querySelector<HTMLElement>('.rescue-wrap-f4'), topInset: 0 },
-    ]
-    return obstacles.some(({ element, topInset }) => {
-      if (!element) return false
-      const padding = 2
-      const box = {
-        left: element.offsetLeft - padding,
-        right: element.offsetLeft + element.offsetWidth + padding,
-        top: element.offsetTop + topInset - padding,
-        bottom: element.offsetTop + element.offsetHeight + padding,
-      }
-      return actorBox.right > box.left && actorBox.left < box.right && actorBox.bottom > box.top && actorBox.top < box.bottom
-    })
+    const rescue = stage?.querySelector<HTMLElement>('.rescue-wrap-f4')
+    if (rescue) {
+      dynamic.push({ left: rescue.offsetLeft, top: rescue.offsetTop, right: rescue.offsetLeft + rescue.offsetWidth, bottom: rescue.offsetTop + rescue.offsetHeight })
+    }
+    return [...uiKeepouts, ...dynamic]
+  }
+
+  /** 松手落点:被 UI/鸡窝/救援框盖住太多时就近挪到露得出来的位置;挪不出去回到拖动前 */
+  const settleDrop = (target: StagePoint, fallback: StagePoint): StagePoint => {
+    const clamp = (point: StagePoint) => spec.kind === 'chick'
+      ? clampBoxToStage(spec.size, point)
+      : clampSceneElementHome(spec.kind === 'mother' ? 'mother' : 'xiaopi', point) ?? point
+    return settleOutsideKeepouts(target, point => rectOf(spec.size, point), clamp, dropKeepouts(), STAGE_W) ?? fallback
   }
 
   const onPointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
@@ -242,7 +249,6 @@ function FarmActor({
       offset: { x: point.x - positionRef.current.x, y: point.y - positionRef.current.y },
       start: point,
       origin: { ...positionRef.current },
-      lastValid: { ...positionRef.current },
       moved: false,
     }
     event.currentTarget.setPointerCapture(event.pointerId)
@@ -263,7 +269,6 @@ function FarmActor({
     if (!next) return
     if (Math.hypot(point.x - drag.start.x, point.y - drag.start.y) > 8) drag.moved = true
     positionRef.current = next
-    if (!positionIsBlocked(next)) drag.lastValid = { ...next }
     actor.style.left = `${next.x}px`
     actor.style.top = `${next.y}px`
     applyDepth(next)
@@ -287,12 +292,13 @@ function FarmActor({
       return
     }
     if (drag.moved) {
-      if (positionIsBlocked(positionRef.current)) {
-        positionRef.current = drag.lastValid
+      const settled = settleDrop(positionRef.current, drag.origin)
+      if (settled.x !== positionRef.current.x || settled.y !== positionRef.current.y) {
+        positionRef.current = settled
         const actor = actorRef.current
         if (actor) {
-          actor.style.left = `${drag.lastValid.x}px`
-          actor.style.top = `${drag.lastValid.y}px`
+          actor.style.left = `${settled.x}px`
+          actor.style.top = `${settled.y}px`
         }
       }
       applyDepth(positionRef.current)
@@ -479,6 +485,7 @@ export function FarmActors({ vm, dispatch }: FarmActorsProps) {
             key={`${vm.viewedSceneId}:${spec.id}`}
             spec={spec}
             motionEnabled={effectiveMotion}
+            uiKeepouts={vm.uiKeepouts}
             chat={chat}
             ambientTalk={ambient[spec.id] ?? null}
             onChat={() => {

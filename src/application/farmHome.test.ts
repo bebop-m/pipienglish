@@ -3,7 +3,7 @@
 import { describe, expect, it } from 'vitest'
 import { getFarmStateV3, PipiDB, setFarmStateV3, setKV } from './db'
 import { createFarmUsecases } from './usecases/farmHome'
-import { sceneElementHomesKey } from '../domain/farmLayout'
+import { blockedByKeepouts, rectOf, SCENE_ELEMENT_LAYOUTS, sceneElementHomesKey, uiKeepoutsFor } from '../domain/farmLayout'
 import { dayKeyOf } from '../domain/time'
 import { NEW_PER_DAY } from '../domain/dailyPlan'
 import { HATCH_MS } from '../domain/types'
@@ -251,11 +251,16 @@ describe('首页三状态与蛋经济全链路', () => {
     const db = freshDb()
     const uc = createFarmUsecases(db)
 
+    // 还没起名:左上角是起名卡(26,99–441,380);救援框整张藏在后面 → 就近挪到露出来的位置
     expect(await uc.placeSceneElement('rescue', { x: 60, y: 190 }, undefined, 'scene-1')).toBe(true)
-    expect((await uc.loadViewModel()).sceneElementHomes.rescue).toEqual({ x: 60, y: 460 })
+    const rescue = (await uc.loadViewModel()).sceneElementHomes.rescue!
+    expect(rescue.x).toBe(60)
+    expect(rescue.y).toBeGreaterThan(190)
+    expect(blockedByKeepouts(rectOf(SCENE_ELEMENT_LAYOUTS.rescue.size, rescue), uiKeepoutsFor('name'))).toBe(false)
 
     await setKV(db, sceneElementHomesKey('scene-1'), { hatchery: { x: 12, y: 200 } })
-    expect((await uc.loadViewModel()).sceneElementHomes.hatchery).toEqual({ x: 12, y: 460 })
+    const hatchery = (await uc.loadViewModel()).sceneElementHomes.hatchery!
+    expect(blockedByKeepouts(rectOf(SCENE_ELEMENT_LAYOUTS.hatchery.size, hatchery), uiKeepoutsFor('name'))).toBe(false)
     db.close()
   })
 
@@ -273,7 +278,8 @@ describe('首页三状态与蛋经济全链路', () => {
     const homes = (await uc.loadViewModel(undefined, 'scene-2')).sceneElementHomes
     expect(homes['scene-2-travel-sign']).toEqual({ x: 900, y: 300 })
     const station = homes['scene-2-apple-juice-station']!
-    expect(station.x + 336 <= 24 || station.x >= 418 || station.y >= 460).toBe(true)
+    expect(station).not.toEqual({ x: 30, y: 100 })
+    expect(blockedByKeepouts(rectOf({ width: 336, height: 234 }, station), uiKeepoutsFor('name'))).toBe(false)
     // 场景 1 没有这些装置,也不会串场
     expect((await uc.loadViewModel(undefined, 'scene-1')).sceneElementHomes['scene-2-travel-sign']).toBeUndefined()
     db.close()

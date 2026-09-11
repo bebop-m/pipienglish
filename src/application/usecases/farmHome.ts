@@ -72,14 +72,17 @@ import {
 } from '../../domain/farmCustomization'
 import type { CharacterLoadout } from '../../domain/farmCatalog'
 import {
+  boardKindFor,
   fixedVisualLayout,
   MOVABLE_FARM_ELEMENT_IDS,
   normalizeSceneElementHomes,
   resolveElementHome,
   SCENE_ELEMENT_LAYOUTS,
   sceneElementHomesKey,
+  uiKeepoutsFor,
   type MovableFarmElementId,
   type SceneElementLayout,
+  type StageRect,
 } from '../../domain/farmLayout'
 import { lessonProgressKey } from './lesson'
 
@@ -240,6 +243,16 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
 
   const sameIds = (left: readonly string[], right: readonly string[]) =>
     left.length === right.length && left.every((id, index) => id === right[index])
+
+  /** 当前首页真正显示的那张卡片 + 右下角按钮组;落点避让只按它们算 */
+  async function uiKeepouts(farm: FarmStateV3, scene: FarmSceneDefinition, now: number): Promise<StageRect[]> {
+    const session = await d.sessions.get(dayKeyOf(now))
+    return uiKeepoutsFor(boardKindFor({
+      henName: farm.henName,
+      completed: session?.completed ?? false,
+      viewingCurrentJourney: scene.id === farm.activeSceneId,
+    }))
+  }
 
   /** 时钟守卫:起步词播种 + 孵化结算 + 今日会话保障。启动/回前台/60s 间隔调用,幂等 */
   async function clockGuard(now = sources.now()): Promise<{
@@ -545,7 +558,7 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
     home: StagePoint,
     now = sources.now(),
   ): Promise<DecorationPlacementResult> {
-    return d.transaction('rw', d.kv, d.decorations, async () => {
+    return d.transaction('rw', d.kv, d.decorations, d.sessions, async () => {
       const farm = await getFarm(now)
       const scene = accessibleCatalogScene(farm, sceneId)
       if (!scene) return { status: 'scene-mismatch', chargedEggs: 0 }
@@ -559,8 +572,8 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
       if (!pointWithinPlacementBounds(home, item.placementBounds)) {
         return { status: 'outside-placement-bounds', chargedEggs: 0 }
       }
-      // 落库前推出 UI 保留区(任务卡/右下按钮组),与视觉层松手逻辑同一规则
-      const resolved = resolveDecorationHome(item, home)
+      // 落库前挪出 UI 保留区(当前卡片/右下按钮组),与视觉层松手逻辑同一规则
+      const resolved = resolveDecorationHome(item, home, await uiKeepouts(farm, scene, now))
       await d.decorations.put({ ...owned, x: resolved.x, y: resolved.y })
       return { status: 'placed', chargedEggs: 0 }
     })
@@ -666,16 +679,17 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
     sceneId?: string,
   ): Promise<boolean> {
     if (!Number.isFinite(home.x) || !Number.isFinite(home.y)) return false
-    return d.transaction('rw', d.kv, async () => {
+    return d.transaction('rw', d.kv, d.sessions, async () => {
       const farm = await getFarm(now)
       const scene = enteredScene(farm, sceneId)
       if (!scene) return false
       const layout = sceneElementLayout(scene, elementId)
       if (!layout) return false
-      const resolved = resolveElementHome(layout, home)
+      const keepouts = await uiKeepouts(farm, scene, now)
+      const resolved = resolveElementHome(layout, home, keepouts)
       if (!resolved) return false
       const key = sceneElementHomesKey(scene.id)
-      const current = normalizeSceneElementHomes(await getKV<unknown>(d, key, {}), fixedVisualLayouts(scene))
+      const current = normalizeSceneElementHomes(await getKV<unknown>(d, key, {}), fixedVisualLayouts(scene), keepouts)
       await setKV(d, key, { ...current, [elementId]: resolved })
       return true
     })
@@ -814,7 +828,15 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
       decorationRows,
       ownedCosmetics,
       loadout,
-      sceneElementHomes: normalizeSceneElementHomes(sceneElementHomes, fixedVisualLayouts(viewedScene)),
+      sceneElementHomes: normalizeSceneElementHomes(
+        sceneElementHomes,
+        fixedVisualLayouts(viewedScene),
+        uiKeepoutsFor(boardKindFor({
+          henName: farm.henName,
+          completed: session?.completed ?? false,
+          viewingCurrentJourney: viewedScene.id === farm.activeSceneId,
+        })),
+      ),
       cosmeticDefinitions: sources.cosmeticDefinitions,
       includeInternalPlaceholders: sources.includeInternalPlaceholders,
     }

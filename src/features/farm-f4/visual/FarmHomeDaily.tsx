@@ -559,6 +559,7 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
           className={`hatchery-wrap-f4 ${vm.overlay === 'hatchery_pop' ? 'is-open' : ''}`}
           ariaLabel="可拖动的鸡蛋孵化区"
           elementId="hatchery"
+          keepouts={vm.uiKeepouts}
           home={vm.sceneElementHomes.hatchery ?? null}
           defaultHome={SCENE_ELEMENT_LAYOUTS.hatchery.defaultHome}
           onPlaced={home => dispatch({ type: 'SCENE_ELEMENT_PLACED', elementId: 'hatchery', home })}
@@ -598,6 +599,7 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
           className={`rescue-wrap-f4 ${vm.overlay === 'rescue_pop' ? 'is-open' : ''}`}
           ariaLabel="可拖动的等待救援小鸡框"
           elementId="rescue"
+          keepouts={vm.uiKeepouts}
           home={vm.sceneElementHomes.rescue ?? null}
           defaultHome={SCENE_ELEMENT_LAYOUTS.rescue.defaultHome}
           onPlaced={home => dispatch({ type: 'SCENE_ELEMENT_PLACED', elementId: 'rescue', home })}
@@ -620,6 +622,7 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
             ariaLabel={`可拖动的${visual.alt}`}
             elementId={visual.id}
             layout={fixedVisualLayout(visual.renderBox)}
+            keepouts={vm.uiKeepouts}
             home={vm.sceneElementHomes[visual.id] ?? null}
             defaultHome={{ x: visual.renderBox.x, y: visual.renderBox.y }}
             onPlaced={home => dispatch({ type: 'SCENE_ELEMENT_PLACED', elementId: visual.id, home })}

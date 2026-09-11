@@ -7,7 +7,15 @@ import type {
   CharacterTarget,
   CosmeticItemDefinition,
 } from './farmCosmetics'
-import { CUSTOMIZATION_ENTRANCE_KEEPOUT, DAILY_BOARD_KEEPOUT, type StageRect } from './farmLayout'
+import {
+  blockedByKeepouts,
+  CUSTOMIZATION_ENTRANCE_KEEPOUT,
+  DAILY_BOARD_KEEPOUT,
+  overlapArea,
+  rectArea,
+  settleOutsideKeepouts,
+  type StageRect,
+} from './farmLayout'
 import type { DecorationCatalogItemDefinition, PlacementBounds, SceneAssetStatus } from './farmScenes'
 import type { StagePoint } from './types'
 
@@ -35,9 +43,10 @@ export function pointWithinPlacementBounds(point: StagePoint, bounds: PlacementB
 type DecorationGeometry = Pick<DecorationCatalogItemDefinition, 'render' | 'placementBounds'>
 
 /**
- * 装饰物落点保留区:每日任务/完成/回访卡片与右下角按钮组都压在装饰层之上,
- * 贴纸一旦整张落到它们背后就再也点不到(2026-09-10 真机复现:风车拖到卡片后消失)。
- * 与 F4-CHG-031 对四类核心物件的处理同构,只是矩形按贴纸自己的显示框计算。
+ * 装饰物落点保留区:左上角卡片与右下角按钮组都压在装饰层之上,贴纸整张落到它们背后就再也点不到
+ * (2026-09-10 真机复现:风车拖到卡片后消失)。规则是软的:露出 ≥35% 就允许靠着/伸到卡片下面
+ * (小皮 2026-09-11:「任务卡周围有空气墙」)。调用方应传入当前首页真正显示的卡片矩形(uiKeepoutsFor);
+ * 这里的默认值只是没有状态可依据时的保守并集。
  */
 export const DECORATION_KEEPOUTS: readonly StageRect[] = [DAILY_BOARD_KEEPOUT, CUSTOMIZATION_ENTRANCE_KEEPOUT]
 
@@ -49,58 +58,34 @@ export function decorationDisplayRect(definition: Pick<DecorationCatalogItemDefi
   return { left, top, right: left + displayBoxPt.width, bottom: top + displayBoxPt.height }
 }
 
-function rectsOverlap(a: StageRect, b: StageRect): boolean {
-  return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top
-}
-
-function overlapArea(a: StageRect, b: StageRect): number {
-  const width = Math.min(a.right, b.right) - Math.max(a.left, b.left)
-  const height = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top)
-  return width > 0 && height > 0 ? width * height : 0
-}
-
-const rectArea = (rect: StageRect) => (rect.right - rect.left) * (rect.bottom - rect.top)
-
-export function decorationCoversKeepout(definition: Pick<DecorationCatalogItemDefinition, 'render'>, home: StagePoint): boolean {
-  const rect = decorationDisplayRect(definition, home)
-  return DECORATION_KEEPOUTS.some(keepout => rectsOverlap(rect, keepout))
+/** 被 UI 盖住太多、手指抓不到:软规则见 farmLayout.blockedByKeepouts */
+export function decorationBlockedByKeepouts(
+  definition: Pick<DecorationCatalogItemDefinition, 'render'>,
+  home: StagePoint,
+  keepouts: readonly StageRect[] = DECORATION_KEEPOUTS,
+): boolean {
+  return blockedByKeepouts(decorationDisplayRect(definition, home), keepouts)
 }
 
 /**
- * 落点解析:先钳回 placementBounds,再把压在保留区上的贴纸沿最近方向推出去;
- * 四个方向都出不去时回到范围中心。松手、placeDecoration 与读取旧存档共用,
+ * 落点解析:先钳回 placementBounds,被 UI 盖住太多时就近挪到露得出来的位置(可以贴着卡片、伸到卡片下面);
+ * 四个方向都挪不出去时回到范围中心偏下。松手、placeDecoration 与读取旧存档共用,
  * 保证任何一次写入或显示都不会把贴纸永久藏到 UI 背后。
  */
-export function resolveDecorationHome(definition: DecorationGeometry, point: StagePoint): StagePoint {
-  const bounded = clampPointToPlacementBounds(point, definition.placementBounds)
-  const rect = decorationDisplayRect(definition, bounded)
-  const blocking = DECORATION_KEEPOUTS.filter(keepout => rectsOverlap(rect, keepout))
-  if (blocking.length === 0) return { x: Math.round(bounded.x), y: Math.round(bounded.y) }
-
-  const width = rect.right - rect.left
-  const height = rect.bottom - rect.top
-  const anchorDx = bounded.x - rect.left
-  const anchorDy = bounded.y - rect.top
-  const margin = 2 // 推出后留 2pt 缝,四舍五入到整数坐标也不会重新贴上保留区
-  const distance = (candidate: StagePoint) => (candidate.x - bounded.x) ** 2 + (candidate.y - bounded.y) ** 2
+export function resolveDecorationHome(
+  definition: DecorationGeometry,
+  point: StagePoint,
+  keepouts: readonly StageRect[] = DECORATION_KEEPOUTS,
+): StagePoint {
   const settle = (candidate: StagePoint): StagePoint => {
     const clamped = clampPointToPlacementBounds(candidate, definition.placementBounds)
     return { x: Math.round(clamped.x), y: Math.round(clamped.y) }
   }
-  const escapes = blocking
-    .flatMap(keepout => [
-      { x: keepout.left - width + anchorDx - margin, y: bounded.y },
-      { x: keepout.right + anchorDx + margin, y: bounded.y },
-      { x: bounded.x, y: keepout.top - height + anchorDy - margin },
-      { x: bounded.x, y: keepout.bottom + anchorDy + margin },
-    ])
-    .map(settle)
-    .filter(candidate => !decorationCoversKeepout(definition, candidate))
-    .sort((a, b) => distance(a) - distance(b))
-  return escapes[0] ?? settle({
-    x: (definition.placementBounds.xMin + definition.placementBounds.xMax) / 2,
-    y: (definition.placementBounds.yMin + definition.placementBounds.yMax) / 2,
-  })
+  return settleOutsideKeepouts(point, home => decorationDisplayRect(definition, home), settle, keepouts, 1194)
+    ?? settle({
+      x: (definition.placementBounds.xMin + definition.placementBounds.xMax) / 2,
+      y: definition.placementBounds.yMin + (definition.placementBounds.yMax - definition.placementBounds.yMin) * 0.72,
+    })
 }
 
 /**
@@ -110,6 +95,7 @@ export function resolveDecorationHome(definition: DecorationGeometry, point: Sta
 export function initialDecorationHome(
   definition: DecorationGeometry,
   occupied: ReadonlyArray<{ definition: Pick<DecorationCatalogItemDefinition, 'render'>; home: StagePoint }>,
+  keepouts: readonly StageRect[] = DECORATION_KEEPOUTS,
 ): StagePoint {
   const bounds = definition.placementBounds
   // 起点放在下半场草地(范围 72% 处),不是几何中心:整页可拖后中心已经到了天空/远景
@@ -129,10 +115,10 @@ export function initialDecorationHome(
     }
   }
   for (const candidate of candidates) {
-    const home = resolveDecorationHome(definition, candidate)
+    const home = resolveDecorationHome(definition, candidate, keepouts)
     if (!crowded(home)) return home
   }
-  return resolveDecorationHome(definition, center)
+  return resolveDecorationHome(definition, center, keepouts)
 }
 
 export function loadoutItem(
