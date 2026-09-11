@@ -4,11 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <!-- black-translucent:standalone 下内容延伸到状态栏后面,舞台用满整块屏;安全区由 .f4-safe-area 处理。
-         注意:这个 meta 在「添加到主屏幕」时被 iOS 固化,之后改代码对已安装的 App 无效。
-         iPadOS 26 会把状态栏高度从布局视口里扣掉却仍铺满屏幕(底部露 32pt 横带),
-         由 src/features/pwa/viewportShortfall.ts 在页面里把文档撑到真实屏幕高度解决。 -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- 状态栏样式在「添加到主屏幕」时被 iOS 固化,之后改这里对已安装的 App 无效。
+         · 已安装(black-translucent):iPadOS 26 把状态栏高度从布局视口里扣掉却仍铺满屏幕(底部露 32pt 横带),
+           由 src/features/pwa/viewportShortfall.ts 在页面里把文档撑到真实屏幕高度解决。
+         · 新安装(default):WebView 排在状态栏下方、贴到屏幕底边,状态栏用 theme-color 的天空色与背景衔接;
+           此时 safe-area-inset-top 为 0,viewportShortfall 不会再撑高。 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <!-- 与 --f4-sky 一致:standalone 的不透明状态栏按它着色,和农场背景顶部的天空衔接 -->
     <meta name="theme-color" content="#bfe5f7" />
     <meta name="apple-mobile-web-app-title" content="皮皮のEnglish" />

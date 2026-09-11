@@ -61,7 +61,7 @@ visual_owner_review: pending-codex (完成卡新增一行守护卡文案、家�
 
 ## 3b. 2026-09-11 晚追加(爸爸:「还是有个条,只是从蓝变绿」+ 批准优化建议 5–8)
 
-- **横带根治**:`apple-mobile-web-app-status-bar-style` 在添加到主屏幕时被 iOS 固化,改 meta 对已安装的 App 无效(下午改 `default` 完全没生效,已改回 `black-translucent`)。新做法:`src/features/pwa/viewportShortfall.ts` 在 standalone 且 innerHeight 比屏幕高度矮 ≤64pt 时,把 `--f4-doc-height` 设为真实屏幕高度,`html/body/#root/.f4-viewport` 都用它,背景层直接铺过底部那 32pt;舞台仍由 safe-area 避开状态栏与 Home 指示条。诊断面板新增该变量读数。
+- **横带根治**:`apple-mobile-web-app-status-bar-style` 在添加到主屏幕时被 iOS 固化,改 meta 对已安装的 App 无效(下午改 `default` 完全没生效)。已安装的 App 由 `src/features/pwa/viewportShortfall.ts` 处理:standalone、缺口 ≤64pt 且缺口≈`safe-area-inset-top`(即内容画在状态栏下面而视口被扣掉了状态栏高度)时,把 `--f4-doc-height` 设为真实屏幕高度,`html/body/#root/.f4-viewport` 都用它,背景层直接铺过底部那 32pt;舞台仍由 safe-area 避开状态栏与 Home 指示条。meta 保留 `default` 给将来重新添加到主屏幕的安装(WebView 排在状态栏下方,safe-area-top 为 0,不会再撑高)。诊断面板新增文档撑高/scrollHeight/scrollY 读数。若真机撑高后横带仍在,说明那 32pt 是系统遮挡区、页面无法绘制,只能走「导出备份 → 删除图标 → 重新添加到主屏幕 → 导入备份」拿到 `default` 状态栏。
 - **写词第一轮 2 颗蛋**:见 F4-CHG-034 裁决 5。
 - **家长页周报**:最近 7 天完成天数、新词、复习、游戏得蛋、待救援,以及按 FSRS 忘记次数排的最容易忘的 5 个词。
 - **视觉小修**:孵化倒计时标签上移 5pt;中层贴纸与角色同一层叠上下文、按脚底 y 排前后(`depthZIndex`,20–40);角色贴近顶栏时气泡翻到身体下方。

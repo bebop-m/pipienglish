@@ -156,7 +156,7 @@ function DeviceDiagnostics() {
         `屏幕 screen: ${window.screen.width}×${window.screen.height} · dpr ${window.devicePixelRatio}`,
         `visualViewport: ${window.visualViewport ? `${Math.round(window.visualViewport.width)}×${Math.round(window.visualViewport.height)}` : '不支持'}`,
         `documentElement.clientHeight: ${document.documentElement.clientHeight} · outerHeight: ${window.outerHeight}`,
-        `文档撑高 --f4-doc-height: ${document.documentElement.style.getPropertyValue('--f4-doc-height') || '(未启用)'} · scrollHeight ${document.documentElement.scrollHeight}`,
+        `文档撑高 --f4-doc-height: ${document.documentElement.style.getPropertyValue('--f4-doc-height') || '(未启用)'} · scrollHeight ${document.documentElement.scrollHeight} · scrollY ${Math.round(window.scrollY)} · vv.offsetTop ${window.visualViewport ? Math.round(window.visualViewport.offsetTop) : '—'}`,
         `安全区 top/right/bottom/left: ${probe ? [probe.paddingTop, probe.paddingRight, probe.paddingBottom, probe.paddingLeft].join(' / ') : '—'}`,
         `standalone: navigator.standalone=${String(nav.standalone)} · display-mode=${window.matchMedia('(display-mode: standalone)').matches}`,
         `方向: ${window.matchMedia('(orientation: landscape)').matches ? 'landscape' : 'portrait'}`,
