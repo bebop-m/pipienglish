@@ -5,7 +5,8 @@ import {
   canAllocateEggToHatch,
   completeDailyLessonWithEggs,
   eggsEarnedFor,
-  GAME_EGGS_DAILY_CAP,
+  GAME_ROUNDS_DAILY_CAP,
+  nextGameRoundEggs,
   hatchesAt,
   isHatchDue,
   remainingHatchMs,
@@ -44,22 +45,32 @@ describe('每日与写词鸡蛋收入', () => {
     expect(duplicate.farm).toBe(first.farm)
   })
 
-  it('同一本地日前 10 轮各发 1 颗，第 11 轮起纯加练', () => {
+  it('同一本地日第一轮发 2 颗、第 2–10 轮各 1 颗，第 11 轮起纯加练', () => {
     let currentSession = session({ completed: true })
     let currentFarm = farm()
-    for (let round = 1; round <= GAME_EGGS_DAILY_CAP; round += 1) {
+    expect(nextGameRoundEggs(currentSession, '2026-07-19')).toBe(2)
+    for (let round = 1; round <= GAME_ROUNDS_DAILY_CAP; round += 1) {
       const result = awardHandwritingRoundEgg(currentSession, currentFarm, '2026-07-19')
-      expect(result.awarded).toBe(1)
-      expect(result.session.gameEggs).toBe(round)
+      expect(result.awarded).toBe(round === 1 ? 2 : 1)
+      expect(result.session.gameRounds).toBe(round)
+      expect(result.session.gameEggs).toBe(round + 1)
       currentSession = result.session
       currentFarm = result.farm
     }
-    expect(currentFarm.eggStock).toBe(10)
+    expect(currentFarm.eggStock).toBe(11)
+    expect(nextGameRoundEggs(currentSession, '2026-07-19')).toBe(0)
 
     const practiceOnly = awardHandwritingRoundEgg(currentSession, currentFarm, '2026-07-19')
     expect(practiceOnly.awarded).toBe(0)
     expect(practiceOnly.session).toBe(currentSession)
     expect(practiceOnly.farm).toBe(currentFarm)
+  })
+
+  it('更新前的旧会话没有 gameRounds:按蛋数推算轮数,不会再送一次第一轮双倍', () => {
+    const legacy = session({ completed: true, gameEggs: 3 })
+    expect(nextGameRoundEggs(legacy, '2026-07-19')).toBe(1)
+    const result = awardHandwritingRoundEgg(legacy, farm(), '2026-07-19')
+    expect(result.session).toMatchObject({ gameRounds: 4, gameEggs: 4 })
   })
 
   it('未完成必修或传入的本地日不同均不发游戏蛋', () => {

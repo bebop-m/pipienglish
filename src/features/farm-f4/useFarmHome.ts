@@ -292,11 +292,11 @@ export function useFarmHome(): FarmHomeBridge {
           await refresh()
           return
         case 'EQUIP_COSMETIC':
-          await usecases.equipCosmetic(event.target, event.slot, event.itemId)
+          await usecases.equipCosmetic(event.target, event.slot, event.itemId, undefined, coreRef.current?.viewedSceneId)
           await refresh()
           return
         case 'UNEQUIP_COSMETIC':
-          await usecases.unequipCosmetic(event.target, event.slot)
+          await usecases.unequipCosmetic(event.target, event.slot, undefined, coreRef.current?.viewedSceneId)
           await refresh()
           return
         case 'TOGGLE_CHICK_FAVORITE': {

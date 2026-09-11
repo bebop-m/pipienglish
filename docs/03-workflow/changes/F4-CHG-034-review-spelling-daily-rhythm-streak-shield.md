@@ -72,6 +72,11 @@ supersedes: SPEC §5.1 暂停新词规则、§5.3 复习题型分配、§3.3 补
 - `eggEconomy.ts` 的 `DAILY_LESSON_EGGS = 1`；写词游戏每轮 1 颗、每日 10 颗上限不变。只做必修的蛋正好每天孵一只；贴纸与装扮的消费来源是写词游戏。
 - 36 日理论收入：必修 36 + 游戏 ≤360。SPEC §2.3 / §3.1 与经济提案 §2 / §4.1 已同步。
 
+## 裁决 5（2026-09-11 追加）：写词游戏当天第一轮 2 颗蛋
+
+- 爸爸：「4 改成第一轮奖励两颗」。`eggEconomy.ts` 新增 `FIRST_GAME_ROUND_EGGS = 2`，`DailySession.gameRounds` 记轮数（更新前的当天会话缺该字段时按蛋数推算，不会再送一次双倍）；每日最多 11 颗。
+- 首页木牌与写词页进度文案按下一轮能拿几颗显示（2 / 1 / 拿满纯加练）。SPEC §2.4、§3.1 与经济提案 §2、§4.2 已同步。
+
 ## 实施记录（2026-09-11）
 
 - `dailyPlan.ts`：`NEW_PER_DAY = 2`、`REVIEW_CAP = 12`；删除 `shouldPauseNewWords` 等暂停规则；`estimatedMinutes = 复习 × 0.6 + 新词 × 2`。`DailySession.newWordsPaused` 保留读兼容、不再写入；首页「今天先复习老朋友」分支删除。

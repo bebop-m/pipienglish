@@ -51,7 +51,13 @@ function decorationLayoutStyle(item: DecorationCatalogItemVM, home: StagePoint):
     width: layout.width,
     height: layout.height,
     '--f7-depth-key': layout.depthKey,
+    ...(item.definition.layer === 'actor' ? { zIndex: depthZIndex(layout.depthKey) } : {}),
   } as CSSProperties
+}
+
+/** 中层贴纸与角色共用的深度 z-index:按脚底 y 映射到 20–40,谁靠下谁在前(与 FarmActors 同一公式) */
+export function depthZIndex(groundY: number): number {
+  return 20 + Math.round(Math.max(0, Math.min(834, groundY)) / 42)
 }
 
 /** 已摆放贴纸:与小鸡一致的指针拖拽,落点钳回 placementBounds 后经 PLACE_DECORATION 免费持久化 */
@@ -74,6 +80,7 @@ function DraggableDecoration({
     element.style.left = `${style.left}px`
     element.style.top = `${style.top}px`
     element.style.setProperty('--f7-depth-key', `${home.y}`)
+    if (item.definition.layer === 'actor') element.style.zIndex = `${depthZIndex(home.y)}`
   }
 
   // 落点由外部变化(刷新恢复、收起再摆)时同步;拖动中不打断跟手

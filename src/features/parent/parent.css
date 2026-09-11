@@ -162,6 +162,12 @@
   margin: 4px 0 8px;
 }
 
+.parent-forgetful {
+  margin: 6px 0 8px;
+  padding-left: 20px;
+  line-height: 1.8;
+}
+
 .parent-diag {
   margin: 8px 0 0;
   padding: 10px 12px;

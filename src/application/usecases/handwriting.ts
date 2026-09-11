@@ -5,7 +5,7 @@
 
 import type { PipiDB } from '../db'
 import { getFarmStateV3, setFarmStateV3 } from '../db'
-import { awardHandwritingRoundEgg } from '../../domain/eggEconomy'
+import { awardHandwritingRoundEgg, nextGameRoundEggs } from '../../domain/eggEconomy'
 import { weightedSample } from '../../domain/staleness'
 import { dayKeyOf } from '../../domain/time'
 import { WORD_MAP } from '../../domain/words'
@@ -52,10 +52,16 @@ export function createHandwritingUsecases(d: PipiDB) {
     })
   }
 
-  /** 今日已领的游戏奖励蛋数(供入口文案:还有奖励 or 纯加练) */
+  /** 今日已领的游戏奖励蛋数(供家长页/测试) */
   async function gameEggsToday(now = Date.now()): Promise<number> {
     const session = await d.sessions.get(dayKeyOf(now))
     return session?.gameEggs ?? 0
+  }
+
+  /** 下一轮能拿几颗蛋(供入口文案:第一轮 2 颗 / 之后 1 颗 / 拿满纯加练) */
+  async function nextRoundEggs(now = Date.now()): Promise<0 | 1 | 2> {
+    const session = await d.sessions.get(dayKeyOf(now))
+    return session ? nextGameRoundEggs(session, dayKeyOf(now)) : 0
   }
 
   /**
@@ -78,7 +84,7 @@ export function createHandwritingUsecases(d: PipiDB) {
     return result
   }
 
-  return { unlockedToday, buildRound, recordCorrect, recordForgot, gameEggsToday, awardRound }
+  return { unlockedToday, buildRound, recordCorrect, recordForgot, gameEggsToday, nextRoundEggs, awardRound }
 }
 
 export type HandwritingUsecases = ReturnType<typeof createHandwritingUsecases>

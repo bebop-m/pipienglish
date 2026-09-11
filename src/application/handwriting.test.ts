@@ -111,17 +111,19 @@ describe('写词游戏用例', () => {
     await completedToday(db, now) // 完成必修 → eggStock 1
     const uc = createHandwritingUsecases(db)
 
+    expect(await uc.nextRoundEggs(now)).toBe(2) // 第一轮 2 颗
     for (let i = 1; i <= 10; i++) {
       expect(await uc.awardRound(now)).toBe('egg')
-      expect(await uc.gameEggsToday(now)).toBe(i)
+      expect(await uc.gameEggsToday(now)).toBe(i + 1)
     }
     let state = await getFarmStateV3(db, { now, today: dayKeyOf(now) })
-    expect(state.eggStock).toBe(1 + 10)
+    expect(state.eggStock).toBe(1 + 11)
 
+    expect(await uc.nextRoundEggs(now)).toBe(0)
     expect(await uc.awardRound(now)).toBe('capped') // 第 11 轮:照常可玩,不发蛋
     state = await getFarmStateV3(db, { now, today: dayKeyOf(now) })
-    expect(state.eggStock).toBe(11)
-    expect(await uc.gameEggsToday(now)).toBe(10)
+    expect(state.eggStock).toBe(12)
+    expect(await uc.gameEggsToday(now)).toBe(11)
     db.close()
   })
 
@@ -131,7 +133,7 @@ describe('写词游戏用例', () => {
     const farm = await completedToday(db, now)
     const uc = createHandwritingUsecases(db)
     await uc.awardRound(now)
-    expect(await uc.gameEggsToday(now)).toBe(1)
+    expect(await uc.gameEggsToday(now)).toBe(2) // 第一轮 2 颗
 
     const t1 = now + DAY_MS
     await farm.clockGuard(t1) // 翻日重建会话

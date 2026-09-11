@@ -1,114 +1,40 @@
 // 生产路由:农场首页 ↔ 学习流(阶段 H 整流:H-1~H-6 均已获小皮批准,导航正式开放)。
 // 救援与写词游戏按爸爸裁决直接复用生产学习卡并开放；
 // 家长页 2026-08-05 爸爸裁决开放(F4-CHG-032)，入口内置算术门控防小皮误入。
+// F4-CHG-035:首页之外的屏幕按路由懒加载,主包只装农场;分包由 Service Worker 一并预缓存,离线仍可进。
 
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { FarmHomeScreen } from './features/farm-f4/FarmHomeScreen'
-import { LessonFlowScreen } from './features/lesson-f4/LessonFlowScreen'
-import { LessonChoiceScreen } from './features/lesson-f4/LessonChoiceScreen'
-import { LessonDictationScreen } from './features/lesson-f4/LessonDictationScreen'
-import { LessonFinishScreen } from './features/lesson-f4/LessonFinishScreen'
-import { LessonIntroScreen } from './features/lesson-f4/LessonIntroScreen'
-import { LessonListeningScreen } from './features/lesson-f4/LessonListeningScreen'
-import { LessonTraceScreen } from './features/lesson-f4/LessonTraceScreen'
-import { RescueFlowScreen } from './features/rescue-f4/RescueFlowScreen'
-import { HandwritingFlowScreen } from './features/handwriting-f4/HandwritingFlowScreen'
-import { ParentScreen } from './features/parent/ParentScreen'
 
-const INTRO_PREVIEWS = {
-  egg: { id: 'egg', word: 'egg', ipa: '/eɡ/', meaning: '鸡蛋', sentence: 'The hen laid an egg!', sentenceCn: '母鸡下了一颗蛋！', imageAssetId: 'egg-f4-v2' },
-  because: { id: 'because', word: 'because', ipa: '/bɪˈkɒz/', meaning: '因为', sentence: 'I stayed inside because it rained.', sentenceCn: '因为下雨了，所以我待在屋里。' },
-  // 词库最长词(11 字母),用于校验描红底字与排版的溢出边界
-  supermarket: { id: 'supermarket', word: 'supermarket', ipa: '/ˈsuːpərmɑːrkɪt/', meaning: '超市', sentence: 'We buy meat at the supermarket.', sentenceCn: '我们在超市买肉。' },
-} as const
+const LessonFlowScreen = lazy(() => import('./features/lesson-f4/LessonFlowScreen').then(m => ({ default: m.LessonFlowScreen })))
+const RescueFlowScreen = lazy(() => import('./features/rescue-f4/RescueFlowScreen').then(m => ({ default: m.RescueFlowScreen })))
+const HandwritingFlowScreen = lazy(() => import('./features/handwriting-f4/HandwritingFlowScreen').then(m => ({ default: m.HandwritingFlowScreen })))
+const ParentScreen = lazy(() => import('./features/parent/ParentScreen').then(m => ({ default: m.ParentScreen })))
+const DevPreviewRoutes = import.meta.env.DEV ? lazy(() => import('./dev/DevPreviewRoutes')) : null
 
-type IntroPreviewKey = keyof typeof INTRO_PREVIEWS
-
-function introPreviewKey(value: string | null | undefined): IntroPreviewKey | null {
-  return value && value in INTRO_PREVIEWS ? value as IntroPreviewKey : null
-}
-
-const EGG_MEANING_OPTIONS = [
-  { id: 'egg', label: '鸡蛋' },
-  { id: 'hen', label: '母鸡' },
-  { id: 'apple', label: '苹果' },
-  { id: 'bread', label: '面包' },
-]
+const PREVIEW_PARAMS = ['lesson-intro', 'lesson-trace', 'lesson-choice', 'lesson-listening', 'lesson-dictation', 'lesson-finish']
 
 export default function App() {
   const [route, setRoute] = useState<'farm' | 'lesson' | 'rescue' | 'handwriting' | 'parent'>('farm')
 
-  const previewParams = import.meta.env.DEV ? new URLSearchParams(window.location.search) : null
-  const preview = introPreviewKey(previewParams?.get('lesson-intro'))
-  if (preview) {
-    return <LessonIntroScreen word={INTRO_PREVIEWS[preview]} todayDone={3} todayTotal={18} onBack={() => undefined} onComplete={() => undefined} />
-  }
-  const tracePreview = introPreviewKey(previewParams?.get('lesson-trace'))
-  if (tracePreview) {
-    return <LessonTraceScreen word={INTRO_PREVIEWS[tracePreview]} todayDone={4} todayTotal={18} onBack={() => undefined} onComplete={() => undefined} />
-  }
-  if (previewParams?.get('lesson-choice') === 'egg') {
-    return (
-      <LessonChoiceScreen
-        word={INTRO_PREVIEWS.egg}
-        options={EGG_MEANING_OPTIONS}
-        correctOptionId="egg"
-        todayDone={5}
-        todayTotal={18}
-        onBack={() => undefined}
-        onAnswer={() => undefined}
-        onContinue={() => undefined}
-      />
-    )
-  }
-  if (previewParams?.get('lesson-listening') === 'egg') {
-    return (
-      <LessonListeningScreen
-        word={INTRO_PREVIEWS.egg}
-        options={EGG_MEANING_OPTIONS}
-        correctOptionId="egg"
-        todayDone={6}
-        todayTotal={18}
-        onBack={() => undefined}
-        onAnswer={() => undefined}
-        onContinue={() => undefined}
-      />
-    )
-  }
-  if (previewParams?.get('lesson-dictation') === 'egg') {
-    const previewState = previewParams.get('state')
-    const initialState = previewState === 'correct' || previewState === 'retry' || previewState === 'captured'
-      ? previewState
-      : 'ready'
-    return (
-      <LessonDictationScreen
-        word={INTRO_PREVIEWS.egg}
-        todayDone={7}
-        todayTotal={18}
-        initialState={initialState}
-        onBack={() => undefined}
-        onAnswer={() => undefined}
-        onForgot={() => undefined}
-        onContinue={() => undefined}
-        onCapturedContinue={() => undefined}
-      />
-    )
-  }
-  if (previewParams?.get('lesson-finish') === '1') {
-    return <LessonFinishScreen dayNumber={7} summary={{ newWords: 4, reviews: 6, streakDays: 3, eggsEarned: 1 }} onReturnFarm={() => undefined} />
+  if (DevPreviewRoutes) {
+    const params = new URLSearchParams(window.location.search)
+    if (PREVIEW_PARAMS.some(key => params.has(key))) {
+      return <Suspense fallback={null}><DevPreviewRoutes params={params} /></Suspense>
+    }
   }
 
   if (route === 'lesson') {
-    return <LessonFlowScreen onExit={() => setRoute('farm')} />
+    return <Suspense fallback={null}><LessonFlowScreen onExit={() => setRoute('farm')} /></Suspense>
   }
   if (route === 'rescue') {
-    return <RescueFlowScreen onExit={() => setRoute('farm')} />
+    return <Suspense fallback={null}><RescueFlowScreen onExit={() => setRoute('farm')} /></Suspense>
   }
   if (route === 'handwriting') {
-    return <HandwritingFlowScreen onExit={() => setRoute('farm')} />
+    return <Suspense fallback={null}><HandwritingFlowScreen onExit={() => setRoute('farm')} /></Suspense>
   }
   if (route === 'parent') {
-    return <ParentScreen onExit={() => setRoute('farm')} />
+    return <Suspense fallback={null}><ParentScreen onExit={() => setRoute('farm')} /></Suspense>
   }
   return (
     <FarmHomeScreen

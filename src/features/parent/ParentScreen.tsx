@@ -3,7 +3,8 @@
 // 面向爸爸的朴素 UI,不做 F4 视觉主张,不使用 F4 资产。
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { db, getFarmStateV3, getKV, setFarmStateV3, setKV } from '../../application/db'
+import { db, getFarmStateV3, getKV, setFarmStateV3, setKV, type CardRow } from '../../application/db'
+import { WORD_MAP } from '../../domain/words'
 import { exportAll, importAll } from '../../application/backup'
 import { fastForward, validateFastForwardInput } from '../../application/fastForward'
 import type { FarmStateV3 } from '../../application/farmPersistence'
@@ -90,19 +91,55 @@ interface LoadedData {
   meta: MetaState
   farm: FarmStateV3
   sessions: DailySession[]
+  cards: CardRow[]
+  rescueCount: number
   lastExportAt: number | null
 }
 
 async function loadData(): Promise<LoadedData> {
   const now = Date.now()
   const today = dayKey()
-  const [meta, farm, sessions, lastExportAt] = await Promise.all([
+  const [meta, farm, sessions, cards, rescueCount, lastExportAt] = await Promise.all([
     getKV<MetaState>(db, 'meta', defaultMeta(today)),
     getFarmStateV3(db, { now, today }),
     db.sessions.where('date').aboveOrEqual(addDays(today, -55)).toArray(),
+    db.cards.toArray(),
+    db.rescue.count(),
     getKV<number | null>(db, LAST_EXPORT_KEY, null),
   ])
-  return { meta, farm, sessions, lastExportAt }
+  return { meta, farm, sessions, cards, rescueCount, lastExportAt }
+}
+
+/** 本周摘要(SPEC §3 给爸爸的 3 分钟摘要):最近 7 天完成情况 + 最容易忘的词(FSRS 记录的忘记次数) */
+function WeeklySummary({ sessions, cards, rescueCount, today }: { sessions: DailySession[]; cards: CardRow[]; rescueCount: number; today: string }) {
+  const weekStart = addDays(today, -6)
+  const week = sessions.filter(session => session.date >= weekStart && session.date <= today && session.completed)
+  const newWords = week.reduce((sum, session) => sum + session.newIds.length, 0)
+  const reviews = week.reduce((sum, session) => sum + session.reviewIds.length, 0)
+  const gameEggs = week.reduce((sum, session) => sum + (session.gameEggs ?? 0), 0)
+  const forgetful = cards
+    .filter(row => (row.card.lapses ?? 0) > 0 && WORD_MAP.has(row.wordId))
+    .sort((a, b) => (b.card.lapses - a.card.lapses) || (a.card.stability - b.card.stability))
+    .slice(0, 5)
+  return (
+    <>
+      <p>
+        最近 7 天完成 <b>{week.length}</b> 天 · 新词 <b>{newWords}</b> 个 · 复习 <b>{reviews}</b> 次
+        · 写词游戏得蛋 <b>{gameEggs}</b> 颗 · 待救援 <b>{rescueCount}</b> 只
+      </p>
+      {forgetful.length === 0
+        ? <p className="parent-hint">还没有反复忘记的词。</p>
+        : (
+          <ul className="parent-forgetful">
+            {forgetful.map(row => {
+              const word = WORD_MAP.get(row.wordId)!
+              return <li key={row.wordId}><b>{word.word}</b> {word.meaning} · 忘过 {row.card.lapses} 次</li>
+            })}
+          </ul>
+        )}
+      <p className="parent-hint">「忘过」= 复习时答错或想不起来的次数(FSRS lapses),按次数从多到少列前 5 个。</p>
+    </>
+  )
 }
 
 /** 设备诊断:真机视口/安全区读数,定位「底部横带」「舞台缩放不对」这类只在 iPad 上出现的问题 */
@@ -119,6 +156,7 @@ function DeviceDiagnostics() {
         `屏幕 screen: ${window.screen.width}×${window.screen.height} · dpr ${window.devicePixelRatio}`,
         `visualViewport: ${window.visualViewport ? `${Math.round(window.visualViewport.width)}×${Math.round(window.visualViewport.height)}` : '不支持'}`,
         `documentElement.clientHeight: ${document.documentElement.clientHeight} · outerHeight: ${window.outerHeight}`,
+        `文档撑高 --f4-doc-height: ${document.documentElement.style.getPropertyValue('--f4-doc-height') || '(未启用)'} · scrollHeight ${document.documentElement.scrollHeight}`,
         `安全区 top/right/bottom/left: ${probe ? [probe.paddingTop, probe.paddingRight, probe.paddingBottom, probe.paddingLeft].join(' / ') : '—'}`,
         `standalone: navigator.standalone=${String(nav.standalone)} · display-mode=${window.matchMedia('(display-mode: standalone)').matches}`,
         `方向: ${window.matchMedia('(orientation: landscape)').matches ? 'landscape' : 'portrait'}`,
@@ -316,6 +354,11 @@ export function ParentScreen({ onExit }: { onExit: () => void }) {
           <button className="parent-btn parent-btn-plain" type="button" disabled={busy} onClick={() => void addShield()}>补 1 张守护卡</button>
         </div>
         <StreakCalendar sessions={data.sessions} today={today} />
+      </section>
+
+      <section className="parent-section">
+        <h2>本周摘要</h2>
+        <WeeklySummary sessions={data.sessions} cards={data.cards} rescueCount={data.rescueCount} today={today} />
       </section>
 
       <section className="parent-section">

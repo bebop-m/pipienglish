@@ -28,7 +28,7 @@ export function HandwritingFlowScreen({ onExit }: HandwritingFlowScreenProps) {
       questionIndex={vm.index}
       questionTotal={vm.total}
       headerTitle={`写词游戏 · 第 ${vm.index} 题 / ${vm.total}`}
-      progressText={vm.eggAvailable ? `写完 ${vm.total} 题得一颗鸡蛋` : '今天的奖励蛋拿满啦,这轮是加练'}
+      progressText={vm.nextRoundEggs === 2 ? `写完 ${vm.total} 题得两颗鸡蛋` : vm.nextRoundEggs === 1 ? `写完 ${vm.total} 题得一颗鸡蛋` : '今天的奖励蛋拿满啦,这轮是加练'}
       stepChip="写一写 · 写词游戏"
       onBack={onExit}
       onAnswer={({ correct }) => {

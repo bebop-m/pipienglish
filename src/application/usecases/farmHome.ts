@@ -28,9 +28,11 @@ import { ensureStarterWords } from '../starterWords'
 import {
   persistedChickHatchedAt,
   defaultCharacterLoadout,
+  SCENE_LOADOUTS_KEY,
   type FarmStateV3,
   type OwnedCosmeticRow,
   type PersistedChick,
+  type SceneLoadouts,
 } from '../farmPersistence'
 import {
   clearReadyMeal,
@@ -198,8 +200,30 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
     return scene?.cosmeticItemIds.includes(item.id) ? item : null
   }
 
-  async function getLoadout(): Promise<CharacterLoadout> {
-    return getKV(d, 'loadout', defaultCharacterLoadout())
+  function loadoutMentionsScene(loadout: CharacterLoadout, scene: FarmSceneDefinition): boolean {
+    const ids = [
+      loadout.xiaopi.headLook, loadout.xiaopi.outfit, loadout.xiaopi.accessory,
+      loadout.mother.headwear, loadout.mother.neckwear,
+    ]
+    return ids.some(id => id !== null && scene.cosmeticItemIds.includes(id))
+  }
+
+  /**
+   * 场景穿戴(F4-CHG-035 补齐 F7 契约):有本场景记录用本场景;没有时,若旧的全局 `kv.loadout`
+   * 穿着本场景的装扮就归入本场景(2026-09-11 前小皮在场景 2 穿的衣服不丢);否则默认装束。
+   */
+  async function getLoadout(scene: FarmSceneDefinition): Promise<CharacterLoadout> {
+    const all = await getKV<SceneLoadouts>(d, SCENE_LOADOUTS_KEY, {})
+    const own = all[scene.id]
+    if (own) return own
+    const legacy = await getKV<CharacterLoadout | null>(d, 'loadout', null)
+    if (legacy && loadoutMentionsScene(legacy, scene)) return legacy
+    return defaultCharacterLoadout()
+  }
+
+  async function setSceneLoadout(sceneId: string, loadout: CharacterLoadout): Promise<void> {
+    const all = await getKV<SceneLoadouts>(d, SCENE_LOADOUTS_KEY, {})
+    await setKV(d, SCENE_LOADOUTS_KEY, { ...all, [sceneId]: loadout })
   }
 
   /** 场景固定装置(路牌、驿站…)的拖动布局表:id → renderBox 契约 */
@@ -579,20 +603,24 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
     })
   }
 
+  /** 在正在查看的场景里穿上;只改该场景的记录,其他场景保持各自的穿戴 */
   async function equipCosmetic(
     target: CharacterTarget,
     slot: CharacterCosmeticSlot,
     itemId: string,
     now = sources.now(),
+    sceneId?: string,
   ): Promise<CosmeticEquipResult> {
     return d.transaction('rw', d.kv, d.cosmetics, async () => {
       const farm = await getFarm(now)
+      const scene = enteredScene(farm, sceneId)
+      if (!scene) return { status: 'item-unavailable', chargedEggs: 0 }
       const item = listableCosmetic(farm, itemId)
       if (!item) return { status: 'item-unavailable', chargedEggs: 0 }
       if (!(await d.cosmetics.get(item.id))) return { status: 'not-owned', chargedEggs: 0 }
-      const equipped = equipLoadoutItem(await getLoadout(), item, target, slot)
+      const equipped = equipLoadoutItem(await getLoadout(scene), item, target, slot)
       if (!equipped.ok) return { status: equipped.reason, chargedEggs: 0 }
-      await setKV(d, 'loadout', equipped.loadout)
+      await setSceneLoadout(scene.id, equipped.loadout)
       return { status: 'equipped', chargedEggs: 0 }
     })
   }
@@ -600,11 +628,16 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
   async function unequipCosmetic(
     target: CharacterTarget,
     slot: CharacterCosmeticSlot,
+    now = sources.now(),
+    sceneId?: string,
   ): Promise<CosmeticEquipResult> {
     return d.transaction('rw', d.kv, async () => {
-      const unequipped = unequipLoadoutItem(await getLoadout(), target, slot)
+      const farm = await getFarm(now)
+      const scene = enteredScene(farm, sceneId)
+      if (!scene) return { status: 'slot-mismatch', chargedEggs: 0 }
+      const unequipped = unequipLoadoutItem(await getLoadout(scene), target, slot)
       if (!unequipped.ok) return { status: unequipped.reason, chargedEggs: 0 }
-      await setKV(d, 'loadout', unequipped.loadout)
+      await setSceneLoadout(scene.id, unequipped.loadout)
       return { status: 'unequipped', chargedEggs: 0 }
     })
   }
@@ -753,7 +786,7 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
       d.rescue.count(),
       d.decorations.where('sceneId').equals(viewedScene.id).toArray(),
       d.cosmetics.toArray(),
-      getLoadout(),
+      getLoadout(viewedScene),
       getKV<unknown>(d, sceneElementHomesKey(viewedScene.id), {}),
     ])
     const orderedSceneChicks = sceneChicks.map(chick => ({

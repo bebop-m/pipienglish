@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { DEFAULT_CHARACTER_LOADOUT } from '../domain/farmCatalog'
 import { INTERNAL_SCENE_1_COSMETIC_DRAFTS } from '../domain/farmCosmetics'
 import { FARM_SCENE_DEFINITIONS } from '../domain/farmScenes'
 import { exportAll, importAll } from './backup'
@@ -230,7 +231,33 @@ describe('cosmetic ownership, loadout and v3 backup', () => {
     expect(await restored.decorations.toArray()).toEqual(await source.decorations.toArray())
     expect(await restored.cosmetics.toArray()).toEqual(await source.cosmetics.toArray())
     expect((await restored.kv.get('loadout'))?.value).toEqual((await source.kv.get('loadout'))?.value)
+    expect((await restored.kv.get('sceneLoadouts'))?.value).toEqual((await source.kv.get('sceneLoadouts'))?.value)
+    expect(((await restored.kv.get('sceneLoadouts'))?.value as Record<string, unknown>)['scene-1']).toMatchObject({ mother: { headwear: headwear.id } })
     source.close()
     restored.close()
+  })
+
+  it('keeps equipment per scene: scene 2 wear does not leak into scene 1, and a legacy global loadout is adopted by the scene it dresses', async () => {
+    const db = freshDb()
+    await seedEggs(db, 200)
+    const uc = createFarmUsecases(db)
+    const farm = await getFarmStateV3(db, { now, today: '2026-09-11' })
+    await setFarmStateV3(db, { ...farm, activeSceneId: 'scene-2', acknowledgedSceneChapter: 2 })
+    const bonnet = 'xiaopi-hat-look-scene-2-extension'
+
+    await uc.buyCosmetic(bonnet, now)
+    expect(await uc.equipCosmetic('xiaopi', 'headLook', bonnet, now + 1, 'scene-2')).toEqual({ status: 'equipped', chargedEggs: 0 })
+    expect((await uc.loadViewModel(now + 2, 'scene-2')).loadout.xiaopi.headLook).toBe(bonnet)
+    expect((await uc.loadViewModel(now + 2, 'scene-1')).loadout.xiaopi.headLook).toBe(DEFAULT_CHARACTER_LOADOUT.xiaopi.headLook)
+
+    expect(await uc.unequipCosmetic('xiaopi', 'headLook', now + 3, 'scene-1')).toEqual({ status: 'unequipped', chargedEggs: 0 })
+    expect((await uc.loadViewModel(now + 4, 'scene-2')).loadout.xiaopi.headLook).toBe(bonnet) // 场景 1 的操作不动场景 2
+
+    // 2026-09-11 前的全局 loadout 穿着场景 2 的衣服:归入场景 2,不丢
+    await db.kv.delete('sceneLoadouts')
+    await setKV(db, 'loadout', { xiaopi: { headLook: bonnet, outfit: DEFAULT_CHARACTER_LOADOUT.xiaopi.outfit, accessory: null }, mother: { headwear: null, neckwear: null } })
+    expect((await uc.loadViewModel(now + 5, 'scene-2')).loadout.xiaopi.headLook).toBe(bonnet)
+    expect((await uc.loadViewModel(now + 5, 'scene-1')).loadout.xiaopi.headLook).toBe(DEFAULT_CHARACTER_LOADOUT.xiaopi.headLook)
+    db.close()
   })
 })

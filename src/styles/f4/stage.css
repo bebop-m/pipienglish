@@ -2,7 +2,12 @@
 
 .f4-viewport {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* 与 html 同高:iPadOS 26 桌面 App 上 --f4-doc-height 会比布局视口多出状态栏那 32pt,
+     背景层随之铺满屏幕底部;舞台仍由 .f4-safe-area 的 env() 避开状态栏与 Home 指示条 */
+  height: var(--f4-doc-height, 100%);
   overflow: hidden;
   background: var(--f4-sky);
   color: var(--f4-ink);

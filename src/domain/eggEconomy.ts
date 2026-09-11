@@ -14,7 +14,28 @@ export function eggsEarnedFor(_totalItems: number): 1 {
 export const DAILY_LESSON_EGGS = 1 as const
 
 /** 写词游戏前 10 轮有奖励；第 11 轮起仍可无限加练。 */
-export const GAME_EGGS_DAILY_CAP = 10
+export const GAME_ROUNDS_DAILY_CAP = 10
+/** 当天第一轮 2 颗(爸爸 2026-09-11:必修只给 1 颗后,第一轮游戏多给一颗把她引进去),之后每轮 1 颗 */
+export const FIRST_GAME_ROUND_EGGS = 2 as const
+export const GAME_ROUND_EGGS = 1 as const
+/** 旧名保留(语义 = 每日有奖励的轮数上限) */
+export const GAME_EGGS_DAILY_CAP = GAME_ROUNDS_DAILY_CAP
+
+/** 今日已结算的游戏轮数;更新前的旧会话没有 gameRounds,按「每轮 1 颗」从蛋数推算 */
+export function gameRoundsPlayed(session: Pick<DailySession, 'gameRounds' | 'gameEggs'>): number {
+  return session.gameRounds ?? session.gameEggs ?? 0
+}
+
+/** 下一轮写词游戏能拿几颗蛋:未完成必修/不是今天/轮数拿满 → 0;第一轮 2;其后 1 */
+export function nextGameRoundEggs(
+  session: Pick<DailySession, 'date' | 'completed' | 'gameRounds' | 'gameEggs'>,
+  localDayKey: string,
+): 0 | 1 | 2 {
+  if (!session.completed || session.date !== localDayKey) return 0
+  const rounds = gameRoundsPlayed(session)
+  if (rounds >= GAME_ROUNDS_DAILY_CAP) return 0
+  return rounds === 0 ? FIRST_GAME_ROUND_EGGS : GAME_ROUND_EGGS
+}
 
 export interface EggBalance {
   eggStock: number
@@ -23,7 +44,7 @@ export interface EggBalance {
 export interface EggRewardResult<TFarm extends EggBalance = FarmState> {
   session: DailySession
   farm: TFarm
-  awarded: 0 | 1
+  awarded: 0 | 1 | 2
 }
 
 /**
@@ -44,7 +65,7 @@ export function completeDailyLessonWithEggs<TFarm extends EggBalance>(
 
 /**
  * 结算一轮写词游戏。奖励只属于传入的本地 dayKey 对应的已完成必修会话；
- * gameEggs 达到 10 后返回 0，但游戏本身不被禁止。
+ * 前 10 轮有奖励(第一轮 2 颗、其后 1 颗),之后返回 0,但游戏本身不被禁止。
  */
 export function awardHandwritingRoundEgg(
   session: DailySession,
@@ -61,14 +82,16 @@ export function awardHandwritingRoundEgg<TFarm extends EggBalance>(
   farm: TFarm,
   localDayKey: string,
 ): EggRewardResult<TFarm> {
-  const gameEggs = session.gameEggs ?? 0
-  if (!session.completed || session.date !== localDayKey || gameEggs >= GAME_EGGS_DAILY_CAP) {
-    return { session, farm, awarded: 0 }
-  }
+  const award = nextGameRoundEggs(session, localDayKey)
+  if (award === 0) return { session, farm, awarded: 0 }
   return {
-    session: { ...session, gameEggs: gameEggs + 1 },
-    farm: { ...farm, eggStock: farm.eggStock + 1 },
-    awarded: 1,
+    session: {
+      ...session,
+      gameRounds: gameRoundsPlayed(session) + 1,
+      gameEggs: (session.gameEggs ?? 0) + award,
+    },
+    farm: { ...farm, eggStock: farm.eggStock + award },
+    awarded: award,
   }
 }
 

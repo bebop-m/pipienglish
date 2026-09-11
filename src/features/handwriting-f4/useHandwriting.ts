@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { db } from '../../application/db'
 import { speak } from '../../application/services/tts'
 import { createHandwritingUsecases } from '../../application/usecases/handwriting'
-import { GAME_EGGS_DAILY_CAP } from '../../domain/eggEconomy'
 import type { LessonWordVM } from '../../application/lessonViewModel'
 import { WORD_MAP } from '../../domain/words'
 
@@ -17,8 +16,8 @@ export interface HandwritingViewModel {
   empty: boolean
   /** 一轮写完(奖励结算已完成):容器退出回农场 */
   done: boolean
-  /** 本轮写完是否还有奖励蛋可拿(日上限 10;拿满后照常可玩,纯加练) */
-  eggAvailable: boolean
+  /** 本轮写完能拿几颗蛋(第一轮 2、之后 1、前 10 轮之外 0 纯加练) */
+  nextRoundEggs: 0 | 1 | 2
   word: LessonWordVM | null
   index: number // 第 x 题(1 起)
   total: number
@@ -53,7 +52,7 @@ interface RoundState {
   wordIds: string[]
   cursor: number
   done: boolean
-  eggAvailable: boolean
+  nextRoundEggs: 0 | 1 | 2
 }
 
 export function useHandwriting(): HandwritingBridge {
@@ -64,9 +63,9 @@ export function useHandwriting(): HandwritingBridge {
 
   useEffect(() => {
     alive.current = true
-    Promise.all([usecases.buildRound(), usecases.gameEggsToday()]).then(([wordIds, claimed]) => {
+    Promise.all([usecases.buildRound(), usecases.nextRoundEggs()]).then(([wordIds, nextRoundEggs]) => {
       if (!alive.current) return
-      const fresh: RoundState = { wordIds, cursor: 0, done: false, eggAvailable: claimed < GAME_EGGS_DAILY_CAP }
+      const fresh: RoundState = { wordIds, cursor: 0, done: false, nextRoundEggs }
       roundRef.current = fresh
       setRound(fresh)
     })
@@ -113,7 +112,7 @@ export function useHandwriting(): HandwritingBridge {
         hydrated: true,
         empty: round.wordIds.length === 0,
         done: round.done,
-        eggAvailable: round.eggAvailable,
+        nextRoundEggs: round.nextRoundEggs,
         word: currentId ? toWordVM(currentId) : null,
         index: Math.min(round.cursor + 1, Math.max(round.wordIds.length, 1)),
         total: round.wordIds.length,

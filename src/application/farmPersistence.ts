@@ -34,6 +34,10 @@ export interface PersistedChick extends Chick {
   hatchedAt?: number
 }
 
+/** 各场景独立的穿戴记录(F7 契约 kv.sceneLoadouts):购买所有权全局,穿什么按场景保存 */
+export type SceneLoadouts = Record<string, CharacterLoadout>
+export const SCENE_LOADOUTS_KEY = 'sceneLoadouts'
+
 export interface DecorationRow {
   sceneId: string
   itemId: string

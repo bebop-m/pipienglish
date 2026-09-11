@@ -708,6 +708,14 @@
 }
 
 .actor-f3.is-talking { z-index: 66; }
+
+/* 角色贴近顶部工具栏时气泡翻到身体下方,不然会被工具栏盖住或被舞台裁掉 */
+.actor-f3.is-bubble-below .actor-talk-f3 {
+  bottom: auto;
+  top: calc(86% + 6px);
+  transform: translate(-50%, -8px) scale(0.9);
+}
+.actor-f3.is-bubble-below.is-talking .actor-talk-f3 { transform: translate(-50%, 0) scale(1); }
 .actor-f3.is-talking .actor-talk-f3 { opacity: 1; transform: translate(-50%, 0) scale(1); }
 
 .actor-f3.is-newly-hatched[data-kind='chick'] .sprite-shell-f3 {
@@ -781,7 +789,7 @@
   position: absolute;
   z-index: 5;
   left: 135px;
-  bottom: -1px;
+  bottom: 4px; /* 原 -1px:进度线不再贴着舞台底边 */
   display: inline-flex;
   width: 92px;
   min-width: 92px;
@@ -1120,8 +1128,9 @@
   pointer-events: none;
 }
 .farm-decorations-f7.is-back { z-index: 8; }
-.farm-decorations-f7.is-actor { z-index: 19; }
-.farm-decorations-f7.is-front { z-index: 30; }
+/* 中层贴纸与角色同一层叠上下文,各自按脚底 y 算 z-index(20–40),谁靠下谁在前 */
+.farm-decorations-f7.is-actor { z-index: auto; }
+.farm-decorations-f7.is-front { z-index: 45; }
 /* 单件已摆放贴纸:可指针拖拽,touch-action:none 防 iPad 拖动时页面滚动 */
 .farm-decoration-f7 {
   position: absolute;

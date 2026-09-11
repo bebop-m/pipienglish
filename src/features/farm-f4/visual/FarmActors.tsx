@@ -6,6 +6,10 @@ import { f4AssetUrl } from '../assetUrl'
 import { STAGE_H, STAGE_W, toStagePoint } from '../stage/stagePoint'
 import { chickAssetId, chickCanvasSize, specialChickHome } from './chickVisual'
 import { characterAppearanceAssetId } from './characterAppearance'
+import { depthZIndex } from './FarmCustomization'
+
+/** 角色顶边低于这个 y 时气泡翻到身体下方(顶部工具栏高约 66pt + 气泡自身) */
+const BUBBLE_BELOW_MAX_Y = 130
 
 type ActorKind = 'mother' | 'farmer' | 'chick'
 type Talk = { line: string; translation: string } | null
@@ -92,6 +96,14 @@ function FarmActor({
   const [localTalk, setLocalTalk] = useState<Talk>(null)
   const [dragging, setDragging] = useState(false)
 
+  /** 位置落定后同步深度与气泡方向:脚底越靠下越在前;贴近顶栏时气泡翻到下方 */
+  const applyDepth = useCallback((point: StagePoint) => {
+    const actor = actorRef.current
+    if (!actor) return
+    actor.style.zIndex = `${depthZIndex(point.y + spec.size.height)}`
+    actor.classList.toggle('is-bubble-below', point.y < BUBBLE_BELOW_MAX_Y)
+  }, [spec.size.height])
+
   const syncPresentation = useCallback(() => {
     const actor = actorRef.current
     if (!actor) return
@@ -110,7 +122,8 @@ function FarmActor({
     actor.style.top = `${positionRef.current.y}px`
     actor.style.transform = 'none'
     actor.classList.remove('is-walking')
-  }, [])
+    applyDepth(positionRef.current)
+  }, [applyDepth])
 
   const moveTo = useCallback(
     async (target: StagePoint) => {
@@ -140,8 +153,9 @@ function FarmActor({
       actor.style.transform = 'none'
       actor.classList.remove('is-walking')
       animationRef.current = null
+      applyDepth(target)
     },
-    [motionEnabled, syncPresentation],
+    [applyDepth, motionEnabled, syncPresentation],
   )
 
   useEffect(() => {
@@ -149,7 +163,8 @@ function FarmActor({
     if (!actor) return
     actor.style.left = `${positionRef.current.x}px`
     actor.style.top = `${positionRef.current.y}px`
-  }, [])
+    applyDepth(positionRef.current)
+  }, [applyDepth])
 
   useEffect(() => {
     window.clearTimeout(timerRef.current)
@@ -251,6 +266,7 @@ function FarmActor({
     if (!positionIsBlocked(next)) drag.lastValid = { ...next }
     actor.style.left = `${next.x}px`
     actor.style.top = `${next.y}px`
+    applyDepth(next)
     event.preventDefault()
   }
 
@@ -267,6 +283,7 @@ function FarmActor({
         actor.style.left = `${drag.origin.x}px`
         actor.style.top = `${drag.origin.y}px`
       }
+      applyDepth(drag.origin)
       return
     }
     if (drag.moved) {
@@ -278,6 +295,7 @@ function FarmActor({
           actor.style.top = `${drag.lastValid.y}px`
         }
       }
+      applyDepth(positionRef.current)
       ignoreClickUntilRef.current = Date.now() + 500
       onPlaced(positionRef.current)
       setLocalTalk({ line: '这里！', translation: 'I will stay near here.' })

@@ -51,7 +51,8 @@ export interface DailySession {
   completed: boolean
   dueBacklog?: number // 构建当日队列时的到期总数(供 SPEC §5.1 连续积压判定;旧记录缺省按 0)
   newWordsPaused?: boolean // 历史字段:F4-CHG-034 起不再暂停新词、不再写入;旧记录可能为 true,读取忽略
-  gameEggs?: number // 今日写词游戏已领奖励蛋数(日上限 GAME_EGGS_DAILY_CAP;旧记录缺省 0)
+  gameEggs?: number // 今日写词游戏已领奖励蛋数(旧记录缺省 0)
+  gameRounds?: number // 今日写词游戏已结算轮数(前 10 轮有奖励,第一轮 2 颗;缺失时按 gameEggs 推算)
 }
 
 export const HATCH_MS = 24 * 60 * 60 * 1000

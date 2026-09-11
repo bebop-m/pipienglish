@@ -4,7 +4,7 @@
 import type { DailySession, MetaState, StagePoint } from '../domain/types'
 import { VISIBLE_CHICK_CAP } from '../domain/types'
 import { estimatedMinutes, totalItems } from '../domain/dailyPlan'
-import { eggsEarnedFor } from '../domain/eggEconomy'
+import { eggsEarnedFor, nextGameRoundEggs } from '../domain/eggEconomy'
 import { hatchesAt, remainingHatchMs } from '../domain/hatchTiming'
 import { dayKeyOf } from '../domain/time'
 import { SHIELD_STREAK_INTERVAL } from '../domain/streak'
@@ -166,6 +166,7 @@ export interface FarmHomeViewModel {
   estimatedMinutes: number
   eggStock: number
   eggsEarnedToday: number // 完成前 = 预告值(任务板「奖励 ×N」),完成后 = 实得值
+  nextGameRoundEggs: 0 | 1 | 2 // 写词游戏下一轮能拿几颗(第一轮 2、之后 1、拿满 0)
   incubating: IncubatingEggVM | null
   hatchTransition: HatchTransitionVM | null
   chicksTotal: number
@@ -401,6 +402,7 @@ export function assembleViewModel(
     estimatedMinutes: estimatedMinutes(session),
     eggStock: farm.eggStock,
     eggsEarnedToday: eggsEarnedFor(items),
+    nextGameRoundEggs: nextGameRoundEggs(session, today),
     incubating: farm.incubating
       ? {
           placedAt: farm.incubating.placedAt,

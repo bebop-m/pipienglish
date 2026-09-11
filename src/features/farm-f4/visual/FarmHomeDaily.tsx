@@ -326,7 +326,7 @@ function CompleteBoard({ vm, dispatch }: FarmHomeDailyProps) {
       <button className="handwriting-sign-f4" type="button" onClick={() => dispatch({ type: 'OPEN_HANDWRITING_GAME' })}>
         <span>✎</span>
         <strong>玩一轮写词游戏</strong>
-        <small>10 题 · 完成可得鸡蛋</small>
+        <small>{vm.nextGameRoundEggs === 2 ? '10 题 · 今天第一轮得 2 颗鸡蛋' : vm.nextGameRoundEggs === 1 ? '10 题 · 完成可得鸡蛋' : '10 题 · 今天奖励拿满，纯加练'}</small>
       </button>
     </section>
   )
