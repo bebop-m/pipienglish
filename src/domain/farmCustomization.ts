@@ -112,7 +112,8 @@ export function initialDecorationHome(
   occupied: ReadonlyArray<{ definition: Pick<DecorationCatalogItemDefinition, 'render'>; home: StagePoint }>,
 ): StagePoint {
   const bounds = definition.placementBounds
-  const center = { x: (bounds.xMin + bounds.xMax) / 2, y: (bounds.yMin + bounds.yMax) / 2 }
+  // 起点放在下半场草地(范围 72% 处),不是几何中心:整页可拖后中心已经到了天空/远景
+  const center = { x: (bounds.xMin + bounds.xMax) / 2, y: bounds.yMin + (bounds.yMax - bounds.yMin) * 0.72 }
   const box = definition.render.displayBoxPt
   const taken = occupied.map(item => decorationDisplayRect(item.definition, item.home))
   const crowded = (home: StagePoint) => {

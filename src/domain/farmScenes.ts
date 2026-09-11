@@ -1,3 +1,4 @@
+import { STAGE_DRAG_INSETS } from './farmLayout'
 import {
   APPROVED_COLOR_CHICK_VARIANT_ID,
   APPROVED_SPECIAL_CHICK_VARIANT_ID,
@@ -139,11 +140,27 @@ const DECORATION_RENDER_BY_KIND = {
   },
 } as const satisfies Readonly<Record<DecorationKind, DecorationRenderContract>>
 
-const PLACEMENT_BOUNDS_BY_KIND = {
-  small: { xMin: 40, xMax: 1154, yMin: 560, yMax: 810 },
-  medium: { xMin: 120, xMax: 1074, yMin: 500, yMax: 800 },
-  landmark: { xMin: 240, xMax: 954, yMin: 390, yMax: 700 },
-} as const satisfies Readonly<Record<DecorationKind, PlacementBounds>>
+/**
+ * 贴纸的地面锚点可放范围 = 整个首页舞台(爸爸 2026-09-11:拖动范围扩到整个首页),
+ * 只要求显示框整体留在舞台内、不进顶部工具栏;任务卡与右下按钮组由 farmCustomization 的保留区处理。
+ */
+function placementBoundsFor(kind: DecorationKind): PlacementBounds {
+  const { canvasPx, displayBoxPt, groundAnchorPx } = DECORATION_RENDER_BY_KIND[kind]
+  const anchorX = groundAnchorPx.x / canvasPx.width * displayBoxPt.width
+  const anchorY = groundAnchorPx.y / canvasPx.height * displayBoxPt.height
+  return {
+    xMin: Math.ceil(STAGE_DRAG_INSETS.left + anchorX),
+    xMax: Math.floor(1194 - STAGE_DRAG_INSETS.right - (displayBoxPt.width - anchorX)),
+    yMin: Math.ceil(STAGE_DRAG_INSETS.top + anchorY),
+    yMax: Math.floor(834 - STAGE_DRAG_INSETS.bottom - (displayBoxPt.height - anchorY)),
+  }
+}
+
+const PLACEMENT_BOUNDS_BY_KIND: Readonly<Record<DecorationKind, PlacementBounds>> = {
+  small: placementBoundsFor('small'),
+  medium: placementBoundsFor('medium'),
+  landmark: placementBoundsFor('landmark'),
+}
 
 function decoration(
   sceneId: string,

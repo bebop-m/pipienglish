@@ -8,16 +8,20 @@ import {
 } from 'react'
 import type { StagePoint } from '../../../domain/types'
 import {
-  clampSceneElementHome,
-  resolveSceneElementHome,
+  clampElementHome,
+  resolveElementHome,
+  SCENE_ELEMENT_LAYOUTS,
   type MovableFarmElementId,
+  type SceneElementLayout,
 } from '../../../domain/farmLayout'
 import { STAGE_W, toStagePoint } from '../stage/stagePoint'
 
 interface StageDraggableProps {
   className: string
   ariaLabel: string
-  elementId: MovableFarmElementId
+  /** 四类核心物件用固定 id;场景固定装置传 fixedVisuals 的 id 并同时给 layout */
+  elementId: string
+  layout?: SceneElementLayout
   home: StagePoint | null
   defaultHome: StagePoint
   onPlaced: (home: StagePoint) => void
@@ -37,11 +41,13 @@ export function StageDraggable({
   className,
   ariaLabel,
   elementId,
+  layout: explicitLayout,
   home,
   defaultHome,
   onPlaced,
   children,
 }: StageDraggableProps) {
+  const layout = explicitLayout ?? SCENE_ELEMENT_LAYOUTS[elementId as MovableFarmElementId]
   const elementRef = useRef<HTMLElement>(null)
   const initial = home ?? defaultHome
   const positionRef = useRef<StagePoint>({ ...initial })
@@ -88,7 +94,7 @@ export function StageDraggable({
     if (!drag || drag.pointerId !== event.pointerId) return
     const point = stageCoordinates(event.clientX, event.clientY)
     if (!point) return
-    const next = clampSceneElementHome(elementId, {
+    const next = clampElementHome(layout, {
       x: point.x - drag.offset.x,
       y: point.y - drag.offset.y,
     })
@@ -111,8 +117,8 @@ export function StageDraggable({
       return
     }
     if (!drag.moved) return
-    // 松手才归位：拖到每日任务卡片上会被推回卡片外，避免物件永久藏到卡片背后点不到。
-    const placed = resolveSceneElementHome(elementId, positionRef.current) ?? drag.origin
+    // 松手才归位：拖到每日任务卡片或右下按钮组上会被推回,避免物件永久藏到 UI 背后点不到。
+    const placed = resolveElementHome(layout, positionRef.current) ?? drag.origin
     positionRef.current = placed
     setPosition(placed)
     ignoreClickUntilRef.current = Date.now() + 500

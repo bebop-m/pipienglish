@@ -99,10 +99,10 @@ describe('v1/v2/v3 JSON 导入', () => {
 
     expect((await db.kv.get('scene-element-homes:scene-2'))?.value).toEqual(corruptedHomes)
     expect((await createFarmUsecases(db).loadViewModel(IMPORT_CLOCK.now)).sceneElementHomes).toEqual({
-      mother: { x: 18, y: 604 },
-      xiaopi: { x: 924, y: 300 },
-      hatchery: { x: 878, y: 180 },
-      rescue: { x: 12, y: 672 },
+      mother: { x: 8, y: 610 },
+      xiaopi: { x: 934, y: 80 },
+      hatchery: { x: 882, y: 80 },
+      rescue: { x: 8, y: 676 },
     })
     db.close()
   })

@@ -4,8 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <!-- black-translucent:standalone 下内容延伸到状态栏后面,舞台用满整块屏;安全区由 .f4-safe-area 处理 -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- default:iPadOS 26 在 black-translucent 下把状态栏高度(32pt)从布局视口里扣掉却仍把内容画到状态栏下面,
+         结果屏幕底部露出一条 32pt 画布色横带(2026-09-11 真机诊断:innerHeight 788 / 屏幕 820 / safe-area-top 32)。
+         改回 default 让 WebView 排在状态栏下方、贴到屏幕底边;状态栏本身用 theme-color 的天空色与背景衔接。 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <!-- 与 --f4-sky 一致:standalone 的不透明状态栏按它着色,和农场背景顶部的天空衔接 -->
+    <meta name="theme-color" content="#bfe5f7" />
     <meta name="apple-mobile-web-app-title" content="皮皮のEnglish" />
     <link rel="icon" type="image/png" href="%BASE_URL%icon-192.png" />
     <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon-v2.png" />

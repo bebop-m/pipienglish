@@ -6,7 +6,7 @@ import {
   incubationHatcheryVisualState,
 } from '../../../domain/hatcheryVisual'
 import type { HatcheryVisualState } from '../../../domain/farmScenes'
-import { SCENE_ELEMENT_LAYOUTS } from '../../../domain/farmLayout'
+import { fixedVisualLayout, SCENE_ELEMENT_LAYOUTS } from '../../../domain/farmLayout'
 import type { FarmHomeEvent, FarmHomeViewModel } from '../../../application/viewmodel'
 import { f4AssetUrl } from '../assetUrl'
 import { approvedBgmTrack } from '../audio/bgmTracks'
@@ -614,18 +614,26 @@ export function FarmHomeDaily({ vm, dispatch }: FarmHomeDailyProps) {
         </StageDraggable>}
 
         {vm.viewedScene.fixedVisuals.map(visual => (
-          <img
-            className="scene-fixed-visual-f4"
-            key={visual.id}
-            src={f4AssetUrl(visual.assetId)}
-            alt={visual.alt}
-            style={{
-              left: visual.renderBox.x,
-              top: visual.renderBox.y,
-              width: visual.renderBox.width,
-              height: visual.renderBox.height,
-            }}
-          />
+          <StageDraggable
+            key={`${vm.viewedSceneId}:${visual.id}`}
+            className="scene-fixed-visual-wrap-f4"
+            ariaLabel={`可拖动的${visual.alt}`}
+            elementId={visual.id}
+            layout={fixedVisualLayout(visual.renderBox)}
+            home={vm.sceneElementHomes[visual.id] ?? null}
+            defaultHome={{ x: visual.renderBox.x, y: visual.renderBox.y }}
+            onPlaced={home => dispatch({ type: 'SCENE_ELEMENT_PLACED', elementId: visual.id, home })}
+          >
+            <button
+              data-stage-drag-handle
+              className="scene-fixed-visual-handle-f4"
+              type="button"
+              aria-label={`拖动${visual.alt}`}
+              style={{ width: visual.renderBox.width, height: visual.renderBox.height }}
+            >
+              <img className="scene-fixed-visual-f4" src={f4AssetUrl(visual.assetId)} alt="" draggable={false} />
+            </button>
+          </StageDraggable>
         ))}
         <FarmDecorations vm={vm} layer="back" dispatch={dispatch} />
         <FarmDecorations vm={vm} layer="actor" dispatch={dispatch} />

@@ -70,11 +70,16 @@ import {
 } from '../../domain/farmCustomization'
 import type { CharacterLoadout } from '../../domain/farmCatalog'
 import {
+  fixedVisualLayout,
+  MOVABLE_FARM_ELEMENT_IDS,
   normalizeSceneElementHomes,
-  resolveSceneElementHome,
+  resolveElementHome,
+  SCENE_ELEMENT_LAYOUTS,
   sceneElementHomesKey,
   type MovableFarmElementId,
+  type SceneElementLayout,
 } from '../../domain/farmLayout'
+import { lessonProgressKey } from './lesson'
 
 const CHAT_NEIGHBOR_CAP = 3
 const CHAT_TTL_MS = 4_000
@@ -197,6 +202,21 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
     return getKV(d, 'loadout', defaultCharacterLoadout())
   }
 
+  /** 场景固定装置(路牌、驿站…)的拖动布局表:id → renderBox 契约 */
+  function fixedVisualLayouts(scene: FarmSceneDefinition): Record<string, SceneElementLayout> {
+    return Object.fromEntries(scene.fixedVisuals.map(visual => [visual.id, fixedVisualLayout(visual.renderBox)]))
+  }
+
+  function sceneElementLayout(scene: FarmSceneDefinition, elementId: string): SceneElementLayout | null {
+    if ((MOVABLE_FARM_ELEMENT_IDS as readonly string[]).includes(elementId)) {
+      return SCENE_ELEMENT_LAYOUTS[elementId as MovableFarmElementId]
+    }
+    return fixedVisualLayouts(scene)[elementId] ?? null
+  }
+
+  const sameIds = (left: readonly string[], right: readonly string[]) =>
+    left.length === right.length && left.every((id, index) => id === right[index])
+
   /** 时钟守卫:起步词播种 + 孵化结算 + 今日会话保障。启动/回前台/60s 间隔调用,幂等 */
   async function clockGuard(now = sources.now()): Promise<{
     hatched: number
@@ -232,9 +252,21 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
 
     const today = dayKeyOf(now)
     let sessionRebuilt = false
-    if (!(await d.sessions.get(today))) {
+    const existing = await d.sessions.get(today)
+    if (!existing) {
       await d.sessions.put(await buildTodaySession(today, now))
       sessionRebuilt = true
+    } else if (!existing.completed && existing.doneCount === 0 && existing.answered === 0) {
+      // 还没动过的会话按当前规则重排:规则升级(F4-CHG-034 的 2+12)当天就生效,
+      // 当天新到期的词也能进队列;一旦答过一题就不再动它,断点不受影响
+      const fresh = await buildTodaySession(today, now)
+      if (!sameIds(fresh.reviewIds, existing.reviewIds) || !sameIds(fresh.newIds, existing.newIds)) {
+        await d.transaction('rw', d.sessions, d.kv, async () => {
+          await d.sessions.put({ ...fresh, gameEggs: existing.gameEggs })
+          await d.kv.delete(lessonProgressKey(today))
+        })
+        sessionRebuilt = true
+      }
     }
     return { hatched, hatchedChickId, sessionRebuilt }
   }
@@ -593,21 +625,25 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
     })
   }
 
+  /** 四类核心物件与场景固定装置的落点持久化(1194×834 逻辑坐标),按场景分开保存 */
   async function placeSceneElement(
-    elementId: MovableFarmElementId,
+    elementId: string,
     home: StagePoint,
     now = sources.now(),
     sceneId?: string,
   ): Promise<boolean> {
-    const clampedHome = resolveSceneElementHome(elementId, home)
-    if (!clampedHome) return false
+    if (!Number.isFinite(home.x) || !Number.isFinite(home.y)) return false
     return d.transaction('rw', d.kv, async () => {
       const farm = await getFarm(now)
       const scene = enteredScene(farm, sceneId)
       if (!scene) return false
+      const layout = sceneElementLayout(scene, elementId)
+      if (!layout) return false
+      const resolved = resolveElementHome(layout, home)
+      if (!resolved) return false
       const key = sceneElementHomesKey(scene.id)
-      const current = normalizeSceneElementHomes(await getKV<unknown>(d, key, {}))
-      await setKV(d, key, { ...current, [elementId]: clampedHome })
+      const current = normalizeSceneElementHomes(await getKV<unknown>(d, key, {}), fixedVisualLayouts(scene))
+      await setKV(d, key, { ...current, [elementId]: resolved })
       return true
     })
   }
@@ -745,7 +781,7 @@ export function createFarmUsecases(d: PipiDB, sourceOverrides: Partial<FarmUseca
       decorationRows,
       ownedCosmetics,
       loadout,
-      sceneElementHomes: normalizeSceneElementHomes(sceneElementHomes),
+      sceneElementHomes: normalizeSceneElementHomes(sceneElementHomes, fixedVisualLayouts(viewedScene)),
       cosmeticDefinitions: sources.cosmeticDefinitions,
       includeInternalPlaceholders: sources.includeInternalPlaceholders,
     }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { FarmChickVM, FarmHomeEvent, FarmHomeViewModel } from '../../../application/viewmodel'
 import type { StagePoint } from '../../../domain/types'
-import { clampSceneElementHome, SCENE_ELEMENT_LAYOUTS } from '../../../domain/farmLayout'
+import { boxAvoidsKeepouts, clampBoxToStage, clampSceneElementHome, SCENE_ELEMENT_LAYOUTS, STAGE_DRAG_INSETS } from '../../../domain/farmLayout'
 import { f4AssetUrl } from '../assetUrl'
 import { STAGE_H, STAGE_W, toStagePoint } from '../stage/stagePoint'
 import { chickAssetId, chickCanvasSize, specialChickHome } from './chickVisual'
@@ -48,11 +48,12 @@ function randomBetween(min: number, max: number) {
 function actorZone(kind: ActorKind, home: StagePoint, size: ActorSpec['size']) {
   const radiusX = kind === 'chick' ? 125 : 110
   const radiusY = kind === 'chick' ? 86 : 72
+  // 散步区跟着落点走(整页可拖后落点可能在上半屏);只不进顶部工具栏、不出舞台
   return {
-    minX: Math.max(330, home.x - radiusX),
-    maxX: Math.min(STAGE_W - size.width - 18, home.x + radiusX),
-    minY: Math.max(365, home.y - radiusY),
-    maxY: Math.min(STAGE_H - size.height - 8, home.y + radiusY),
+    minX: Math.max(STAGE_DRAG_INSETS.left, home.x - radiusX),
+    maxX: Math.max(STAGE_DRAG_INSETS.left, Math.min(STAGE_W - size.width - STAGE_DRAG_INSETS.right, home.x + radiusX)),
+    minY: Math.max(STAGE_DRAG_INSETS.top, home.y - radiusY),
+    maxY: Math.max(STAGE_DRAG_INSETS.top, Math.min(STAGE_H - size.height - STAGE_DRAG_INSETS.bottom, home.y + radiusY)),
   }
 }
 
@@ -161,7 +162,13 @@ function FarmActor({
       timerRef.current = window.setTimeout(async () => {
         if (disposed) return
         const zone = actorZone(spec.kind, spec.home, spec.size)
-        await moveTo({ x: randomBetween(zone.minX, zone.maxX), y: randomBetween(zone.minY, zone.maxY) })
+        // 散步目标不进任务卡/右下按钮组背后(否则走过去就看不见了);抽不到就原地等下一轮
+        let target: StagePoint | null = null
+        for (let attempt = 0; attempt < 6 && !target; attempt += 1) {
+          const candidate = { x: randomBetween(zone.minX, zone.maxX), y: randomBetween(zone.minY, zone.maxY) }
+          if (boxAvoidsKeepouts(spec.size, candidate)) target = candidate
+        }
+        if (target) await moveTo(target)
         if (!disposed) schedule()
       }, randomBetween(2600, 5600))
     }
@@ -236,10 +243,7 @@ function FarmActor({
     if (!point || !actor) return
     const raw = { x: point.x - drag.offset.x, y: point.y - drag.offset.y }
     const next = spec.kind === 'chick'
-      ? {
-          x: Math.min(STAGE_W - spec.size.width - 18, Math.max(18, raw.x)),
-          y: Math.min(STAGE_H - spec.size.height - 10, Math.max(300, raw.y)),
-        }
+      ? clampBoxToStage(spec.size, raw)
       : clampSceneElementHome(spec.kind === 'mother' ? 'mother' : 'xiaopi', raw)
     if (!next) return
     if (Math.hypot(point.x - drag.start.x, point.y - drag.start.y) > 8) drag.moved = true

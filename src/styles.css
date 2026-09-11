@@ -24,7 +24,9 @@ html {
 body {
   overflow: hidden;
   font-family: system-ui, sans-serif;
-  background: #bfe5f7;
+  /* WebKit 的「页面外延背景色」是 html 与 body 背景叠加后的颜色,body 不透明的天蓝会盖掉 html 的草地色,
+     所以 body 也必须走同一个变量(2026-09-11 iPad 真机:横带仍是天蓝的原因) */
+  background: var(--f4-canvas, #bfe5f7);
   color: #222;
 }
 

@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest'
 import { getFarmStateV3, PipiDB, setFarmStateV3, setKV } from './db'
 import { createFarmUsecases } from './usecases/farmHome'
 import { sceneElementHomesKey } from '../domain/farmLayout'
+import { dayKeyOf } from '../domain/time'
+import { NEW_PER_DAY } from '../domain/dailyPlan'
 import { HATCH_MS } from '../domain/types'
 import { persistedChickWithDefaults } from './farmPersistence'
 import { FARM_SCENE_DEFINITIONS, FUTURE_FARM_SCENE_DRAFTS } from '../domain/farmScenes'
@@ -234,7 +236,7 @@ describe('首页三状态与蛋经济全链路', () => {
     expect((await uc.loadViewModel()).sceneElementHomes).toEqual(sceneOneHomes)
 
     expect(await uc.placeSceneElement('mother', { x: -50_000, y: 50_000 }, undefined, 'scene-1')).toBe(true)
-    const clampedSceneOneHomes = { ...sceneOneHomes, mother: { x: 18, y: 604 } }
+    const clampedSceneOneHomes = { ...sceneOneHomes, mother: { x: 8, y: 610 } } // 整页可拖:只留 8/4pt 舞台边
     expect((await uc.loadViewModel()).sceneElementHomes).toEqual(clampedSceneOneHomes)
 
     const farm = await getFarmStateV3(db, { now: Date.now(), today: '2026-07-22' })
@@ -254,6 +256,49 @@ describe('首页三状态与蛋经济全链路', () => {
 
     await setKV(db, sceneElementHomesKey('scene-1'), { hatchery: { x: 12, y: 200 } })
     expect((await uc.loadViewModel()).sceneElementHomes.hatchery).toEqual({ x: 12, y: 460 })
+    db.close()
+  })
+
+  it('场景固定装置(路牌/驿站)也按场景持久化落点,未知 id 拒绝', async () => {
+    const db = freshDb()
+    const uc = createFarmUsecases(db)
+    await uc.clockGuard()
+    const farm = await getFarmStateV3(db, { now: Date.now(), today: '2026-09-11' })
+    await setFarmStateV3(db, { ...farm, activeSceneId: 'scene-2', acknowledgedSceneChapter: 2 })
+
+    expect(await uc.placeSceneElement('scene-2-travel-sign', { x: 900, y: 300 }, undefined, 'scene-2')).toBe(true)
+    expect(await uc.placeSceneElement('scene-2-nonexistent', { x: 900, y: 300 }, undefined, 'scene-2')).toBe(false)
+    // 拖到左上角任务卡背后:推回可点区域;拖出舞台:钳回
+    expect(await uc.placeSceneElement('scene-2-apple-juice-station', { x: 30, y: 100 }, undefined, 'scene-2')).toBe(true)
+    const homes = (await uc.loadViewModel(undefined, 'scene-2')).sceneElementHomes
+    expect(homes['scene-2-travel-sign']).toEqual({ x: 900, y: 300 })
+    const station = homes['scene-2-apple-juice-station']!
+    expect(station.x + 336 <= 24 || station.x >= 418 || station.y >= 460).toBe(true)
+    // 场景 1 没有这些装置,也不会串场
+    expect((await uc.loadViewModel(undefined, 'scene-1')).sceneElementHomes['scene-2-travel-sign']).toBeUndefined()
+    db.close()
+  })
+
+  it('还没开始的今日会话按当前规则重排;一旦答过题就不再动', async () => {
+    const db = freshDb()
+    const uc = createFarmUsecases(db)
+    const t0 = Date.now()
+    await uc.clockGuard(t0)
+    const today = dayKeyOf(t0)
+
+    // 模拟旧规则留下的「暂停日」会话:没有新词、复习也只有 0 张,且还没动过
+    const stale = (await db.sessions.get(today))!
+    await db.sessions.put({ ...stale, newIds: [], reviewIds: [] })
+    await setKV(db, `lesson:${today}`, { version: 1, date: today, steps: [], cursor: 0, answered: 0, correct: 0, forgotten: [] })
+    expect((await uc.clockGuard(t0)).sessionRebuilt).toBe(true)
+    const rebuilt = (await db.sessions.get(today))!
+    expect(rebuilt.newIds).toHaveLength(NEW_PER_DAY)
+    expect(await db.kv.get(`lesson:${today}`)).toBeUndefined()
+
+    // 已经答过一题:即使计划和现在不同也保持不动
+    await db.sessions.put({ ...rebuilt, newIds: [], doneCount: 1 })
+    expect((await uc.clockGuard(t0)).sessionRebuilt).toBe(false)
+    expect((await db.sessions.get(today))!.newIds).toEqual([])
     db.close()
   })
 

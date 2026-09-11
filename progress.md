@@ -11,6 +11,7 @@ Original prompt: 批准按建议参数进行代码接入，暂不发布场景二
 - 资产瘦身:56 张母版 PNG 移入 `design-samples/assets/f4-production-masters/`(只读),生产目录改为按显示尺寸 2× 缩放的 WebP,离线包 58 MB → 约 3 MB;`assetUrl.ts` 统一把 `.png` 逻辑 ID 映射到 `.webp`,领域层 ID 与存档不变。`scripts/optimize-f4-assets.py` 可重跑,`--check` 校验清单。
 - 门禁:`check:visual-references` 移出 `npm run build` 与 CI(今天上线曾因任务文档路径失败一次),改为美术任务前手动跑;执行预算政策改为「直接推 main」与 hotfix 通道。
 - 验证:`tsc` 干净,vitest 全绿,GitHub Pages 构建通过,浏览器实测见 F4-CHG-035。
+- 下午追加(真机复查后):状态栏改回 `default` + 天空色 theme-color 根治 iPadOS 26 底部横带;贴纸 `<img>` 不再接收触摸(iPad 拖不动的根因);拖动范围扩到整个首页(只避开顶部工具栏与任务卡/按钮组),路牌、驿站等固定装置也可拖动并按场景保存;未开始的今日会话按新规则重排,2+12 当天生效。
 
 ## 2026-07-19 · 长期农场场景 1 发布收口
 

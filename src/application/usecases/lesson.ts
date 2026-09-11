@@ -15,7 +15,9 @@ import { dayKeyOf } from '../../domain/time'
 import { WORDS, WORD_MAP } from '../../domain/words'
 import { assembleLessonVM, type LessonViewModel } from '../lessonViewModel'
 
-const kvKey = (date: string) => `lesson:${date}`
+/** 今日课程断点的 kv 键;farmHome.clockGuard 重建未开始的会话时也要清掉它 */
+export const lessonProgressKey = (date: string) => `lesson:${date}`
+const kvKey = lessonProgressKey
 
 export interface LessonDeps {
   /** 注入 farmHome 用例的 completeDailyLesson(发蛋 + 连胜,幂等),避免规则两处实现 */

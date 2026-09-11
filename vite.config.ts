@@ -34,7 +34,7 @@ export default defineConfig({
         lang: 'zh-CN',
         start_url: './',
         scope: './',
-        theme_color: '#ffe382',
+        theme_color: '#bfe5f7', // 与 --f4-sky 一致:standalone 的不透明状态栏用它着色,和背景顶部的天空衔接
         background_color: '#faf3e4',
         display: 'standalone',
         orientation: 'landscape',

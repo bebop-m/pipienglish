@@ -41,7 +41,7 @@ import {
   type OwnedCosmeticRow,
 } from './farmPersistence'
 import type { CharacterLoadout } from '../domain/farmCatalog'
-import type { MovableFarmElementId, SceneElementHomes } from '../domain/farmLayout'
+import type { SceneElementHomes } from '../domain/farmLayout'
 
 export type FarmHomeState = 'first_visit' | 'daily_incomplete' | 'daily_complete'
 export type FarmOverlay =
@@ -231,7 +231,7 @@ export type FarmHomeEvent =
   | { type: 'CHICK_CHAT'; chickId: string; neighborIds: string[] }
   | { type: 'CHAT_DISMISSED' }
   | { type: 'CHICK_PLACED'; chickId: string; home: StagePoint }
-  | { type: 'SCENE_ELEMENT_PLACED'; elementId: MovableFarmElementId; home: StagePoint }
+  | { type: 'SCENE_ELEMENT_PLACED'; elementId: string; home: StagePoint } // 四类核心物件 id 或场景固定装置 id
   | { type: 'SET_MOTION'; enabled: boolean }
   | { type: 'SET_MUSIC'; enabled: boolean }
   | { type: 'OPEN_PARENT' }

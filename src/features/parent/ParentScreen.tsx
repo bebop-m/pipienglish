@@ -175,6 +175,15 @@ function StreakCalendar({ sessions, today }: { sessions: DailySession[]; today: 
 
 export function ParentScreen({ onExit }: { onExit: () => void }) {
   const [unlocked, setUnlocked] = useState(false)
+
+  // 家长页也把画布底色设成自己的米色,视口外的横带不再是天蓝
+  useEffect(() => {
+    const root = document.documentElement
+    root.style.setProperty('--f4-canvas', '#f6f2ea')
+    return () => {
+      root.style.removeProperty('--f4-canvas')
+    }
+  }, [])
   const [data, setData] = useState<LoadedData | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)

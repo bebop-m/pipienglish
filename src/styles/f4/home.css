@@ -746,12 +746,35 @@
   filter: drop-shadow(0 4px 3px rgba(77, 45, 26, 0.18));
 }
 
-.scene-fixed-visual-f4 {
+.scene-fixed-visual-wrap-f4 {
   position: absolute;
   z-index: 15;
+}
+
+.scene-fixed-visual-handle-f4 {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+}
+
+.scene-fixed-visual-handle-f4:focus-visible { outline: 5px solid rgba(255, 255, 255, 0.94); outline-offset: -12px; border-radius: 24px; }
+
+.scene-fixed-visual-f4 {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   pointer-events: none;
   filter: drop-shadow(0 7px 6px rgba(48, 41, 37, 0.14));
+  transition: transform 180ms ease;
+}
+
+.stage-draggable-f4.is-dragging .scene-fixed-visual-f4 {
+  transform: translateY(-7px) scale(1.03);
+  filter: drop-shadow(0 15px 8px rgba(48, 41, 37, 0.22));
 }
 
 .hatchery-status-f4 {
@@ -1116,6 +1139,9 @@
   height: 100%;
   object-fit: contain;
   transform: translateZ(0);
+  /* 指针事件一律落在按钮上:iPad 上以 <img> 为目标的触摸会被系统当成图片拖拽/长按而取消 pointer 序列 */
+  pointer-events: none;
+  touch-action: none;
   -webkit-user-drag: none;
   user-select: none;
 }

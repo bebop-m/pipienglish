@@ -46,12 +46,25 @@ visual_owner_review: pending-codex (完成卡新增一行守护卡文案、家�
 - CI 去掉独立的 check 步骤(build 内部仍跑守卫)。
 - `EXECUTION_BUDGET_POLICY.md` §3 改为「直接推 main」,新增 §3a hotfix 通道。
 
-## 4. 未做(留给 Codex / 后续)
+## 3a. 2026-09-11 下午追加(爸爸看真机截图后:「还是有个条」「装饰贴图无法拖动」「拖动范围扩大到整个首页」)
 
-- 孵化倒计时标签仍贴舞台底边、压鸡窝 17px(Codex 视觉)。
+家长页设备诊断读数:innerHeight 788、屏幕 820、safe-area top 32 / bottom 20、standalone、iPadOS 26(Safari 26.6.1)。
+
+| 反馈 | 根因 | 修法 |
+|---|---|---|
+| 底部横带还在,而且还是天蓝 | iPadOS 26 在 `black-translucent` 下把状态栏高度 32pt 从布局视口里扣掉却仍把内容画到状态栏下面,底部 32pt 没有任何页面内容;WebKit 的页面外延背景色 = html 与 body 背景叠加,body 不透明的天蓝盖掉了 html 的草地色 | `index.html` 状态栏改回 `default`(WebView 排在状态栏下方、贴到屏幕底边),`theme-color` 与 manifest `theme_color` 改为天空色 `#bfe5f7` 让状态栏与背景顶部衔接;`body` 背景也走 `--f4-canvas`;家长页把画布设为自己的米色 |
+| 装饰贴图无法拖动(iPad) | 贴纸按钮里的 `<img>` 直接接收触摸,iPadOS 把以图片为目标的触摸当成图片拖拽/长按而取消 pointer 序列;小鸡/鸡窝的图片一直是 `pointer-events: none` 所以没事 | `.farm-decoration-f7 img { pointer-events: none }`;苹果汁驿站、路牌这类场景固定装置本来就不可拖,现在也做成可拖动(`StageDraggable` 接受任意 id + 布局,落点按场景保存在 `scene-element-homes:<scene>`) |
+| 拖动范围太小 | 母鸡/小皮限 y ≥ 300,鸡窝/救援框 y ≥ 180,小鸡 y ≥ 300,贴纸只能放在下半场 | 统一为 `STAGE_DRAG_INSETS`(8/80/8/4):整个首页可拖,只不进顶部工具栏;贴纸 `placementBounds` 由显示框推导覆盖全舞台;小鸡散步区跟着落点走并避开任务卡/按钮组;「摆出来」起点放在下半场草地 |
+| 今天(DAY 38)还是旧的 6 复习 0 新词 | 当天会话在更新前已由旧规则建好,新代码只在会话不存在时才建 | `clockGuard` 对「还没答过题」的会话按当前规则重排(并清掉空的课程断点);答过一题就不再动 |
+
+验证:vitest 49 文件 304/304;浏览器 1180×820:路牌、母鸡、异色小鸡都能拖到顶部工具栏正下方(y=80),三种稀有度小鸡 WebP 全部正常渲染,守护卡文案正常。
+
+## 4. 未做(留给后续)
+
+- 孵化倒计时标签仍贴舞台底边、压鸡窝 17px。
 - 中层装饰永远在角色后面(深度排序未做)。
 - 按场景独立穿戴(`kv.sceneLoadouts`)与分层角色母版:架构债,另立任务。
-- 底部横带根因待家长页诊断面板读数确认;画布底色只是兜底。
+- 底部横带根因已由诊断面板读数确认并在 §3a 处理;若 `default` 状态栏在 iPadOS 26 上仍留缝,画布底色兜底为草地色。
 
 ## 5. 验证
 
